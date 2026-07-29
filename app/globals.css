@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+  color: #172033;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: #fbbf24;
+  color: #10234f;
+}
+
+.container-site {
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.section-space {
+  padding-block: 5rem;
+}
+
+.hero-overlay {
+  background:
+    linear-gradient(90deg, rgba(6, 18, 43, 0.94) 0%, rgba(9, 28, 63, 0.82) 45%, rgba(9, 28, 63, 0.2) 100%),
+    linear-gradient(0deg, rgba(6, 18, 43, 0.35), rgba(6, 18, 43, 0.35));
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  .section-space {
+    padding-block: 3.75rem;
+  }
+}
