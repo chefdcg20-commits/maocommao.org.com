@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import { FiHeart, FiMenu, FiX } from 'react-icons/fi';
 
@@ -18,9 +19,16 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="container-site flex min-h-20 items-center justify-between gap-4">
+      <div className="container-site flex min-h-24 items-center justify-between gap-4">
         <a href="#inicio" className="focus-ring flex items-center gap-3 rounded-md" aria-label="Ir para o início">
-          <span className="grid h-11 w-11 place-items-center rounded-full bg-brand-800 text-xl font-black text-white">MM</span>
+          <Image
+            src="/images/logo-mao-com-mao.jpg"
+            alt="Logotipo Mão com Mão Jiu-Jitsu"
+            width={72}
+            height={72}
+            priority
+            className="h-16 w-16 shrink-0 rounded-full object-cover sm:h-[4.5rem] sm:w-[4.5rem]"
+          />
           <span>
             <strong className="block text-lg leading-none text-brand-900">MÃO COM MÃO</strong>
             <small className="text-[0.68rem] font-bold tracking-[0.2em] text-brand-600">PROJETO SOCIAL</small>
