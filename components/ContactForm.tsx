@@ -1,31 +1,37 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
-import { FiCheckCircle, FiSend } from 'react-icons/fi';
+import { FormEvent } from 'react';
+import { FaWhatsapp } from 'react-icons/fa';
+
+const DANIEL_WHATSAPP = '5511982984625';
 
 export function ContactForm() {
-  const [sent, setSent] = useState(false);
-
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSent(true);
-  }
+    const form = new FormData(event.currentTarget);
+    const message = [
+      'Olá, Daniel! Vim pelo site do Projeto Mão com Mão.',
+      '',
+      `Nome: ${form.get('nome')}`,
+      `Contato: ${form.get('contato')}`,
+      `Assunto: ${form.get('assunto')}`,
+      '',
+      `Mensagem: ${form.get('mensagem')}`
+    ].join('\n');
 
-  if (sent) {
-    return (
-      <div className="rounded-2xl bg-emerald-50 p-8 text-center text-emerald-900" role="status">
-        <FiCheckCircle className="mx-auto mb-3 text-4xl" aria-hidden />
-        <h3 className="text-xl font-black">Mensagem preparada!</h3>
-        <p className="mt-2 text-sm">Na publicação definitiva, este formulário poderá ser conectado ao e-mail oficial ou ao WhatsApp do projeto.</p>
-        <button type="button" onClick={() => setSent(false)} className="focus-ring mt-5 rounded-lg bg-emerald-700 px-5 py-3 font-bold text-white">
-          Enviar outra mensagem
-        </button>
-      </div>
+    window.open(
+      `https://wa.me/${DANIEL_WHATSAPP}?text=${encodeURIComponent(message)}`,
+      '_blank',
+      'noopener,noreferrer'
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4 rounded-3xl bg-white p-6 shadow-soft md:p-8">
+      <div className="rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
+        <strong className="block">Resposta rápida pelo WhatsApp</strong>
+        Ao enviar, sua mensagem será aberta diretamente no WhatsApp do secretário Daniel Guedes.
+      </div>
       <div className="grid gap-4 md:grid-cols-2">
         <label className="grid gap-2 text-sm font-bold text-slate-700">
           Nome
@@ -51,7 +57,7 @@ export function ContactForm() {
         <textarea required name="mensagem" rows={5} className="focus-ring resize-y rounded-xl border border-slate-300 px-4 py-3 font-normal" placeholder="Conte como podemos ajudar." />
       </label>
       <button type="submit" className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl bg-brand-700 px-6 py-4 font-black text-white transition hover:bg-brand-800">
-        <FiSend aria-hidden /> Enviar mensagem
+        <FaWhatsapp aria-hidden className="text-xl" /> Enviar pelo WhatsApp
       </button>
     </form>
   );

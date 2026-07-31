@@ -5,15 +5,19 @@ import {
   FiCalendar,
   FiCheck,
   FiChevronRight,
+  FiExternalLink,
+  FiFacebook,
   FiFileText,
   FiGift,
   FiHeart,
   FiHome,
+  FiInstagram,
   FiMapPin,
   FiShield,
   FiTarget,
   FiUsers
 } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { Header } from '@/components/Header';
 import { ContactForm } from '@/components/ContactForm';
 
@@ -211,9 +215,40 @@ export default function Home() {
       </section>
 
       <section id="contato" className="section-space bg-brand-50">
-        <div className="container-site grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-          <div><p className="font-black uppercase tracking-[0.2em] text-brand-600">Contato</p><h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Vamos construir essa transformação juntos.</h2><p className="mt-5 leading-relaxed text-slate-600">Entre em contato para conhecer as aulas, apoiar uma ação, oferecer uma parceria ou participar do projeto.</p><div className="mt-7 grid gap-4"><div className="flex gap-3"><FiMapPin className="mt-1 text-brand-700" /><p><strong className="block text-brand-900">Ginásio Poliesportivo Rômulo Duncan Arantes</strong><span className="text-sm text-slate-600">Av. Casa Grande, 485 — Diadema, SP.</span></p></div><div className="flex gap-3"><FiHome className="mt-1 text-brand-700" /><p><strong className="block text-brand-900">Espaço próprio</strong><span className="text-sm text-slate-600">Uma das metas prioritárias para a próxima fase.</span></p></div></div></div>
-          <ContactForm />
+        <div className="container-site">
+          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+            <div><p className="font-black uppercase tracking-[0.2em] text-brand-600">Contato</p><h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Vamos construir essa transformação juntos.</h2><p className="mt-5 leading-relaxed text-slate-600">Entre em contato para conhecer as aulas, apoiar uma ação, oferecer uma parceria ou participar do projeto.</p><div className="mt-7 grid gap-4"><div className="flex gap-3"><FiMapPin className="mt-1 text-brand-700" /><p><strong className="block text-brand-900">Ginásio Poliesportivo Rômulo Duncan Arantes</strong><span className="text-sm text-slate-600">Av. Casa Grande, 485 — Diadema, SP.</span></p></div><div className="flex gap-3"><FiHome className="mt-1 text-brand-700" /><p><strong className="block text-brand-900">Espaço próprio</strong><span className="text-sm text-slate-600">Uma das metas prioritárias para a próxima fase.</span></p></div></div></div>
+            <ContactForm />
+          </div>
+
+          <div className="mt-10 grid items-center gap-7 overflow-hidden rounded-[2rem] bg-brand-900 p-6 text-white shadow-soft sm:p-8 md:grid-cols-[auto_1fr]">
+            <a
+              href="https://chat.whatsapp.com/HKVWuTNfP1XImKgvemIzGs?s=cl&p=a&ilr=1&amv=0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="focus-ring mx-auto rounded-2xl bg-white p-3"
+              aria-label="Abrir o grupo do Projeto Mão com Mão no WhatsApp"
+            >
+              <Image
+                src="/images/qr-grupo-whatsapp.png"
+                alt="QR Code para entrar no grupo do Projeto Mão com Mão no WhatsApp"
+                width={190}
+                height={190}
+                className="h-44 w-44 sm:h-48 sm:w-48"
+              />
+            </a>
+            <div>
+              <p className="flex items-center gap-2 font-black uppercase tracking-[0.2em] text-gold"><FiUsers aria-hidden /> Nossa comunidade</p>
+              <h3 className="mt-3 text-2xl font-black sm:text-3xl">Entre no grupo e acompanhe o projeto de perto.</h3>
+              <p className="mt-3 max-w-2xl text-blue-100">Aponte a câmera do celular para o QR Code ou use os botões abaixo para participar do grupo, falar com Daniel e acompanhar nossas redes sociais.</p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a href="https://chat.whatsapp.com/HKVWuTNfP1XImKgvemIzGs?s=cl&p=a&ilr=1&amv=0" target="_blank" rel="noopener noreferrer" className="focus-ring inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 font-black text-slate-950 transition hover:bg-emerald-400"><FaWhatsapp aria-hidden className="text-xl" /> Entrar no grupo <FiExternalLink aria-hidden /></a>
+                <a href="https://wa.me/5511982984625" target="_blank" rel="noopener noreferrer" className="focus-ring inline-flex items-center gap-2 rounded-xl border border-white/30 px-5 py-3 font-black text-white transition hover:bg-white hover:text-brand-900"><FaWhatsapp aria-hidden className="text-xl" /> Falar com Daniel</a>
+                <a href="https://www.instagram.com/mao.com.mao?igsh=YW1wcGcyd2w2MzR2" target="_blank" rel="noopener noreferrer" className="focus-ring inline-flex items-center gap-2 rounded-xl border border-white/30 px-5 py-3 font-black text-white transition hover:bg-white hover:text-brand-900" aria-label="Instagram do Projeto Mão com Mão"><FiInstagram aria-hidden className="text-xl" /> Instagram</a>
+                <a href="https://www.facebook.com/share/1Pf1rx1mYQ/" target="_blank" rel="noopener noreferrer" className="focus-ring inline-flex items-center gap-2 rounded-xl border border-white/30 px-5 py-3 font-black text-white transition hover:bg-white hover:text-brand-900" aria-label="Facebook do Projeto Mão com Mão"><FiFacebook aria-hidden className="text-xl" /> Facebook</a>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
