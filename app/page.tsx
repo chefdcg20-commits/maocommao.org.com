@@ -20,7 +20,7 @@ import { ContactForm } from '@/components/ContactForm';
 const team = [
   ['Joaquim Guedes', 'Presidente e mestre'],
   ['Daniel Guedes', 'Secretário e professor'],
-  ['Tamires Guedes', 'Tesoureira'],
+  ['Thamires Guedes', 'Tesoureira'],
   ['Marconi Zovico', 'Professor'],
   ['Luizão', 'Professor'],
   ['Marcos', 'Professor']
