@@ -27,9 +27,13 @@ const team = [
 ];
 
 const galleryImages = [
-  ['gallery-1.jpg', 'Registro das atividades do projeto 1'],
-  ['gallery-2.jpg', 'Registro das atividades do projeto 2'],
-  ['gallery-3.jpg', 'Professores e alunos do Projeto Mão com Mão reunidos no tatame']
+  { file: 'gallery-1.jpg', alt: 'Registro das atividades do projeto 1', fit: 'cover' },
+  { file: 'gallery-2.jpg', alt: 'Registro das atividades do projeto 2', fit: 'cover' },
+  { file: 'gallery-3.jpg', alt: 'Professores e alunos do Projeto Mão com Mão reunidos no tatame', fit: 'contain' },
+  { file: 'gallery-4.jpg', alt: 'Alunos do Projeto Mão com Mão participando de uma atividade coletiva no tatame', fit: 'cover' },
+  { file: 'gallery-5.jpg', alt: 'Turma do Projeto Mão com Mão reunida com a bandeira do projeto', fit: 'cover' },
+  { file: 'gallery-6.jpg', alt: 'Professor registrando uma confraternização com alunos e familiares no tatame', fit: 'contain' },
+  { file: 'gallery-7.jpg', alt: 'Professores do Projeto Mão com Mão ao lado de uma aluna', fit: 'contain' }
 ];
 
 export default function Home() {
@@ -185,9 +189,9 @@ export default function Home() {
 
       <section className="section-space bg-slate-50" id="galeria">
         <div className="container-site">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="font-black uppercase tracking-[0.2em] text-brand-600">Galeria</p><h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Momentos que contam nossa história.</h2></div><p className="max-w-md text-slate-600">Substitua estas imagens pelas fotografias oficiais das aulas, ações e competições.</p></div>
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="font-black uppercase tracking-[0.2em] text-brand-600">Galeria</p><h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Momentos que contam nossa história.</h2></div><p className="max-w-md text-slate-600">Registros das aulas, encontros e conquistas vividas pela comunidade do Projeto Mão com Mão.</p></div>
           <div className="mt-9 grid gap-5 md:grid-cols-3">
-            {galleryImages.map(([file, alt]) => <div key={file} className="overflow-hidden rounded-3xl"><Image src={`/images/${file}`} alt={alt} width={700} height={520} className={`h-72 w-full transition duration-500 hover:scale-105 ${file === 'gallery-3.jpg' ? 'bg-slate-100 object-contain' : 'object-cover'}`} /></div>)}
+            {galleryImages.map(({ file, alt, fit }) => <div key={file} className="overflow-hidden rounded-3xl"><Image src={`/images/${file}`} alt={alt} width={700} height={520} className={`h-72 w-full transition duration-500 hover:scale-105 ${fit === 'contain' ? 'bg-slate-100 object-contain' : 'object-cover'}`} /></div>)}
           </div>
         </div>
       </section>
