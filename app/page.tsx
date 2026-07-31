@@ -1,5 +1,7 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import {
+  FiArrowRight,
   FiAward,
   FiBookOpen,
   FiCalendar,
@@ -184,6 +186,43 @@ export default function Home() {
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {team.map(([name, role]) => <article key={name} className="flex items-center gap-4 rounded-2xl border border-slate-200 p-5"><span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-brand-800 text-lg font-black text-white">{name.split(' ').map((part) => part[0]).slice(0,2).join('')}</span><div><h3 className="font-black text-brand-900">{name}</h3><p className="text-sm text-slate-500">{role}</p></div></article>)}
           </div>
+        </div>
+      </section>
+
+      <section id="diario" className="section-space bg-brand-900 text-white">
+        <div className="container-site">
+          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+            <div>
+              <p className="font-black uppercase tracking-[0.2em] text-gold">Notícias da comunidade</p>
+              <h2 className="mt-3 text-3xl font-black sm:text-5xl">Diário Mão Com Mão</h2>
+              <p className="mt-4 max-w-2xl leading-relaxed text-blue-100">Acompanhe comunicados, eventos e conquistas que fazem parte da rotina do nosso projeto.</p>
+            </div>
+            <Link href="/diario/" className="focus-ring inline-flex items-center gap-2 self-start rounded-xl border border-white/30 px-5 py-3 font-black text-white transition hover:bg-white hover:text-brand-900 md:self-auto">
+              Ver todas as notícias <FiArrowRight aria-hidden />
+            </Link>
+          </div>
+
+          <article className="mt-9 grid overflow-hidden rounded-[2rem] bg-white text-slate-800 shadow-soft lg:grid-cols-[1.05fr_0.95fr]">
+            <Image
+              src="/images/turma-patrocinio-2.jpg"
+              alt="Alunos e professores do Projeto Mão Com Mão reunidos no tatame"
+              width={900}
+              height={650}
+              className="h-full min-h-72 w-full object-cover"
+            />
+            <div className="p-7 sm:p-10">
+              <div className="flex flex-wrap items-center gap-3 text-sm font-bold">
+                <span className="rounded-full bg-gold px-3 py-1 text-brand-900">Comunicado</span>
+                <span className="flex items-center gap-2 text-slate-500"><FiCalendar aria-hidden /><time dateTime="2026-07-31">31 de julho de 2026</time></span>
+              </div>
+              <h3 className="mt-5 text-2xl font-black text-brand-900 sm:text-3xl">Volta às aulas de Jiu-jítsu — segundo semestre de 2026</h3>
+              <p className="mt-4 leading-relaxed text-slate-600">O Projeto Mão Com Mão retoma as aulas de Jiu-jítsu na quinta-feira, 6 de agosto.</p>
+              <div className="mt-5 rounded-2xl bg-brand-50 p-4 text-brand-900"><strong>06/08 · Quinta-feira</strong><span className="ml-2">Oss!</span></div>
+              <Link href="/diario/volta-as-aulas-segundo-semestre-2026/" className="focus-ring mt-6 inline-flex items-center gap-2 rounded-xl bg-brand-700 px-5 py-3 font-black text-white transition hover:bg-brand-800">
+                Ler comunicado <FiArrowRight aria-hidden />
+              </Link>
+            </div>
+          </article>
         </div>
       </section>
 

@@ -5,13 +5,14 @@ import { useState } from 'react';
 import { FiHeart, FiMenu, FiX } from 'react-icons/fi';
 
 const links = [
-  ['Quem somos', '#quem-somos'],
-  ['Aulas', '#aulas'],
-  ['Impacto', '#impacto'],
-  ['Ações', '#acoes'],
-  ['Equipe', '#equipe'],
-  ['Transparência', '#transparencia'],
-  ['Contato', '#contato']
+  ['Quem somos', '/#quem-somos'],
+  ['Aulas', '/#aulas'],
+  ['Impacto', '/#impacto'],
+  ['Ações', '/#acoes'],
+  ['Equipe', '/#equipe'],
+  ['Diário', '/diario/'],
+  ['Transparência', '/#transparencia'],
+  ['Contato', '/#contato']
 ];
 
 export function Header() {
@@ -20,7 +21,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="container-site flex min-h-24 items-center justify-between gap-4">
-        <a href="#inicio" className="focus-ring flex items-center gap-3 rounded-md" aria-label="Ir para o início">
+        <a href="/#inicio" className="focus-ring flex items-center gap-3 rounded-md" aria-label="Ir para o início">
           <Image
             src="/images/logo-mao-com-mao.jpg"
             alt="Logotipo Mão com Mão Jiu-Jitsu"
@@ -41,7 +42,7 @@ export function Header() {
               {label}
             </a>
           ))}
-          <a href="#doacao" className="focus-ring inline-flex items-center gap-2 rounded-full bg-gold px-5 py-3 text-sm font-black text-brand-900 transition hover:-translate-y-0.5 hover:shadow-lg">
+          <a href="/#doacao" className="focus-ring inline-flex items-center gap-2 rounded-full bg-gold px-5 py-3 text-sm font-black text-brand-900 transition hover:-translate-y-0.5 hover:shadow-lg">
             <FiHeart aria-hidden /> Doe agora
           </a>
         </nav>
@@ -65,7 +66,7 @@ export function Header() {
                 {label}
               </a>
             ))}
-            <a href="#doacao" onClick={() => setOpen(false)} className="focus-ring mt-3 rounded-lg bg-gold px-4 py-3 text-center font-black text-brand-900">
+            <a href="/#doacao" onClick={() => setOpen(false)} className="focus-ring mt-3 rounded-lg bg-gold px-4 py-3 text-center font-black text-brand-900">
               Fazer uma doação
             </a>
           </div>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://maocommao-org-com.vercel.app'),
   title: 'Projeto Social Mão com Mão | Jiu-jítsu e transformação social',
   description:
     'Projeto social de Diadema que utiliza o jiu-jítsu como instrumento de disciplina, acolhimento e transformação social.',
