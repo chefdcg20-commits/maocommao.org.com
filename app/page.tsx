@@ -26,6 +26,12 @@ const team = [
   ['Marcos', 'Professor']
 ];
 
+const galleryImages = [
+  ['gallery-1.jpg', 'Registro das atividades do projeto 1'],
+  ['gallery-2.jpg', 'Registro das atividades do projeto 2'],
+  ['gallery-3.jpg', 'Professores e alunos do Projeto Mão com Mão reunidos no tatame']
+];
+
 export default function Home() {
   return (
     <main>
@@ -181,7 +187,7 @@ export default function Home() {
         <div className="container-site">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="font-black uppercase tracking-[0.2em] text-brand-600">Galeria</p><h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Momentos que contam nossa história.</h2></div><p className="max-w-md text-slate-600">Substitua estas imagens pelas fotografias oficiais das aulas, ações e competições.</p></div>
           <div className="mt-9 grid gap-5 md:grid-cols-3">
-            {['gallery-1.jpg', 'gallery-2.jpg', 'gallery-3.jpg'].map((file, index) => <div key={file} className="overflow-hidden rounded-3xl"><Image src={`/images/${file}`} alt={`Registro das atividades do projeto ${index + 1}`} width={700} height={520} className="h-72 w-full object-cover transition duration-500 hover:scale-105" /></div>)}
+            {galleryImages.map(([file, alt]) => <div key={file} className="overflow-hidden rounded-3xl"><Image src={`/images/${file}`} alt={alt} width={700} height={520} className={`h-72 w-full transition duration-500 hover:scale-105 ${file === 'gallery-3.jpg' ? 'bg-slate-100 object-contain' : 'object-cover'}`} /></div>)}
           </div>
         </div>
       </section>
