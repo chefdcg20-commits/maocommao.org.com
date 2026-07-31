@@ -27,13 +27,9 @@ const team = [
 ];
 
 const galleryImages = [
-  { file: 'gallery-1.jpg', alt: 'Registro das atividades do projeto 1', fit: 'cover' },
-  { file: 'gallery-2.jpg', alt: 'Registro das atividades do projeto 2', fit: 'cover' },
   { file: 'gallery-3.jpg', alt: 'Professores e alunos do Projeto Mão com Mão reunidos no tatame', fit: 'contain' },
   { file: 'gallery-4.jpg', alt: 'Alunos do Projeto Mão com Mão participando de uma atividade coletiva no tatame', fit: 'cover' },
-  { file: 'gallery-5.jpg', alt: 'Turma do Projeto Mão com Mão reunida com a bandeira do projeto', fit: 'cover' },
-  { file: 'gallery-6.jpg', alt: 'Professor registrando uma confraternização com alunos e familiares no tatame', fit: 'contain' },
-  { file: 'gallery-7.jpg', alt: 'Professores do Projeto Mão com Mão ao lado de uma aluna', fit: 'contain' }
+  { file: 'gallery-5.jpg', alt: 'Turma do Projeto Mão com Mão reunida com a bandeira do projeto', fit: 'cover' }
 ];
 
 export default function Home() {
