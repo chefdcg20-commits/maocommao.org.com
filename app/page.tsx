@@ -148,7 +148,7 @@ export default function Home() {
             <p className="font-black uppercase tracking-[0.2em] text-brand-600">Aulas e horários</p>
             <h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Jiu-jítsu com orientação, disciplina e acolhimento.</h2>
             <p className="mt-5 leading-relaxed text-slate-600">As atividades são realizadas em Diadema e organizadas por faixa etária e nível de desenvolvimento dos alunos.</p>
-            <div className="mt-7 flex items-start gap-4 rounded-2xl border border-brand-100 bg-brand-50 p-5"><FiMapPin className="mt-1 shrink-0 text-2xl text-brand-700" /><p><strong className="block text-brand-900">Ginásio Municipal Casa Grande</strong><span className="text-sm text-slate-600">Diadema, São Paulo. Confirme o endereço e a disponibilidade antes de comparecer.</span></p></div>
+            <div className="mt-7 flex items-start gap-4 rounded-2xl border border-brand-100 bg-brand-50 p-5"><FiMapPin className="mt-1 shrink-0 text-2xl text-brand-700" /><p><strong className="block text-brand-900">Ginásio Poliesportivo Rômulo Duncan Arantes</strong><span className="text-sm text-slate-600">Av. Casa Grande, 485 — Diadema, SP.</span></p></div>
           </div>
           <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft">
             {[
@@ -216,7 +216,7 @@ export default function Home() {
 
       <section id="contato" className="section-space bg-brand-50">
         <div className="container-site grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-          <div><p className="font-black uppercase tracking-[0.2em] text-brand-600">Contato</p><h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Vamos construir essa transformação juntos.</h2><p className="mt-5 leading-relaxed text-slate-600">Entre em contato para conhecer as aulas, apoiar uma ação, oferecer uma parceria ou participar do projeto.</p><div className="mt-7 grid gap-4"><div className="flex gap-3"><FiMapPin className="mt-1 text-brand-700" /><p><strong className="block text-brand-900">Diadema, São Paulo</strong><span className="text-sm text-slate-600">Atuação principal no bairro Casa Grande.</span></p></div><div className="flex gap-3"><FiHome className="mt-1 text-brand-700" /><p><strong className="block text-brand-900">Espaço próprio</strong><span className="text-sm text-slate-600">Uma das metas prioritárias para a próxima fase.</span></p></div></div></div>
+          <div><p className="font-black uppercase tracking-[0.2em] text-brand-600">Contato</p><h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Vamos construir essa transformação juntos.</h2><p className="mt-5 leading-relaxed text-slate-600">Entre em contato para conhecer as aulas, apoiar uma ação, oferecer uma parceria ou participar do projeto.</p><div className="mt-7 grid gap-4"><div className="flex gap-3"><FiMapPin className="mt-1 text-brand-700" /><p><strong className="block text-brand-900">Ginásio Poliesportivo Rômulo Duncan Arantes</strong><span className="text-sm text-slate-600">Av. Casa Grande, 485 — Diadema, SP.</span></p></div><div className="flex gap-3"><FiHome className="mt-1 text-brand-700" /><p><strong className="block text-brand-900">Espaço próprio</strong><span className="text-sm text-slate-600">Uma das metas prioritárias para a próxima fase.</span></p></div></div></div>
           <ContactForm />
         </div>
       </section>
