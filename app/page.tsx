@@ -115,7 +115,7 @@ export default function Home() {
             </div>
           </div>
           <div className="relative overflow-hidden rounded-3xl shadow-soft">
-            <Image src="/images/gallery-1.jpg" alt="Alunos do projeto reunidos" width={900} height={650} className="h-full min-h-[430px] w-full object-cover" />
+            <Image src="/images/gallery-7.jpg" alt="Dois professores do Projeto Mão com Mão ao lado de uma aluna" width={900} height={650} className="h-full min-h-[430px] w-full object-cover" />
             <div className="absolute bottom-5 left-5 right-5 rounded-2xl bg-white/95 p-5 backdrop-blur">
               <strong className="text-xl text-brand-900">Construindo um futuro melhor, mão com mão.</strong>
               <p className="mt-1 text-sm text-slate-600">Cada aluno, família, voluntário e parceiro faz parte dessa história.</p>
