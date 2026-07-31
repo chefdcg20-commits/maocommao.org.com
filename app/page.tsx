@@ -195,7 +195,7 @@ export default function Home() {
       <section id="patrocinio" className="section-space">
         <div className="container-site grid overflow-hidden rounded-[2rem] bg-brand-800 text-white lg:grid-cols-2">
           <div className="p-8 sm:p-12"><p className="font-black uppercase tracking-[0.2em] text-gold">Seja um patrocinador</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Sua empresa pode deixar um legado em Diadema.</h2><p className="mt-5 leading-relaxed text-blue-100">O apoio pode financiar materiais, competições, alimentação, comunicação e a futura manutenção de um espaço próprio.</p><ul className="mt-7 grid gap-3 text-sm">{['Exposição responsável da marca', 'Relatórios e prestação de contas', 'Participação em ações e eventos', 'Impacto social mensurável'].map((item) => <li key={item} className="flex items-center gap-3"><FiCheck className="text-gold" /> {item}</li>)}</ul><a href="#contato" className="focus-ring mt-8 inline-flex rounded-xl bg-gold px-6 py-4 font-black text-brand-900">Quero conversar sobre patrocínio</a></div>
-          <div className="relative min-h-96"><Image src="/images/turma-patrocinio.jpg" alt="Alunos e professores do Projeto Mão com Mão reunidos no tatame" fill className="object-cover" /></div>
+          <div className="relative aspect-[4/3] lg:aspect-auto lg:min-h-96"><Image src="/images/turma-patrocinio-2.jpg" alt="Turma infantil e adulta do Projeto Mão com Mão reunida no tatame" fill className="object-cover object-center" /></div>
         </div>
       </section>
 
