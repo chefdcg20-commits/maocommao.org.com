@@ -32,14 +32,20 @@ export default function Home() {
       <Header />
 
       <section id="inicio" className="relative min-h-[690px] overflow-hidden bg-brand-900 text-white">
-        <Image src="/images/hero.jpg" alt="Aula social de jiu-jítsu com crianças" fill priority className="object-cover object-center" />
+        <Image
+          src="/images/professores-hero.jpg"
+          alt="Professores do Projeto Mão com Mão no tatame"
+          fill
+          priority
+          className="object-cover object-[55%_0%] md:object-[center_5%]"
+        />
         <div className="hero-overlay absolute inset-0" />
         <div className="container-site relative flex min-h-[690px] items-center py-20">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-bold backdrop-blur">
               <FiMapPin aria-hidden /> Diadema, São Paulo
             </span>
-            <h1 className="mt-7 text-4xl font-black uppercase leading-[1.02] sm:text-5xl lg:text-7xl">
+            <h1 className="mt-7 text-[2rem] font-black uppercase leading-[1.02] sm:text-5xl lg:text-7xl">
               Transformando vidas através do <span className="text-gold">jiu-jítsu</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-100 sm:text-xl">
