@@ -92,10 +92,10 @@ export default async function DiarioPostPage({ params }: PageProps) {
               <Image
                 src={post.image}
                 alt={post.imageAlt}
-                width={1280}
-                height={850}
+                width={post.imageOrientation === 'portrait' ? 960 : 1280}
+                height={post.imageOrientation === 'portrait' ? 1280 : 850}
                 priority
-                className="aspect-[3/2] w-full object-cover"
+                className={post.imageOrientation === 'portrait' ? 'max-h-[55rem] w-full bg-slate-950 object-contain' : 'aspect-[3/2] w-full object-cover'}
               />
               <div className="p-7 sm:p-12">
                 <div className="rounded-2xl bg-brand-50 p-5 text-brand-900">

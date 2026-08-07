@@ -34,9 +34,9 @@ export default function DiarioPage() {
                   <Image
                     src={post.image}
                     alt={post.imageAlt}
-                    width={900}
-                    height={600}
-                    className="aspect-[3/2] w-full object-cover"
+                    width={post.imageOrientation === 'portrait' ? 960 : 900}
+                    height={post.imageOrientation === 'portrait' ? 1280 : 600}
+                    className={post.imageOrientation === 'portrait' ? 'h-[32rem] w-full bg-slate-100 object-contain' : 'aspect-[3/2] w-full object-cover'}
                   />
                   <div className="p-6 sm:p-8">
                     <div className="flex flex-wrap items-center gap-3 text-sm font-bold">
