@@ -260,6 +260,32 @@ export default function Home() {
             <ContactForm />
           </div>
 
+          <div className="mt-10 grid overflow-hidden rounded-[2rem] border border-brand-100 bg-white shadow-soft lg:grid-cols-[0.72fr_1.28fr]">
+            <div className="flex flex-col justify-center p-7 sm:p-9">
+              <p className="font-black uppercase tracking-[0.2em] text-brand-600">Como chegar</p>
+              <h3 className="mt-3 text-2xl font-black text-brand-900 sm:text-3xl">Encontre o Projeto Mão Com Mão no Google Maps.</h3>
+              <p className="mt-4 leading-relaxed text-slate-600">As aulas acontecem no Ginásio Poliesportivo Rômulo Duncan Arantes, na Av. Casa Grande, 485, em Diadema.</p>
+              <a
+                href="https://maps.app.goo.gl/UwXmbHq4v2GXDK336?g_st=ac"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="focus-ring mt-6 inline-flex w-fit items-center gap-2 rounded-xl bg-brand-700 px-5 py-3 font-black text-white transition hover:bg-brand-800"
+              >
+                <FiMapPin aria-hidden /> Abrir no Google Maps <FiExternalLink aria-hidden />
+              </a>
+            </div>
+            <div className="min-h-80 border-t border-brand-100 lg:min-h-[26rem] lg:border-l lg:border-t-0">
+              <iframe
+                src="https://www.google.com/maps?q=Associa%C3%A7%C3%A3o+M%C3%A3o+Com+M%C3%A3o+Jiu-Jitsu,+Diadema,+SP&output=embed"
+                title="Localização do Projeto Mão Com Mão no Google Maps"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                className="h-full min-h-80 w-full border-0 lg:min-h-[26rem]"
+              />
+            </div>
+          </div>
+
           <div className="mt-10 grid items-center gap-7 overflow-hidden rounded-[2rem] bg-brand-900 p-6 text-white shadow-soft sm:p-8 md:grid-cols-[auto_1fr]">
             <a
               href="https://chat.whatsapp.com/HKVWuTNfP1XImKgvemIzGs?s=cl&p=a&ilr=1&amv=0"
