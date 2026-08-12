@@ -332,7 +332,19 @@ export default function Home() {
       <section id="transparencia" className="section-space">
         <div className="container-site grid gap-10 lg:grid-cols-2">
           <div><p className="font-black uppercase tracking-[0.2em] text-brand-600">Transparência</p><h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Confiança se constrói com responsabilidade.</h2><p className="mt-5 leading-relaxed text-slate-600">Esta área foi preparada para disponibilizar estatuto, atas, relatórios, prestações de contas, recibos e demais documentos públicos do projeto.</p></div>
-          <div className="grid gap-3">{['Estatuto social', 'Atas e registros', 'Relatórios de atividades', 'Prestação de contas e documentos'].map((item) => item === 'Relatórios de atividades' ? <a key={item} href="#relatorio-atividades" className="focus-ring flex items-center justify-between rounded-2xl border border-brand-200 bg-brand-50 p-5 transition hover:border-brand-400 hover:bg-brand-100"><span className="flex items-center gap-3 font-bold text-brand-900"><FiFileText className="text-brand-600" /> {item}</span><span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Ver metodologia <FiArrowRight aria-hidden /></span></a> : <div key={item} className="flex items-center justify-between rounded-2xl border border-slate-200 p-5"><span className="flex items-center gap-3 font-bold text-brand-900"><FiFileText className="text-brand-600" /> {item}</span><span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">Em preparação</span></div>)}</div>
+          <div className="grid gap-3">
+            <a
+              href="/documentos/estatuto-social-mao-com-mao.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="focus-ring flex items-center justify-between gap-4 rounded-2xl border border-brand-200 bg-brand-50 p-5 transition hover:border-brand-400 hover:bg-brand-100"
+            >
+              <span className="flex items-center gap-3 font-bold text-brand-900"><FiFileText className="text-brand-600" /> Estatuto social</span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Abrir PDF <FiExternalLink aria-hidden /></span>
+            </a>
+            {['Atas e registros', 'Prestação de contas e documentos'].map((item) => <div key={item} className="flex items-center justify-between rounded-2xl border border-slate-200 p-5"><span className="flex items-center gap-3 font-bold text-brand-900"><FiFileText className="text-brand-600" /> {item}</span><span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">Em preparação</span></div>)}
+            <a href="#relatorio-atividades" className="focus-ring flex items-center justify-between gap-4 rounded-2xl border border-brand-200 bg-brand-50 p-5 transition hover:border-brand-400 hover:bg-brand-100"><span className="flex items-center gap-3 font-bold text-brand-900"><FiFileText className="text-brand-600" /> Relatórios de atividades</span><span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Ver metodologia <FiArrowRight aria-hidden /></span></a>
+          </div>
         </div>
       </section>
 
