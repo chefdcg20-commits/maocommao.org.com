@@ -38,6 +38,33 @@ const galleryImages = [
   { file: 'gallery-5.jpg', alt: 'Turma do Projeto Mão com Mão reunida com a bandeira do projeto', fit: 'cover' }
 ];
 
+const trainingMethodology = [
+  {
+    week: '1ª quinta-feira',
+    focus: 'Quedas',
+    practice: 'Entrada, desequilíbrio, projeção e queda segura.',
+    objective: 'Desenvolver base, coordenação, confiança e segurança.'
+  },
+  {
+    week: '2ª quinta-feira',
+    focus: 'Finalizações',
+    practice: 'Técnicas de controle e finalização com responsabilidade.',
+    objective: 'Aprimorar precisão, autocontrole e respeito ao parceiro.'
+  },
+  {
+    week: '3ª quinta-feira',
+    focus: 'Raspagens',
+    practice: 'Alavancas e transições para sair da posição inferior.',
+    objective: 'Estimular estratégia, tempo de reação e resolução de problemas.'
+  },
+  {
+    week: '4ª quinta-feira',
+    focus: 'Combate livre e lutas casadas',
+    practice: 'Aplicação dos conteúdos em situações reais de luta.',
+    objective: 'Integrar o aprendizado e acompanhar a evolução dos alunos.'
+  }
+];
+
 export default function Home() {
   return (
     <main>
@@ -246,10 +273,66 @@ export default function Home() {
         <div className="container-site text-center"><FiHeart className="mx-auto text-4xl text-gold" /><p className="mt-4 font-black uppercase tracking-[0.2em] text-gold">Faça uma doação</p><h2 className="mx-auto mt-3 max-w-3xl text-3xl font-black sm:text-5xl">Toda contribuição ajuda o projeto a permanecer em movimento.</h2><p className="mx-auto mt-5 max-w-2xl text-slate-300">Você pode ajudar financeiramente ou doar alimentos, kimonos, tatames e outros materiais. As formas oficiais de doação serão inseridas após validação da diretoria.</p><div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row"><a href="#contato" className="focus-ring rounded-xl bg-gold px-7 py-4 font-black text-brand-900">Quero doar</a><a href="#contato" className="focus-ring rounded-xl border border-white/30 px-7 py-4 font-black text-white">Quero doar materiais</a></div></div>
       </section>
 
+      <section id="relatorio-atividades" className="section-space bg-brand-50 scroll-mt-28">
+        <div className="container-site">
+          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+            <div>
+              <p className="font-black uppercase tracking-[0.2em] text-brand-600">Relatório de atividades</p>
+              <h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Metodologia mensal de treinamento.</h2>
+              <p className="mt-5 max-w-3xl text-lg leading-relaxed text-slate-600">O Projeto Mão Com Mão organiza cada quinta-feira do mês em torno de um fundamento do jiu-jítsu. Essa sequência cria um ciclo simples, previsível e progressivo: os alunos aprendem uma habilidade por vez e, ao final do mês, aplicam todo o conteúdo em combate livre e lutas casadas.</p>
+            </div>
+            <div className="rounded-3xl bg-brand-900 p-6 text-white shadow-soft">
+              <FiTarget className="text-3xl text-gold" aria-hidden />
+              <h3 className="mt-4 text-xl font-black">Por que funciona bem?</h3>
+              <p className="mt-3 leading-relaxed text-blue-100">O foco semanal reduz a dispersão, favorece a repetição consciente e permite que professores acompanhem a evolução técnica com mais clareza. A luta da quarta semana transforma o conteúdo treinado em experiência prática.</p>
+            </div>
+          </div>
+
+          <div className="mt-10 overflow-hidden rounded-3xl border border-brand-100 bg-white shadow-soft">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[760px] border-collapse text-left">
+                <caption className="sr-only">Planejamento mensal das aulas de jiu-jítsu do Projeto Mão Com Mão</caption>
+                <thead className="bg-brand-800 text-white">
+                  <tr>
+                    <th scope="col" className="px-6 py-4 text-sm font-black uppercase tracking-wide">Semana</th>
+                    <th scope="col" className="px-6 py-4 text-sm font-black uppercase tracking-wide">Tema</th>
+                    <th scope="col" className="px-6 py-4 text-sm font-black uppercase tracking-wide">Conteúdo principal</th>
+                    <th scope="col" className="px-6 py-4 text-sm font-black uppercase tracking-wide">Objetivo pedagógico</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {trainingMethodology.map((item) => (
+                    <tr key={item.week} className="align-top transition hover:bg-brand-50">
+                      <th scope="row" className="whitespace-nowrap px-6 py-5 font-black text-brand-700">{item.week}</th>
+                      <td className="px-6 py-5 font-black text-brand-900">{item.focus}</td>
+                      <td className="px-6 py-5 leading-relaxed text-slate-600">{item.practice}</td>
+                      <td className="px-6 py-5 leading-relaxed text-slate-600">{item.objective}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {[
+              [FiBookOpen, 'Aprendizado progressivo', 'Cada fundamento recebe atenção exclusiva antes de ser combinado aos demais.'],
+              [FiShield, 'Treino seguro e responsável', 'A organização facilita correções, controle de intensidade e adaptação por idade e nível.'],
+              [FiAward, 'Evolução observável', 'O combate livre mostra o que foi assimilado e orienta o planejamento do próximo ciclo.']
+            ].map(([Icon, title, text]) => {
+              const Component = Icon as typeof FiBookOpen;
+              return <article key={String(title)} className="rounded-2xl border border-brand-100 bg-white p-6"><Component className="text-3xl text-brand-700" aria-hidden /><h3 className="mt-4 font-black text-brand-900">{String(title)}</h3><p className="mt-2 leading-relaxed text-slate-600">{String(text)}</p></article>;
+            })}
+          </div>
+
+          <p className="mt-6 text-sm leading-relaxed text-slate-500">A metodologia é aplicada respeitando a idade, o nível técnico e as necessidades de cada turma. O planejamento considera as quatro quintas-feiras principais de cada mês.</p>
+        </div>
+      </section>
+
       <section id="transparencia" className="section-space">
         <div className="container-site grid gap-10 lg:grid-cols-2">
           <div><p className="font-black uppercase tracking-[0.2em] text-brand-600">Transparência</p><h2 className="mt-3 text-3xl font-black text-brand-900 sm:text-5xl">Confiança se constrói com responsabilidade.</h2><p className="mt-5 leading-relaxed text-slate-600">Esta área foi preparada para disponibilizar estatuto, atas, relatórios, prestações de contas, recibos e demais documentos públicos do projeto.</p></div>
-          <div className="grid gap-3">{['Estatuto social', 'Atas e registros', 'Relatórios de atividades', 'Prestação de contas e documentos'].map((item) => <div key={item} className="flex items-center justify-between rounded-2xl border border-slate-200 p-5"><span className="flex items-center gap-3 font-bold text-brand-900"><FiFileText className="text-brand-600" /> {item}</span><span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">Em preparação</span></div>)}</div>
+          <div className="grid gap-3">{['Estatuto social', 'Atas e registros', 'Relatórios de atividades', 'Prestação de contas e documentos'].map((item) => item === 'Relatórios de atividades' ? <a key={item} href="#relatorio-atividades" className="focus-ring flex items-center justify-between rounded-2xl border border-brand-200 bg-brand-50 p-5 transition hover:border-brand-400 hover:bg-brand-100"><span className="flex items-center gap-3 font-bold text-brand-900"><FiFileText className="text-brand-600" /> {item}</span><span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Ver metodologia <FiArrowRight aria-hidden /></span></a> : <div key={item} className="flex items-center justify-between rounded-2xl border border-slate-200 p-5"><span className="flex items-center gap-3 font-bold text-brand-900"><FiFileText className="text-brand-600" /> {item}</span><span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">Em preparação</span></div>)}</div>
         </div>
       </section>
 
