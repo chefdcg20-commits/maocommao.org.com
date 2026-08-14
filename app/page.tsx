@@ -22,6 +22,7 @@ import {
 import { FaWhatsapp } from 'react-icons/fa';
 import { Header } from '@/components/Header';
 import { ContactForm } from '@/components/ContactForm';
+import { diarioPosts } from '@/lib/diario';
 
 const team = [
   ['Joaquim Guedes', 'Presidente e mestre'],
@@ -37,6 +38,8 @@ const galleryImages = [
   { file: 'gallery-4.jpg', alt: 'Alunos do Projeto Mão com Mão participando de uma atividade coletiva no tatame', fit: 'cover' },
   { file: 'gallery-5.jpg', alt: 'Turma do Projeto Mão com Mão reunida com a bandeira do projeto', fit: 'cover' }
 ];
+
+const featuredPost = diarioPosts[0];
 
 const trainingMethodology = [
   {
@@ -231,21 +234,21 @@ export default function Home() {
 
           <article className="mt-9 grid overflow-hidden rounded-[2rem] bg-white text-slate-800 shadow-soft lg:grid-cols-[1.05fr_0.95fr]">
             <Image
-              src="/images/diario-volta-treino-pizza.jpg"
-              alt="Alunos do Projeto Mão Com Mão reunidos ao redor das pizzas depois do treino"
-              width={960}
-              height={1280}
-              className="h-full max-h-[42rem] min-h-72 w-full bg-slate-950 object-contain"
+              src={featuredPost.image}
+              alt={featuredPost.imageAlt}
+              width={1280}
+              height={720}
+              className="h-full max-h-[42rem] min-h-72 w-full object-cover"
             />
             <div className="p-7 sm:p-10">
               <div className="flex flex-wrap items-center gap-3 text-sm font-bold">
-                <span className="rounded-full bg-gold px-3 py-1 text-brand-900">Comunidade</span>
-                <span className="flex items-center gap-2 text-slate-500"><FiCalendar aria-hidden /><time dateTime="2026-08-07">7 de agosto de 2026</time></span>
+                <span className="rounded-full bg-gold px-3 py-1 text-brand-900">{featuredPost.category}</span>
+                <span className="flex items-center gap-2 text-slate-500"><FiCalendar aria-hidden /><time dateTime={featuredPost.publishedAt}>{featuredPost.publishedLabel}</time></span>
               </div>
-              <h3 className="mt-5 text-2xl font-black text-brand-900 sm:text-3xl">Voltamos às aulas: treino e pizza</h3>
-              <p className="mt-4 leading-relaxed text-slate-600">O segundo semestre começou com treino no tatame e uma confraternização com pizza para a turma.</p>
-              <div className="mt-5 rounded-2xl bg-brand-50 p-4 text-brand-900"><strong>Treino, união e alegria.</strong><span className="ml-2">Oss!</span></div>
-              <Link href="/diario/voltamos-as-aulas-treino-e-pizza/" className="focus-ring mt-6 inline-flex items-center gap-2 rounded-xl bg-brand-700 px-5 py-3 font-black text-white transition hover:bg-brand-800">
+              <h3 className="mt-5 text-2xl font-black text-brand-900 sm:text-3xl">{featuredPost.title}</h3>
+              <p className="mt-4 leading-relaxed text-slate-600">{featuredPost.excerpt}</p>
+              <div className="mt-5 rounded-2xl bg-brand-50 p-4 text-brand-900"><strong>Famílias e projeto construindo juntos.</strong></div>
+              <Link href={`/diario/${featuredPost.slug}/`} className="focus-ring mt-6 inline-flex items-center gap-2 rounded-xl bg-brand-700 px-5 py-3 font-black text-white transition hover:bg-brand-800">
                 Ler notícia <FiArrowRight aria-hidden />
               </Link>
             </div>

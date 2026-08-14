@@ -9,11 +9,31 @@ export type DiarioPost = {
   eventDateLabel: string;
   image: string;
   imageAlt: string;
-  imageOrientation?: 'portrait' | 'landscape';
+  imageOrientation?: 'portrait' | 'landscape' | 'wide';
   paragraphs: string[];
 };
 
 export const diarioPosts: DiarioPost[] = [
+  {
+    slug: 'familias-unidas-futuro-projeto-2027',
+    title: 'Famílias e projeto unidos por um novo futuro em 2027',
+    excerpt:
+      'Reunião com os pais reforça o incentivo aos atletas, o compromisso com o projeto e os planos para conquistar um espaço próprio.',
+    category: 'Comunidade',
+    publishedAt: '2026-08-13',
+    publishedLabel: '13 de agosto de 2026',
+    eventDate: '2026-08-13',
+    eventDateLabel: 'Quinta-feira, 13 de agosto de 2026',
+    image: '/images/diario-reuniao-pais-2027.jpg',
+    imageAlt: 'Pais, responsáveis e professores reunidos com o Projeto Mão Com Mão em Diadema',
+    imageOrientation: 'wide',
+    paragraphs: [
+      'O Projeto Mão Com Mão realizou uma reunião com pais e responsáveis para fortalecer o incentivo aos atletas e aproximar ainda mais as famílias da rotina do projeto.',
+      'Durante o encontro, conversamos sobre a importância da participação de cada família no desenvolvimento dos alunos, dentro e fora do tatame. O apoio dos pais, a presença nas atividades e o compromisso com os valores do projeto são fundamentais para a evolução esportiva e pessoal de cada atleta.',
+      'Também firmamos uma parceria para os próximos passos do Mão Com Mão, unindo pais, responsáveis e iniciativa privada. O objetivo é ampliar a estrutura do projeto e trabalhar pela conquista de um espaço próprio em 2027, preparado para receber nossos alunos e desenvolver novas ações para a comunidade.',
+      'Essa união representa uma evolução significativa para a causa do esporte em Diadema. Com planejamento, participação das famílias e apoio de parceiros, muitas coisas boas serão realizadas em 2027. Seguimos construindo esse futuro juntos, mão com mão.'
+    ]
+  },
   {
     slug: 'voltamos-as-aulas-treino-e-pizza',
     title: 'Voltamos às aulas: treino e pizza',

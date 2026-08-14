@@ -93,13 +93,17 @@ export default async function DiarioPostPage({ params }: PageProps) {
                 src={post.image}
                 alt={post.imageAlt}
                 width={post.imageOrientation === 'portrait' ? 960 : 1280}
-                height={post.imageOrientation === 'portrait' ? 1280 : 850}
+                height={post.imageOrientation === 'portrait' ? 1280 : post.imageOrientation === 'wide' ? 720 : 850}
                 priority
-                className={post.imageOrientation === 'portrait' ? 'max-h-[55rem] w-full bg-slate-950 object-contain' : 'aspect-[3/2] w-full object-cover'}
+                className={post.imageOrientation === 'portrait'
+                  ? 'max-h-[55rem] w-full bg-slate-950 object-contain'
+                  : post.imageOrientation === 'wide'
+                    ? 'aspect-video w-full object-cover'
+                    : 'aspect-[3/2] w-full object-cover'}
               />
               <div className="p-7 sm:p-12">
                 <div className="rounded-2xl bg-brand-50 p-5 text-brand-900">
-                  <strong className="block text-sm uppercase tracking-[0.15em] text-brand-600">Data do retorno</strong>
+                  <strong className="block text-sm uppercase tracking-[0.15em] text-brand-600">Data do acontecimento</strong>
                   <time dateTime={post.eventDate} className="mt-2 block text-xl font-black">{post.eventDateLabel}</time>
                 </div>
                 <div className="mt-8 space-y-6 text-lg leading-relaxed text-slate-700">
