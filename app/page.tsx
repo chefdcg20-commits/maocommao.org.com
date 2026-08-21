@@ -22,6 +22,7 @@ import {
 import { FaWhatsapp } from 'react-icons/fa';
 import { Header } from '@/components/Header';
 import { ContactForm } from '@/components/ContactForm';
+import { PixDonation } from '@/components/PixDonation';
 import { diarioPosts } from '@/lib/diario';
 
 const team = [
@@ -272,9 +273,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="doacao" className="section-space bg-slate-950 text-white">
-        <div className="container-site text-center"><FiHeart className="mx-auto text-4xl text-gold" /><p className="mt-4 font-black uppercase tracking-[0.2em] text-gold">Faça uma doação</p><h2 className="mx-auto mt-3 max-w-3xl text-3xl font-black sm:text-5xl">Toda contribuição ajuda o projeto a permanecer em movimento.</h2><p className="mx-auto mt-5 max-w-2xl text-slate-300">Você pode ajudar financeiramente ou doar alimentos, kimonos, tatames e outros materiais. As formas oficiais de doação serão inseridas após validação da diretoria.</p><div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row"><a href="#contato" className="focus-ring rounded-xl bg-gold px-7 py-4 font-black text-brand-900">Quero doar</a><a href="#contato" className="focus-ring rounded-xl border border-white/30 px-7 py-4 font-black text-white">Quero doar materiais</a></div></div>
-      </section>
+      <PixDonation />
 
       <section id="relatorio-atividades" className="section-space bg-brand-50 scroll-mt-28">
         <div className="container-site">
