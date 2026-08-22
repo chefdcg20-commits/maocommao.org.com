@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { FiCheck, FiCopy, FiHeart, FiPackage, FiShield } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
@@ -61,18 +62,33 @@ export function PixDonation() {
             </div>
           </div>
 
-          <div className="mt-7 rounded-2xl border-2 border-brand-100 bg-brand-50 p-5">
-            <span className="text-sm font-bold text-slate-600">Chave PIX — CNPJ</span>
-            <strong className="mt-2 block break-all text-2xl font-black tracking-wide text-brand-900 sm:text-3xl">{PIX_KEY}</strong>
-            <button
-              type="button"
-              onClick={copyPix}
-              className={`focus-ring mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 font-black transition ${copied ? 'bg-emerald-500 text-slate-950' : 'bg-gold text-brand-900 hover:bg-yellow-300'}`}
-              aria-live="polite"
-            >
-              {copied ? <FiCheck aria-hidden /> : <FiCopy aria-hidden />}
-              {copied ? 'PIX copiado!' : 'Copiar chave PIX'}
-            </button>
+          <div className="mt-7 grid gap-5 rounded-2xl border-2 border-brand-100 bg-brand-50 p-5 sm:grid-cols-[13rem_1fr] sm:items-center">
+            <div className="mx-auto w-full max-w-52 rounded-2xl bg-white p-3 shadow-sm">
+              <Image
+                src="/images/pix-qrcode-associacao.jpg"
+                alt="QR Code para doação por PIX ao Projeto Mão Com Mão"
+                width={1280}
+                height={1280}
+                className="h-auto w-full"
+              />
+            </div>
+            <div>
+              <span className="text-sm font-black uppercase tracking-[0.12em] text-brand-600">Escaneie para doar</span>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">Abra o aplicativo do seu banco, escolha a opção de pagar com QR Code e aponte a câmera.</p>
+              <div className="mt-4 rounded-xl bg-white p-4">
+                <span className="text-xs font-bold text-slate-500">Ou use a chave PIX — CNPJ</span>
+                <strong className="mt-1 block break-all text-xl font-black tracking-wide text-brand-900">{PIX_KEY}</strong>
+              </div>
+              <button
+                type="button"
+                onClick={copyPix}
+                className={`focus-ring mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 font-black transition ${copied ? 'bg-emerald-500 text-slate-950' : 'bg-gold text-brand-900 hover:bg-yellow-300'}`}
+                aria-live="polite"
+              >
+                {copied ? <FiCheck aria-hidden /> : <FiCopy aria-hidden />}
+                {copied ? 'PIX copiado!' : 'Copiar chave PIX'}
+              </button>
+            </div>
           </div>
 
           <ol className="mt-7 grid gap-4 text-sm text-slate-700 sm:grid-cols-3">
