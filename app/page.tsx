@@ -248,7 +248,10 @@ export default function Home() {
               </div>
               <h3 className="mt-5 text-2xl font-black text-brand-900 sm:text-3xl">{featuredPost.title}</h3>
               <p className="mt-4 leading-relaxed text-slate-600">{featuredPost.excerpt}</p>
-              <div className="mt-5 rounded-2xl bg-brand-50 p-4 text-brand-900"><strong>Famílias e projeto construindo juntos.</strong></div>
+              <div className="mt-5 rounded-2xl bg-brand-50 p-4 text-brand-900">
+                <strong>{featuredPost.youtubeId ? 'Nosso canal começou.' : 'Novidade no Diário.'}</strong>
+                <span className="ml-2">{featuredPost.youtubeId ? 'Assista e compartilhe!' : 'Conheça este novo capítulo.'}</span>
+              </div>
               <Link href={`/diario/${featuredPost.slug}/`} className="focus-ring mt-6 inline-flex items-center gap-2 rounded-xl bg-brand-700 px-5 py-3 font-black text-white transition hover:bg-brand-800">
                 Ler notícia <FiArrowRight aria-hidden />
               </Link>

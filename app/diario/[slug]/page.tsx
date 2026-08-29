@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { FiArrowLeft, FiCalendar, FiMessageCircle } from 'react-icons/fi';
+import { FaYoutube } from 'react-icons/fa';
 import { Header } from '@/components/Header';
 import { diarioPosts, getDiarioPost } from '@/lib/diario';
 
@@ -89,18 +90,31 @@ export default async function DiarioPostPage({ params }: PageProps) {
 
           <div className="container-site py-10 sm:py-14">
             <div className="mx-auto max-w-4xl overflow-hidden rounded-[2rem] bg-white shadow-soft">
-              <Image
-                src={post.image}
-                alt={post.imageAlt}
-                width={post.imageOrientation === 'portrait' ? 960 : 1280}
-                height={post.imageOrientation === 'portrait' ? 1280 : post.imageOrientation === 'wide' ? 720 : 850}
-                priority
-                className={post.imageOrientation === 'portrait'
-                  ? 'max-h-[55rem] w-full bg-slate-950 object-contain'
-                  : post.imageOrientation === 'wide'
-                    ? 'aspect-video w-full object-cover'
-                    : 'aspect-[3/2] w-full object-cover'}
-              />
+              {post.youtubeId ? (
+                <div className="aspect-video w-full bg-slate-950">
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${post.youtubeId}`}
+                    title={post.title}
+                    className="h-full w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <Image
+                  src={post.image}
+                  alt={post.imageAlt}
+                  width={post.imageOrientation === 'portrait' ? 960 : 1280}
+                  height={post.imageOrientation === 'portrait' ? 1280 : post.imageOrientation === 'wide' ? 720 : 850}
+                  priority
+                  className={post.imageOrientation === 'portrait'
+                    ? 'max-h-[55rem] w-full bg-slate-950 object-contain'
+                    : post.imageOrientation === 'wide'
+                      ? 'aspect-video w-full object-cover'
+                      : 'aspect-[3/2] w-full object-cover'}
+                />
+              )}
               <div className="p-7 sm:p-12">
                 <div className="rounded-2xl bg-brand-50 p-5 text-brand-900">
                   <strong className="block text-sm uppercase tracking-[0.15em] text-brand-600">Data do acontecimento</strong>
@@ -109,9 +123,16 @@ export default async function DiarioPostPage({ params }: PageProps) {
                 <div className="mt-8 space-y-6 text-lg leading-relaxed text-slate-700">
                   {post.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 </div>
-                <a href="https://wa.me/5511982984625" target="_blank" rel="noopener noreferrer" className="focus-ring mt-10 inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-4 font-black text-slate-950 transition hover:bg-emerald-400">
-                  <FiMessageCircle aria-hidden /> Tirar dúvidas com Daniel
-                </a>
+                <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+                  {post.youtubeUrl && (
+                    <a href={post.youtubeUrl} target="_blank" rel="noopener noreferrer" className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-6 py-4 font-black text-white transition hover:bg-red-700">
+                      <FaYoutube className="text-xl" aria-hidden /> Assistir no YouTube
+                    </a>
+                  )}
+                  <a href="https://wa.me/5511982984625" target="_blank" rel="noopener noreferrer" className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-4 font-black text-slate-950 transition hover:bg-emerald-400">
+                    <FiMessageCircle aria-hidden /> Tirar dúvidas com Daniel
+                  </a>
+                </div>
               </div>
             </div>
           </div>

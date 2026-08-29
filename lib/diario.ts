@@ -10,10 +10,33 @@ export type DiarioPost = {
   image: string;
   imageAlt: string;
   imageOrientation?: 'portrait' | 'landscape' | 'wide';
+  youtubeId?: string;
+  youtubeUrl?: string;
   paragraphs: string[];
 };
 
 export const diarioPosts: DiarioPost[] = [
+  {
+    slug: 'primeiro-video-canal-jiu-jitsu-infantil',
+    title: 'Nosso primeiro vídeo no YouTube: jiu-jítsu infantil em ação',
+    excerpt:
+      'O Projeto Mão Com Mão estreia seu canal no YouTube com uma aula de jiu-jítsu para crianças, levando a energia do tatame para ainda mais pessoas.',
+    category: 'Vídeo',
+    publishedAt: '2026-08-29',
+    publishedLabel: '29 de agosto de 2026',
+    eventDate: '2026-08-29',
+    eventDateLabel: 'Sábado, 29 de agosto de 2026',
+    image: '/images/diario-primeiro-video-youtube.jpg',
+    imageAlt: 'Capa do primeiro vídeo do canal Mão Com Mão no YouTube sobre jiu-jítsu infantil',
+    imageOrientation: 'wide',
+    youtubeId: 'XVtawvIS5Pk',
+    youtubeUrl: 'https://youtu.be/XVtawvIS5Pk',
+    paragraphs: [
+      'Este é um marco especial para o Projeto Mão Com Mão: publicamos o primeiro vídeo do nosso canal no YouTube.',
+      'A estreia apresenta uma aula de jiu-jítsu infantil e leva para o ambiente digital um pouco da alegria, da disciplina e do aprendizado que fazem parte da rotina das nossas crianças no tatame.',
+      'O canal será mais uma forma de aproximar famílias, apoiadores e a comunidade do trabalho realizado pelo projeto. Assista, compartilhe e acompanhe os próximos capítulos dessa história. Oss!'
+    ]
+  },
   {
     slug: 'familias-unidas-futuro-projeto-2027',
     title: 'Famílias e projeto unidos por um novo futuro em 2027',
