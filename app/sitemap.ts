@@ -9,13 +9,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: `${siteUrl}/`,
-      lastModified: new Date('2026-08-29'),
+      lastModified: new Date('2026-09-05'),
       changeFrequency: 'weekly',
       priority: 1
     },
     {
       url: `${siteUrl}/diario/`,
-      lastModified: new Date('2026-08-29'),
+      lastModified: new Date('2026-09-05'),
       changeFrequency: 'weekly',
       priority: 0.8
     },

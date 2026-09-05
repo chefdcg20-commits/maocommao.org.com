@@ -106,12 +106,14 @@ export default async function DiarioPostPage({ params }: PageProps) {
                   src={post.image}
                   alt={post.imageAlt}
                   width={post.imageOrientation === 'portrait' ? 960 : 1280}
-                  height={post.imageOrientation === 'portrait' ? 1280 : post.imageOrientation === 'wide' ? 720 : 850}
+                  height={post.imageOrientation === 'portrait' ? 1280 : post.imageOrientation === 'wide' ? 720 : post.imageOrientation === 'fourThree' ? 960 : 850}
                   priority
                   className={post.imageOrientation === 'portrait'
                     ? 'max-h-[55rem] w-full bg-slate-950 object-contain'
                     : post.imageOrientation === 'wide'
                       ? 'aspect-video w-full object-cover'
+                      : post.imageOrientation === 'fourThree'
+                        ? 'aspect-[4/3] w-full object-cover'
                       : 'aspect-[3/2] w-full object-cover'}
                 />
               )}
