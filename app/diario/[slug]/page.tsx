@@ -25,15 +25,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
+  const articleUrl = `https://maocommao-org-com.vercel.app/diario/${post.slug}/`;
+
   return {
-    title: `${post.title} | Diário Mão Com Mão`,
+    title: post.seoTitle ?? `${post.title} | Diário Mão Com Mão`,
     description: post.excerpt,
+    keywords: post.keywords,
+    alternates: {
+      canonical: articleUrl
+    },
     openGraph: {
       title: post.title,
       description: post.excerpt,
       type: 'article',
+      url: articleUrl,
+      siteName: 'Projeto Social Mão Com Mão',
+      locale: 'pt_BR',
       publishedTime: post.publishedAt,
-      images: [{ url: post.image }]
+      images: [{ url: post.image, width: 1280, height: 720, alt: post.imageAlt }],
+      ...(post.youtubeUrl ? { videos: [{ url: post.youtubeUrl, width: 1280, height: 720 }] } : {})
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: [post.image]
     }
   };
 }
@@ -47,9 +63,9 @@ export default async function DiarioPostPage({ params }: PageProps) {
   }
 
   const articleUrl = `https://maocommao-org-com.vercel.app/diario/${post.slug}/`;
-  const structuredData = {
-    '@context': 'https://schema.org',
+  const articleStructuredData = {
     '@type': 'NewsArticle',
+    '@id': `${articleUrl}#article`,
     headline: post.title,
     description: post.excerpt,
     datePublished: post.publishedAt,
@@ -63,7 +79,26 @@ export default async function DiarioPostPage({ params }: PageProps) {
       '@type': 'Organization',
       name: 'Projeto Social Mão Com Mão'
     },
-    mainEntityOfPage: articleUrl
+    mainEntityOfPage: articleUrl,
+    ...(post.youtubeId ? { mainEntity: { '@id': `${articleUrl}#video` } } : {})
+  };
+  const videoStructuredData = post.youtubeId ? {
+    '@type': 'VideoObject',
+    '@id': `${articleUrl}#video`,
+    name: post.title,
+    description: post.excerpt,
+    thumbnailUrl: [`https://maocommao-org-com.vercel.app${post.image}`],
+    uploadDate: post.videoPublishedAt ?? post.eventDate,
+    embedUrl: `https://www.youtube.com/embed/${post.youtubeId}`,
+    url: post.youtubeUrl,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Projeto Social Mão Com Mão'
+    }
+  } : null;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [articleStructuredData, ...(videoStructuredData ? [videoStructuredData] : [])]
   };
 
   return (

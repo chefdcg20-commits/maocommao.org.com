@@ -10,12 +10,46 @@ export type DiarioPost = {
   image: string;
   imageAlt: string;
   imageOrientation?: 'portrait' | 'landscape' | 'wide' | 'fourThree';
+  seoTitle?: string;
+  keywords?: string[];
   youtubeId?: string;
   youtubeUrl?: string;
+  videoPublishedAt?: string;
   paragraphs: string[];
 };
 
 export const diarioPosts: DiarioPost[] = [
+  {
+    slug: 'treino-infantil-jiu-jitsu-gratuito-diadema',
+    title: 'Treino infantil de jiu-jítsu gratuito em Diadema',
+    seoTitle: 'Jiu-jítsu infantil gratuito em Diadema | Mão Com Mão',
+    excerpt:
+      'Conheça o treino infantil de jiu-jítsu gratuito do Projeto Mão Com Mão em Diadema (SP), com aulas para crianças que promovem disciplina, respeito e inclusão.',
+    keywords: [
+      'jiu-jítsu infantil gratuito em Diadema',
+      'aulas de jiu-jítsu para crianças',
+      'Projeto Mão Com Mão',
+      'esporte social em Diadema',
+      'treino infantil de jiu-jítsu'
+    ],
+    category: 'Vídeo',
+    publishedAt: '2026-09-05',
+    publishedLabel: '5 de setembro de 2026',
+    eventDate: '2026-09-04',
+    eventDateLabel: 'Sexta-feira, 4 de setembro de 2026',
+    image: '/images/diario-segundo-video-jiu-jitsu-infantil-diadema.jpg',
+    imageAlt: 'Capa do segundo vídeo do Projeto Mão Com Mão sobre treino infantil de jiu-jítsu gratuito em Diadema',
+    imageOrientation: 'wide',
+    youtubeId: 'rmQZDAjKLkI',
+    youtubeUrl: 'https://youtu.be/rmQZDAjKLkI',
+    videoPublishedAt: '2026-09-04T07:00:30-03:00',
+    paragraphs: [
+      'O segundo vídeo oficial do canal do Projeto Mão Com Mão apresenta nosso treino infantil de jiu-jítsu gratuito em Diadema, São Paulo.',
+      'As aulas ajudam crianças e jovens a desenvolver disciplina, respeito, confiança, convivência e hábitos saudáveis por meio do esporte, em um ambiente de acolhimento e inclusão social.',
+      'O projeto realiza suas atividades no Ginásio Rômulo Duncan Arantes, localizado na Avenida Casa Grande, 485, em Diadema. Nossa missão é ampliar o acesso ao jiu-jítsu e transformar vidas dentro e fora do tatame.',
+      'Assista ao vídeo, inscreva-se no canal e compartilhe com outras famílias de Diadema que procuram aulas gratuitas de jiu-jítsu para crianças. Cada visualização ajuda o trabalho do Mão Com Mão a alcançar mais pessoas. Oss!'
+    ]
+  },
   {
     slug: 'turma-crescendo-em-busca-de-novo-espaco',
     title: 'Três turmas cheias e um novo desafio: precisamos de mais espaço',
