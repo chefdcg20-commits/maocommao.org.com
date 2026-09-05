@@ -18,19 +18,20 @@ export type DiarioPost = {
 export const diarioPosts: DiarioPost[] = [
   {
     slug: 'turma-crescendo-em-busca-de-novo-espaco',
-    title: 'A turma está crescendo — e precisamos de um novo espaço',
+    title: 'Três turmas cheias e um novo desafio: precisamos de mais espaço',
     excerpt:
-      'A aula da última quinta-feira mostrou a força do Projeto Mão Com Mão: cada vez mais alunos no tatame e a necessidade de um local maior para continuar crescendo.',
+      'A foto registra a turma das 19h, mas outras duas turmas de porte semelhante também treinaram na quinta-feira, reforçando a necessidade de um local maior.',
     category: 'Comunidade',
     publishedAt: '2026-09-05',
     publishedLabel: '5 de setembro de 2026',
     eventDate: '2026-09-03',
     eventDateLabel: 'Quinta-feira, 3 de setembro de 2026',
     image: '/images/diario-turma-crescendo-novo-espaco.jpg',
-    imageAlt: 'Turma infantil e professores do Projeto Mão Com Mão reunidos após a aula de jiu-jítsu',
+    imageAlt: 'Turma das 19h e professores do Projeto Mão Com Mão reunidos após a aula de jiu-jítsu',
     imageOrientation: 'fourThree',
     paragraphs: [
-      'Na última quinta-feira, 3 de setembro, o tatame do Projeto Mão Com Mão ficou cheio de energia, aprendizado e novos alunos. A turma continua crescendo, mostrando a confiança das famílias e a força do trabalho realizado em nossa comunidade.',
+      'Na última quinta-feira, 3 de setembro, o Projeto Mão Com Mão realizou três turmas de jiu-jítsu. A foto desta matéria registra especificamente o treino das 19h, que encheu o tatame de energia, aprendizado e união.',
+      'Além da turma das 19h, outras duas turmas de porte semelhante também participaram das atividades no mesmo dia. Juntas, elas mostram como o projeto continua crescendo, conquistando a confiança das famílias e alcançando cada vez mais crianças e jovens da nossa comunidade.',
       'Esse crescimento é motivo de muita alegria, mas também traz um novo desafio: o espaço atual está ficando pequeno para receber todos com o conforto, a segurança e a estrutura que nossos atletas merecem.',
       'Por isso, o projeto está em busca de um novo local, mais amplo e adequado, onde possamos acolher mais crianças, fortalecer as turmas e ampliar as atividades oferecidas às famílias.',
       'Cada aluno que chega confirma que o esporte transforma vidas. Com união, apoio da comunidade e novas parcerias, seguiremos trabalhando para que o Mão Com Mão tenha um espaço à altura dos sonhos que estão crescendo dentro do tatame. Oss!'
