@@ -10,6 +10,9 @@ export type DiarioPost = {
   image: string;
   imageAlt: string;
   imageOrientation?: 'portrait' | 'landscape' | 'wide' | 'fourThree';
+  storyImage?: string;
+  storyImageAlt?: string;
+  storyImageCaption?: string;
   seoTitle?: string;
   keywords?: string[];
   youtubeId?: string;
@@ -19,6 +22,41 @@ export type DiarioPost = {
 };
 
 export const diarioPosts: DiarioPost[] = [
+  {
+    slug: 'chuva-infiltracao-treino-cancelado-novo-espaco',
+    title: 'A chuva interrompe o treino e reforça a busca por um novo espaço',
+    seoTitle: 'Chuva cancela treino de jiu-jítsu infantil em Diadema',
+    excerpt:
+      'A infiltração na sala voltou a impedir o treino do Projeto Mão Com Mão. O episódio reforça a necessidade de um espaço novo, seguro e adequado para as turmas.',
+    keywords: [
+      'treino de jiu-jítsu cancelado pela chuva',
+      'infiltração em projeto social',
+      'jiu-jítsu infantil em Diadema',
+      'Projeto Mão Com Mão',
+      'novo espaço para projeto social'
+    ],
+    category: 'Vídeo',
+    publishedAt: '2026-09-12',
+    publishedLabel: '12 de setembro de 2026',
+    eventDate: '2026-09-11',
+    eventDateLabel: 'Sexta-feira, 11 de setembro de 2026',
+    image: '/images/diario-video-treino-cancelado-chuva.jpg',
+    imageAlt: 'Capa do vídeo Treino cancelado por causa da chuva, do Projeto Mão Com Mão',
+    imageOrientation: 'wide',
+    storyImage: '/images/diario-infiltracao-busca-novo-espaco.jpg',
+    storyImageAlt: 'Alunos e professores do Projeto Mão Com Mão reunidos no espaço atual de treinamento',
+    storyImageCaption: 'Uma das turmas do Projeto Mão Com Mão reunida no espaço atual de treinamento.',
+    youtubeId: 'mLha5vpyDpw',
+    youtubeUrl: 'https://youtu.be/mLha5vpyDpw',
+    videoPublishedAt: '2026-09-11T07:00:19-03:00',
+    paragraphs: [
+      'Quando chove, o Projeto Mão Com Mão enfrenta um problema recorrente: a sala apresenta infiltrações. Desta vez, a situação impediu a realização do treino e a atividade precisou ser cancelada.',
+      'A segurança e o bem-estar dos alunos são prioridades. Com a entrada de água, fica difícil manter o tatame e o ambiente nas condições adequadas para receber crianças, jovens, professores e famílias.',
+      'Ao mesmo tempo, nossas turmas continuam crescendo. A foto mostra uma das turmas atendidas pelo projeto e ajuda a dimensionar o quanto precisamos de uma estrutura maior, protegida da chuva e preparada para acolher todos com segurança.',
+      'Por isso, seguimos em busca de um novo espaço em Diadema: coberto, seguro e adequado para dar continuidade às aulas gratuitas de jiu-jítsu e ampliar o impacto social do Projeto Mão Com Mão.',
+      'Assista ao vídeo e compartilhe esta história. O apoio da comunidade, de empresas e de parceiros pode nos ajudar a encontrar um novo local e evitar que a chuva interrompa novamente o desenvolvimento dos nossos atletas. Oss!'
+    ]
+  },
   {
     slug: 'treino-infantil-jiu-jitsu-gratuito-diadema',
     title: 'Treino infantil de jiu-jítsu gratuito em Diadema',

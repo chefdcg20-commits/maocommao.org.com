@@ -157,6 +157,22 @@ export default async function DiarioPostPage({ params }: PageProps) {
                   <strong className="block text-sm uppercase tracking-[0.15em] text-brand-600">Data do acontecimento</strong>
                   <time dateTime={post.eventDate} className="mt-2 block text-xl font-black">{post.eventDateLabel}</time>
                 </div>
+                {post.storyImage && post.storyImageAlt && (
+                  <figure className="mt-8 overflow-hidden rounded-3xl bg-slate-100">
+                    <Image
+                      src={post.storyImage}
+                      alt={post.storyImageAlt}
+                      width={1280}
+                      height={960}
+                      className="aspect-[4/3] w-full object-cover"
+                    />
+                    {post.storyImageCaption && (
+                      <figcaption className="px-5 py-4 text-sm leading-relaxed text-slate-600">
+                        {post.storyImageCaption}
+                      </figcaption>
+                    )}
+                  </figure>
+                )}
                 <div className="mt-8 space-y-6 text-lg leading-relaxed text-slate-700">
                   {post.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 </div>
