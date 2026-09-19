@@ -23,6 +23,65 @@ export type DiarioPost = {
 
 export const diarioPosts: DiarioPost[] = [
   {
+    slug: 'campanha-arrecadacao-alimentos-outubro-2026',
+    title: 'Campanha de arrecadação de alimentos: doe até 29 de outubro',
+    seoTitle: 'Arrecadação de alimentos em Diadema | Mão Com Mão',
+    excerpt:
+      'O Projeto Mão Com Mão está arrecadando alimentos não perecíveis para ajudar famílias. A campanha será encerrada na quinta-feira, 29 de outubro de 2026.',
+    keywords: [
+      'arrecadação de alimentos em Diadema',
+      'doação de alimentos',
+      'campanha solidária',
+      'Projeto Mão Com Mão',
+      'ajudar famílias em Diadema'
+    ],
+    category: 'Campanha',
+    publishedAt: '2026-09-19',
+    publishedLabel: '19 de setembro de 2026',
+    eventDate: '2026-10-29',
+    eventDateLabel: 'Encerramento: quinta-feira, 29 de outubro de 2026',
+    image: '/images/diario-campanha-arrecadacao-alimentos-2026.jpg',
+    imageAlt: 'Arte da campanha de arrecadação de alimentos do Projeto Mão Com Mão',
+    imageOrientation: 'portrait',
+    paragraphs: [
+      'O Projeto Mão Com Mão iniciou uma campanha de arrecadação de alimentos não perecíveis para apoiar famílias que precisam de ajuda em nossa comunidade.',
+      'Podem ser doados itens como arroz, feijão, macarrão, leite longa vida, óleo, enlatados e outros alimentos dentro do prazo de validade. Cada contribuição, independentemente da quantidade, fará diferença na mesa de uma família.',
+      'A campanha seguirá até a última quinta-feira de outubro e será encerrada no dia 29 de outubro de 2026. Até essa data, queremos mobilizar alunos, familiares, professores, parceiros e toda a comunidade de Diadema.',
+      'Para combinar a entrega dos alimentos, entre em contato com Daniel pelo WhatsApp disponível nesta página. Juntos podemos ajudar mais famílias e mostrar que solidariedade também faz parte do nosso maior combate.'
+    ]
+  },
+  {
+    slug: 'treino-com-bola-aprendendo-triangulo-jiu-jitsu',
+    title: 'Treino com bola: aprendendo triângulo no jiu-jítsu',
+    seoTitle: 'Treino de triângulo no jiu-jítsu infantil | Mão Com Mão',
+    excerpt:
+      'No vídeo mais recente do Projeto Mão Com Mão, a turma aprende o triângulo no jiu-jítsu com uma atividade dinâmica, divertida e adaptada para os alunos.',
+    keywords: [
+      'triângulo no jiu-jítsu',
+      'jiu-jítsu infantil em Diadema',
+      'treino de jiu-jítsu com bola',
+      'Projeto Mão Com Mão',
+      'aulas gratuitas de jiu-jítsu'
+    ],
+    category: 'Vídeo',
+    publishedAt: '2026-09-19',
+    publishedLabel: '19 de setembro de 2026',
+    eventDate: '2026-09-18',
+    eventDateLabel: 'Sexta-feira, 18 de setembro de 2026',
+    image: '/images/diario-video-treino-bola-triangulo.jpg',
+    imageAlt: 'Capa do vídeo Treino com bola, aprendendo triângulo no jiu-jítsu, do Projeto Mão Com Mão',
+    imageOrientation: 'wide',
+    youtubeId: 'D7qBQ7oqMCc',
+    youtubeUrl: 'https://youtu.be/D7qBQ7oqMCc',
+    videoPublishedAt: '2026-09-18T16:16:40-03:00',
+    paragraphs: [
+      'O vídeo mais recente do canal Mão Com Mão mostra uma aula diferente e divertida: o uso da bola como apoio para ensinar o triângulo, uma técnica importante do jiu-jítsu.',
+      'Atividades dinâmicas ajudam os alunos a compreender movimentos, posicionamento e coordenação de maneira mais leve, mantendo a atenção da turma e tornando o aprendizado mais envolvente.',
+      'O Projeto Mão Com Mão oferece aulas gratuitas de jiu-jítsu para crianças e jovens em Diadema, promovendo disciplina, respeito, inclusão e desenvolvimento por meio do esporte.',
+      'Assista ao vídeo, inscreva-se no canal e compartilhe com outras famílias. Cada visualização ajuda nosso projeto a alcançar mais pessoas. Oss!'
+    ]
+  },
+  {
     slug: 'chuva-infiltracao-treino-cancelado-novo-espaco',
     title: 'A chuva interrompe o treino e reforça a busca por um novo espaço',
     seoTitle: 'Chuva cancela treino de jiu-jítsu infantil em Diadema',
