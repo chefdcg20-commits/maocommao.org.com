@@ -23,6 +23,65 @@ export type DiarioPost = {
 
 export const diarioPosts: DiarioPost[] = [
   {
+    slug: 'treino-1000-polichinelos-superacao-jiu-jitsu',
+    title: 'Nunca é o mesmo treino: desafio dos 1.000 polichinelos',
+    seoTitle: 'Treino de jiu-jítsu com 1.000 polichinelos | Mão Com Mão',
+    excerpt:
+      'O novo vídeo do Projeto Mão Com Mão mostra um treino diferente, intenso e cheio de energia com o desafio dos 1.000 polichinelos.',
+    keywords: [
+      'treino de jiu-jítsu em Diadema',
+      '1.000 polichinelos',
+      'condicionamento físico no jiu-jítsu',
+      'Projeto Mão Com Mão',
+      'jiu-jítsu social'
+    ],
+    category: 'Vídeo',
+    publishedAt: '2026-09-25',
+    publishedLabel: '25 de setembro de 2026',
+    eventDate: '2026-09-25',
+    eventDateLabel: 'Sexta-feira, 25 de setembro de 2026',
+    image: '/images/diario-video-treino-1000-polichinelos.jpg',
+    imageAlt: 'Capa do vídeo Nunca é o mesmo treino de sempre, desafio dos 1.000 polichinelos, do Projeto Mão Com Mão',
+    imageOrientation: 'wide',
+    youtubeId: 'fbGBuOjWCo0',
+    youtubeUrl: 'https://youtu.be/fbGBuOjWCo0',
+    videoPublishedAt: '2026-09-25T07:00:12-03:00',
+    paragraphs: [
+      'No Projeto Mão Com Mão, cada aula pode trazer um desafio novo. O vídeo mais recente do nosso canal registra um treino intenso com o desafio dos 1.000 polichinelos.',
+      'Além das técnicas do jiu-jítsu, exercícios de condicionamento ajudam os alunos a desenvolver resistência, coordenação, disciplina e força para superar limites com responsabilidade.',
+      'A variedade das atividades mantém a turma motivada e mostra que evolução também nasce da persistência, da união e da disposição para encarar algo diferente.',
+      'Assista ao vídeo, inscreva-se no canal e compartilhe o trabalho do Projeto Mão Com Mão. Cada visualização ajuda nossas aulas sociais de jiu-jítsu em Diadema a alcançar mais pessoas. Oss!'
+    ]
+  },
+  {
+    slug: 'arrecadacao-alimentos-avancando-outubro-2026',
+    title: 'Arrecadação de alimentos está avançando: participe até 29 de outubro',
+    seoTitle: 'Arrecadação de alimentos avança em Diadema | Mão Com Mão',
+    excerpt:
+      'A arrecadação de alimentos do Projeto Mão Com Mão está avançando com o apoio da comunidade. As doações podem ser entregues até 29 de outubro de 2026.',
+    keywords: [
+      'arrecadação de alimentos em Diadema',
+      'doação de alimentos não perecíveis',
+      'Projeto Mão Com Mão',
+      'campanha solidária em Diadema',
+      '29 de outubro de 2026'
+    ],
+    category: 'Campanha',
+    publishedAt: '2026-09-25',
+    publishedLabel: '25 de setembro de 2026',
+    eventDate: '2026-10-29',
+    eventDateLabel: 'Encerramento: quinta-feira, 29 de outubro de 2026',
+    image: '/images/diario-arrecadacao-alimentos-avancando.jpg',
+    imageAlt: 'A arrecadação de alimentos está avançando com a participação dos alunos, professores e famílias do Projeto Mão Com Mão',
+    imageOrientation: 'fourThree',
+    paragraphs: [
+      'A arrecadação de alimentos do Projeto Mão Com Mão está avançando. A participação dos alunos, professores, famílias e apoiadores mostra mais uma vez a força da nossa comunidade quando todos caminham juntos.',
+      'Seguimos recebendo alimentos não perecíveis, como arroz, feijão, macarrão, leite longa vida, óleo e enlatados dentro do prazo de validade. Cada item doado ajudará famílias que precisam de apoio.',
+      'A campanha termina na quinta-feira, 29 de outubro de 2026. Ainda há tempo para participar, mobilizar amigos e contribuir com essa corrente de solidariedade.',
+      'Para combinar a entrega dos alimentos, fale com Daniel pelo WhatsApp disponível no site. Juntos podemos ampliar o resultado da campanha e ajudar ainda mais famílias de Diadema.'
+    ]
+  },
+  {
     slug: 'campanha-arrecadacao-alimentos-outubro-2026',
     title: 'Campanha de arrecadação de alimentos: doe até 29 de outubro',
     seoTitle: 'Arrecadação de alimentos em Diadema | Mão Com Mão',
