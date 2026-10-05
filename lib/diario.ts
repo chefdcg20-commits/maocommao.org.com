@@ -23,6 +23,70 @@ export type DiarioPost = {
 
 export const diarioPosts: DiarioPost[] = [
   {
+    slug: 'testemunho-mae-alta-medica-jiu-jitsu',
+    title: 'Mãe relata avanços da filha com o jiu-jítsu e alta médica',
+    seoTitle: 'Testemunho: jiu-jítsu, disciplina e bem-estar | Mão Com Mão',
+    excerpt:
+      'Em depoimento ao Projeto Mão Com Mão, uma mãe conta que a filha apresentou avanços no bem-estar, recebeu alta médica e teve a medicação suspensa por orientação profissional.',
+    keywords: [
+      'testemunho jiu-jítsu infantil',
+      'jiu-jítsu e bem-estar infantil',
+      'TDAH e esporte',
+      'ansiedade infantil e atividade física',
+      'Projeto Mão Com Mão Diadema'
+    ],
+    category: 'Vídeo',
+    publishedAt: '2026-10-05',
+    publishedLabel: '5 de outubro de 2026',
+    eventDate: '2026-10-02',
+    eventDateLabel: 'Sexta-feira, 2 de outubro de 2026',
+    image: '/images/diario-video-testemunho-mae-alta-medica.jpg',
+    imageAlt: 'Capa do vídeo com o testemunho de uma mãe sobre os avanços da filha após começar no jiu-jítsu',
+    imageOrientation: 'wide',
+    youtubeId: '9jPNSiILhws',
+    youtubeUrl: 'https://youtu.be/9jPNSiILhws',
+    videoPublishedAt: '2026-10-02T07:00:27-03:00',
+    paragraphs: [
+      'No vídeo mais recente do canal Mão Com Mão, uma mãe compartilha um testemunho emocionante sobre mudanças que observou na filha depois que ela passou a participar das aulas de jiu-jítsu.',
+      'Segundo o relato da mãe, a criança havia recebido diagnóstico de TDAH, enfrentava ansiedade e fazia uso de medicação. Ela conta que, depois de um período praticando o esporte e mantendo o acompanhamento de saúde, a filha recebeu alta médica e teve a medicação suspensa por orientação profissional.',
+      'O depoimento mostra como uma rotina esportiva pode contribuir para disciplina, convivência, autoestima, concentração e bem-estar. Cada criança, porém, tem necessidades próprias: o jiu-jítsu não substitui diagnóstico, tratamento nem acompanhamento médico.',
+      'Qualquer alteração ou suspensão de medicamentos deve ser decidida exclusivamente pelos profissionais de saúde responsáveis pela criança. O Projeto Mão Com Mão oferece apoio social e esportivo, sem prestar orientação médica.',
+      'Assista ao vídeo, conheça esse testemunho e compartilhe o trabalho do Projeto Mão Com Mão. Cada visualização ajuda as aulas sociais de jiu-jítsu em Diadema a alcançar novas famílias. Oss!'
+    ]
+  },
+  {
+    slug: 'ultimo-treino-100-assinaturas-reforma-ginasio',
+    title: 'Último treino reúne as turmas e abaixo-assinado alcança 100 assinaturas',
+    seoTitle: '100 assinaturas pela reforma do ginásio em Diadema',
+    excerpt:
+      'As fotos do último treino registram a força das turmas do Projeto Mão Com Mão. A mobilização pela reforma do ginásio já alcançou 100 assinaturas.',
+    keywords: [
+      'reforma do ginásio em Diadema',
+      'abaixo-assinado projeto social',
+      '100 assinaturas',
+      'jiu-jítsu social em Diadema',
+      'Projeto Mão Com Mão'
+    ],
+    category: 'Comunidade',
+    publishedAt: '2026-10-05',
+    publishedLabel: '5 de outubro de 2026',
+    eventDate: '2026-10-01',
+    eventDateLabel: 'Quinta-feira, 1º de outubro de 2026',
+    image: '/images/diario-ultimo-treino-100-assinaturas.jpg',
+    imageAlt: 'Alunos e professores do Projeto Mão Com Mão reunidos no último treino de jiu-jítsu',
+    imageOrientation: 'fourThree',
+    storyImage: '/images/diario-ultimo-treino-turma-jovens.jpg',
+    storyImageAlt: 'Turma de jovens e professores do Projeto Mão Com Mão reunidos após o treino',
+    storyImageCaption: 'Mais uma turma reunida no tatame, mostrando o crescimento e a união do Projeto Mão Com Mão.',
+    paragraphs: [
+      'O último treino reuniu crianças, jovens, professores e familiares em mais uma noite de aprendizado, disciplina e convivência no tatame do Projeto Mão Com Mão.',
+      'Além da força das turmas, celebramos uma conquista importante para a comunidade: o abaixo-assinado em apoio à reforma do Ginásio Rômulo Ducan Arante alcançou 100 assinaturas.',
+      'A mobilização busca reforçar a necessidade de melhorias no espaço, para que alunos e professores tenham um ambiente mais seguro, adequado e preparado para receber as atividades esportivas e sociais.',
+      'As 100 assinaturas não encerram o trabalho, mas demonstram participação popular e fortalecem o pedido de reforma. Cada apoio representa uma família que acredita no esporte como instrumento de oportunidade e transformação em Diadema.',
+      'Seguiremos dialogando com a comunidade e buscando melhorias para o ginásio, para que o Projeto Mão Com Mão possa atender cada vez mais alunos com dignidade e segurança.'
+    ]
+  },
+  {
     slug: 'treino-1000-polichinelos-superacao-jiu-jitsu',
     title: 'Nunca é o mesmo treino: desafio dos 1.000 polichinelos',
     seoTitle: 'Treino de jiu-jítsu com 1.000 polichinelos | Mão Com Mão',
