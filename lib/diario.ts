@@ -23,6 +23,38 @@ export type DiarioPost = {
 
 export const diarioPosts: DiarioPost[] = [
   {
+    slug: 'treino-insano-criancas-contra-sensei-jok',
+    title: 'Crianças unem forças em treino divertido contra o Sensei Jok',
+    seoTitle: 'Jiu-jítsu infantil em Diadema: desafio contra o Sensei Jok',
+    excerpt:
+      'Em um treino cheio de energia, as crianças do Projeto Mão Com Mão unem técnica, força e trabalho em equipe para tentar derrubar o Sensei Jok.',
+    keywords: [
+      'jiu-jítsu infantil em Diadema',
+      'treino de jiu-jítsu para crianças',
+      'Sensei Jok',
+      'Projeto Mão Com Mão',
+      'esporte social em Diadema'
+    ],
+    category: 'Vídeo',
+    publishedAt: '2026-10-09',
+    publishedLabel: '9 de outubro de 2026',
+    eventDate: '2026-10-08',
+    eventDateLabel: 'Quinta-feira, 8 de outubro de 2026',
+    image: '/images/diario-video-treino-insano-sensei-jok.jpg',
+    imageAlt: 'Capa do vídeo em que crianças do Projeto Mão Com Mão desafiam o Sensei Jok em um treino de jiu-jítsu',
+    imageOrientation: 'wide',
+    youtubeId: 'jq6RIIUnyqI',
+    youtubeUrl: 'https://youtu.be/jq6RIIUnyqI',
+    videoPublishedAt: '2026-10-09T07:00:34-03:00',
+    paragraphs: [
+      'O novo vídeo do canal Mão Com Mão registra um treino que transformou o tatame em um desafio coletivo: a criançada uniu forças para tentar derrubar o Sensei Jok.',
+      'A atividade combina técnica, força, equilíbrio e muita diversão. Mais do que buscar uma queda, os alunos precisam cooperar, respeitar as orientações e aplicar o que aprendem durante as aulas.',
+      'Desafios lúdicos como esse mantêm as crianças motivadas e ajudam a desenvolver disciplina, confiança, amizade e espírito de equipe. É assim que o jiu-jítsu se torna uma ferramenta de formação dentro e fora do tatame.',
+      'Será que a turma conseguiu derrubar o Sensei Jok? Assista ao vídeo até o final para descobrir e conhecer um pouco mais das aulas gratuitas de jiu-jítsu infantil do Projeto Mão Com Mão em Diadema.',
+      'Inscreva-se no canal e compartilhe a matéria. Cada visualização ajuda o projeto a alcançar novas famílias e amplia a força do esporte social em nossa comunidade. Oss!'
+    ]
+  },
+  {
     slug: 'testemunho-mae-alta-medica-jiu-jitsu',
     title: 'Mãe relata avanços da filha com o jiu-jítsu e alta médica',
     seoTitle: 'Testemunho: jiu-jítsu, disciplina e bem-estar | Mão Com Mão',
