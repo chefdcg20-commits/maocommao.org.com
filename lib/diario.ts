@@ -13,6 +13,11 @@ export type DiarioPost = {
   storyImage?: string;
   storyImageAlt?: string;
   storyImageCaption?: string;
+  gallery?: Array<{
+    src: string;
+    alt: string;
+    caption?: string;
+  }>;
   seoTitle?: string;
   keywords?: string[];
   youtubeId?: string;
@@ -22,6 +27,47 @@ export type DiarioPost = {
 };
 
 export const diarioPosts: DiarioPost[] = [
+  {
+    slug: 'turma-expandindo-projeto-pede-espaco-maior',
+    title: 'A turma está expandindo: projeto continua pedindo um espaço maior',
+    seoTitle: 'Projeto de jiu-jítsu cresce e pede espaço maior em Diadema',
+    excerpt:
+      'O crescimento das turmas levou o Projeto Mão Com Mão a ampliar a carga horária e dividir os alunos em três grupos para atender as famílias com segurança e qualidade.',
+    keywords: [
+      'projeto de jiu-jítsu em Diadema',
+      'jiu-jítsu infantil em Diadema',
+      'esporte social para crianças',
+      'Projeto Mão Com Mão',
+      'espaço para projeto social'
+    ],
+    category: 'Comunidade',
+    publishedAt: '2026-10-15',
+    publishedLabel: '15 de outubro de 2026',
+    eventDate: '2026-10-15',
+    eventDateLabel: 'Quinta-feira, 15 de outubro de 2026',
+    image: '/images/diario-turma-expandindo-jovens.jpg',
+    imageAlt: 'Turma de jovens e professores do Projeto Mão Com Mão reunidos no tatame em Diadema',
+    imageOrientation: 'fourThree',
+    gallery: [
+      {
+        src: '/images/diario-turma-expandindo-infantil-1.jpg',
+        alt: 'Primeira turma infantil do Projeto Mão Com Mão reunida depois do treino de jiu-jítsu',
+        caption: 'Uma das turmas infantis organizadas para receber melhor os alunos no espaço disponível.'
+      },
+      {
+        src: '/images/diario-turma-expandindo-infantil-2.jpg',
+        alt: 'Segunda turma infantil com alunos, familiares e professores do Projeto Mão Com Mão',
+        caption: 'O crescimento do projeto reflete a participação das famílias e a força do jiu-jítsu na comunidade.'
+      }
+    ],
+    paragraphs: [
+      'A turma cresceu tanto que o Projeto Mão Com Mão precisou aumentar a carga horária dos treinos e dividir os alunos em três grupos para acomodar todos no espaço disponível.',
+      'A nova organização permite oferecer aulas com mais segurança, atenção e qualidade. Ao mesmo tempo, mostra que o espaço atual está ficando pequeno diante do interesse de crianças, jovens e famílias da região.',
+      'Esse crescimento representa a evolução do jiu-jítsu em nossa comunidade e a integração das famílias ao projeto de artes marciais. O tatame se tornou um ponto de encontro para disciplina, respeito, convivência e oportunidades.',
+      'O Projeto Mão Com Mão continua pedindo um espaço maior, adequado ao número de alunos e às atividades desenvolvidas. Com apoio público, privado e comunitário, será possível ampliar o atendimento e alcançar ainda mais pessoas.',
+      'Vale a pena acreditar no esporte e em sua capacidade de transformar vidas. — Daniel Guedes, secretário e professor do Projeto Mão Com Mão. Oss!'
+    ]
+  },
   {
     slug: 'jiu-jitsu-kids-desafio-derrubar-luisao',
     title: 'Jiu-jítsu Kids unem forças para tentar derrubar o Luisão',

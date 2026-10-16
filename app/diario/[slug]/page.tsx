@@ -176,6 +176,26 @@ export default async function DiarioPostPage({ params }: PageProps) {
                 <div className="mt-8 space-y-6 text-lg leading-relaxed text-slate-700">
                   {post.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 </div>
+                {post.gallery && post.gallery.length > 0 && (
+                  <div className="mt-10 grid gap-6 md:grid-cols-2">
+                    {post.gallery.map((photo) => (
+                      <figure key={photo.src} className="overflow-hidden rounded-3xl bg-slate-100">
+                        <Image
+                          src={photo.src}
+                          alt={photo.alt}
+                          width={1280}
+                          height={960}
+                          className="aspect-[4/3] w-full object-cover"
+                        />
+                        {photo.caption && (
+                          <figcaption className="px-5 py-4 text-sm leading-relaxed text-slate-600">
+                            {photo.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    ))}
+                  </div>
+                )}
                 <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                   {post.youtubeUrl && (
                     <a href={post.youtubeUrl} target="_blank" rel="noopener noreferrer" className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-6 py-4 font-black text-white transition hover:bg-red-700">
