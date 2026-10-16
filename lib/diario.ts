@@ -23,6 +23,38 @@ export type DiarioPost = {
 
 export const diarioPosts: DiarioPost[] = [
   {
+    slug: 'jiu-jitsu-kids-desafio-derrubar-luisao',
+    title: 'Jiu-jítsu Kids unem forças para tentar derrubar o Luisão',
+    seoTitle: 'Jiu-jítsu infantil em Diadema: desafio contra o Luisão',
+    excerpt:
+      'No novo vídeo do Projeto Mão Com Mão, a turma infantil entra em ação e trabalha em equipe em um desafio divertido para tentar derrubar o Luisão.',
+    keywords: [
+      'jiu-jítsu infantil em Diadema',
+      'jiu-jítsu kids',
+      'treino de jiu-jítsu para crianças',
+      'Projeto Mão Com Mão',
+      'esporte social em Diadema'
+    ],
+    category: 'Vídeo',
+    publishedAt: '2026-10-15',
+    publishedLabel: '15 de outubro de 2026',
+    eventDate: '2026-10-15',
+    eventDateLabel: 'Quinta-feira, 15 de outubro de 2026',
+    image: '/images/diario-video-jiu-jitsu-kids-luisao.png',
+    imageAlt: 'Capa do vídeo em que crianças do Projeto Mão Com Mão tentam derrubar o professor Luisão durante o treino de jiu-jítsu',
+    imageOrientation: 'wide',
+    youtubeId: 'dnFIAJvLRu0',
+    youtubeUrl: 'https://youtu.be/dnFIAJvLRu0',
+    videoPublishedAt: '2026-10-15T23:18:00-03:00',
+    paragraphs: [
+      'O novo vídeo do canal Mão Com Mão mostra um momento especial do treino infantil: os alunos se unem em um desafio coletivo para tentar derrubar o Luisão no tatame.',
+      'A brincadeira exige mais do que força. As crianças precisam coordenar movimentos, manter o equilíbrio, ouvir as orientações e trabalhar juntas para alcançar o objetivo.',
+      'Atividades lúdicas como essa tornam o aprendizado mais envolvente e ajudam a desenvolver confiança, disciplina, respeito, cooperação e amizade entre os alunos.',
+      'O desafio também mostra a alegria presente nas aulas gratuitas de jiu-jítsu do Projeto Mão Com Mão em Diadema, onde o esporte é usado como ferramenta de educação e transformação social.',
+      'Será que o Jiu-jítsu Kids conseguiu derrubar o Luisão? Assista ao vídeo até o final, inscreva-se no canal e compartilhe. Cada visualização ajuda o projeto a alcançar novas famílias. Oss!'
+    ]
+  },
+  {
     slug: 'treino-insano-criancas-contra-sensei-jok',
     title: 'Crianças unem forças em treino divertido contra o Sensei Jok',
     seoTitle: 'Jiu-jítsu infantil em Diadema: desafio contra o Sensei Jok',
