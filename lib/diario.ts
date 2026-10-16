@@ -22,6 +22,7 @@ export type DiarioPost = {
   keywords?: string[];
   youtubeId?: string;
   youtubeUrl?: string;
+  useCustomVideoCover?: boolean;
   videoPublishedAt?: string;
   paragraphs: string[];
 };
@@ -91,6 +92,7 @@ export const diarioPosts: DiarioPost[] = [
     imageOrientation: 'wide',
     youtubeId: 'dnFIAJvLRu0',
     youtubeUrl: 'https://youtu.be/dnFIAJvLRu0',
+    useCustomVideoCover: true,
     videoPublishedAt: '2026-10-15T23:18:00-03:00',
     paragraphs: [
       'O novo vídeo do canal Mão Com Mão mostra um momento especial do treino infantil: os alunos se unem em um desafio coletivo para tentar derrubar o Luisão no tatame.',

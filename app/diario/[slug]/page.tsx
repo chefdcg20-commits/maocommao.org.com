@@ -125,7 +125,30 @@ export default async function DiarioPostPage({ params }: PageProps) {
 
           <div className="container-site py-10 sm:py-14">
             <div className="mx-auto max-w-4xl overflow-hidden rounded-[2rem] bg-white shadow-soft">
-              {post.youtubeId ? (
+              {post.youtubeId && post.useCustomVideoCover ? (
+                <a
+                  href={post.youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Assistir ${post.title} no YouTube`}
+                  className="focus-ring group relative block aspect-video w-full overflow-hidden bg-slate-950"
+                >
+                  <Image
+                    src={post.image}
+                    alt={post.imageAlt}
+                    width={1280}
+                    height={720}
+                    priority
+                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center bg-slate-950/15 transition group-hover:bg-slate-950/25">
+                    <span className="inline-flex items-center gap-3 rounded-full bg-red-600 px-6 py-4 text-lg font-black text-white shadow-xl">
+                      <FaYoutube className="text-2xl" aria-hidden />
+                      Assistir no YouTube
+                    </span>
+                  </span>
+                </a>
+              ) : post.youtubeId ? (
                 <div className="aspect-video w-full bg-slate-950">
                   <iframe
                     src={`https://www.youtube-nocookie.com/embed/${post.youtubeId}`}
