@@ -8,7 +8,8 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
-      allow: '/'
+      allow: '/',
+      disallow: ['/admin/', '/cadastro-aluno/']
     },
     sitemap: [`${siteUrl}/sitemap.xml`, `${siteUrl}/video-sitemap.xml`]
   };
