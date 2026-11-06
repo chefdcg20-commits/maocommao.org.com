@@ -2,26 +2,48 @@
 
 import { FormEvent, useMemo, useState } from "react";
 
+const ERRORS: Record<string, string> = {
+  default: "Não foi possível enviar. Tente novamente em instantes.",
+  invalid_invite: "Convite inválido. Solicite um novo link ao secretário do projeto.",
+  expired_invite: "Este convite expirou. Solicite um novo link ao secretário do projeto.",
+  invite_limit: "Este convite atingiu o limite de cadastros. Solicite um novo link.",
+  file_too_large: "Uma das imagens é grande demais (foto até 5 MB, assinatura até 2 MB).",
+  invalid_file_type: "Envie as imagens em formato JPG, PNG ou WebP.",
+  missing_files: "Envie a foto do aluno e a foto da assinatura.",
+  invalid_training_time: "Escolha um horário de treino válido (18h, 19h ou 20h).",
+  missing_field: "Preencha todos os campos obrigatórios.",
+  upload_failed: "Falha ao enviar as imagens. Tente novamente em instantes.",
+  invite_lookup_failed: "Erro temporário no servidor. Tente novamente em alguns minutos.",
+  database_error: "Erro temporário ao salvar o cadastro. Tente novamente em alguns minutos.",
+  server_misconfigured: "Erro temporário no servidor. Avise a equipe do projeto.",
+};
+
 const field = "mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-amber-400";
 
 export default function EnrollmentForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState(ERRORS.default);
   const token = useMemo(() => typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("convite") || "", []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!token) { setStatus("error"); return; }
+    if (!token) { setErrorMessage(ERRORS.invalid_invite); setStatus("error"); return; }
     setStatus("sending");
     const endpoint = process.env.NEXT_PUBLIC_ENROLLMENT_ENDPOINT || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/submit-enrollment";
-    if (!endpoint) { setStatus("error"); return; }
-    const body = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const body = new FormData(form);
     body.set("invite_token", token);
     try {
       const response = await fetch(endpoint, { method: "POST", body });
-      if (!response.ok) throw new Error("submission_failed");
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        setErrorMessage(ERRORS[result?.error as string] || ERRORS.default);
+        setStatus("error");
+        return;
+      }
       setStatus("success");
-      event.currentTarget.reset();
-    } catch { setStatus("error"); }
+      form.reset();
+    } catch { setErrorMessage("Sem conexão com o servidor. Verifique a internet e tente novamente."); setStatus("error"); }
   }
 
   if (!token) return <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-6 text-center"><h2 className="text-xl font-bold text-amber-300">Convite necessário</h2><p className="mt-2 text-slate-300">Solicite ao secretário do projeto um link válido para realizar o cadastro.</p></div>;
@@ -32,6 +54,7 @@ export default function EnrollmentForm() {
       <Section title="Dados do aluno">
         <Label text="Nome completo"><input className={field} name="student_full_name" required /></Label>
         <Label text="Data de nascimento"><input className={field} type="date" name="birth_date" required /></Label>
+        <Label text="Horário de treino"><select className={field} name="training_time" required defaultValue=""><option value="" disabled>Selecione o horário</option><option value="18:00">18h</option><option value="19:00">19h</option><option value="20:00">20h</option></select></Label>
         <Label text="Foto atual do aluno"><input className={field} type="file" name="student_photo" accept="image/jpeg,image/png,image/webp" capture="user" required /><small className="mt-2 block text-slate-400">No celular, você poderá tirar a foto na hora.</small></Label>
       </Section>
       <Section title="Responsável legal">
@@ -54,7 +77,7 @@ export default function EnrollmentForm() {
         <Label text="Assinatura do responsável"><input className={field} type="file" name="guardian_signature" accept="image/jpeg,image/png,image/webp" capture="environment" required /><small className="mt-2 block text-slate-400">Envie uma foto nítida da assinatura em papel branco.</small></Label>
         <label className="flex gap-3"><input type="checkbox" required className="mt-1 h-5 w-5 accent-amber-400" /><span className="text-sm text-slate-300">Declaro que as informações são verdadeiras e que sou responsável legal pelo aluno.</span></label>
       </Section>
-      {status === "error" && <p role="alert" className="rounded-xl bg-red-500/15 p-4 text-red-300">Não foi possível enviar. Verifique se o convite é válido e tente novamente.</p>}
+      {status === "error" && <p role="alert" className="rounded-xl bg-red-500/15 p-4 text-red-300">{errorMessage}</p>}
       <button disabled={status === "sending"} className="w-full rounded-xl bg-amber-400 px-5 py-4 text-lg font-black text-slate-950 hover:bg-amber-300 disabled:opacity-60">{status === "sending" ? "Enviando com segurança..." : "Enviar cadastro para análise"}</button>
       <p className="text-center text-xs leading-5 text-slate-500">Os dados são privados e utilizados somente para gestão dos alunos, segurança das atividades e emissão da carteirinha.</p>
     </form>

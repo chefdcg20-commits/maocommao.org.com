@@ -29,9 +29,10 @@ Deno.serve(async (request) => {
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   try {
-    const secretKeys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}");
+    let secretKeys: Record<string, string> = {};
+    try { secretKeys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}"); } catch { /* formato inesperado */ }
     const adminKey = secretKeys.default || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    if (!adminKey) throw new Error("missing_admin_key");
+    if (!adminKey) { console.error("[enroll] stage=config error=missing_admin_key"); return json({ error: "server_misconfigured" }, 500); }
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       adminKey,
@@ -46,9 +47,17 @@ Deno.serve(async (request) => {
       .eq("token_hash", tokenHash)
       .maybeSingle();
 
-    if (inviteError || !invite || !invite.active) return json({ error: "invalid_invite" }, 403);
-    if (invite.expires_at && new Date(invite.expires_at) < new Date()) return json({ error: "expired_invite" }, 403);
-    if (invite.max_uses !== null && invite.uses_count >= invite.max_uses) return json({ error: "invite_limit" }, 403);
+    if (inviteError) {
+      console.error(`[enroll] stage=invite_lookup db_code=${inviteError.code ?? "?"} db_message=${inviteError.message}`);
+      return json({ error: "invite_lookup_failed" }, 500);
+    }
+    if (!invite) { console.error("[enroll] stage=invite result=not_found token_len=" + rawToken.length); return json({ error: "invalid_invite" }, 403); }
+    if (!invite.active) { console.error("[enroll] stage=invite result=inactive"); return json({ error: "invalid_invite" }, 403); }
+    if (invite.expires_at && new Date(invite.expires_at) < new Date()) { console.error("[enroll] stage=invite result=expired"); return json({ error: "expired_invite" }, 403); }
+    if (invite.max_uses !== null && invite.uses_count >= invite.max_uses) { console.error("[enroll] stage=invite result=limit_reached"); return json({ error: "invite_limit" }, 403); }
+
+    const trainingTime = text(data, "training_time");
+    if (!["18:00", "19:00", "20:00"].includes(trainingTime!)) return json({ error: "invalid_training_time" }, 400);
 
     const photo = data.get("student_photo");
     const signature = data.get("guardian_signature");
@@ -63,16 +72,18 @@ Deno.serve(async (request) => {
     const signaturePath = `${enrollmentId}/responsavel.${extension(signature)}`;
 
     const photoUpload = await supabase.storage.from("student-photos").upload(photoPath, photo, { contentType: photo.type, upsert: false });
-    if (photoUpload.error) throw photoUpload.error;
+    if (photoUpload.error) { console.error(`[enroll] stage=upload_photo message=${photoUpload.error.message}`); return json({ error: "upload_failed" }, 500); }
     const signatureUpload = await supabase.storage.from("guardian-signatures").upload(signaturePath, signature, { contentType: signature.type, upsert: false });
     if (signatureUpload.error) {
       await supabase.storage.from("student-photos").remove([photoPath]);
-      throw signatureUpload.error;
+      console.error(`[enroll] stage=upload_signature message=${signatureUpload.error.message}`);
+      return json({ error: "upload_failed" }, 500);
     }
 
     const payload = {
       id: enrollmentId,
       student_full_name: text(data, "student_full_name"),
+      training_time: trainingTime,
       birth_date: text(data, "birth_date"),
       photo_path: photoPath,
       guardian_full_name: text(data, "guardian_full_name"),
@@ -101,14 +112,16 @@ Deno.serve(async (request) => {
         supabase.storage.from("student-photos").remove([photoPath]),
         supabase.storage.from("guardian-signatures").remove([signaturePath]),
       ]);
-      throw error;
+      console.error(`[enroll] stage=insert db_code=${error.code ?? "?"} db_message=${error.message}`);
+      return json({ error: "database_error" }, 500);
     }
 
     await supabase.from("enrollment_events").insert({ enrollment_id: enrollmentId, event_type: "submitted" });
     await supabase.from("enrollment_invites").update({ uses_count: invite.uses_count + 1 }).eq("id", invite.id);
     return json({ ok: true, protocol: enrollment.protocol }, 201);
   } catch (error) {
-    console.error(error);
-    return json({ error: "submission_failed" }, 400);
+    const message = error instanceof Error ? error.message : "unknown";
+    console.error(`[enroll] stage=unexpected message=${message}`);
+    return json({ error: message.startsWith("missing:") ? "missing_field" : "submission_failed" }, 400);
   }
 });
