@@ -11,12 +11,62 @@ type Student = {
   photo_url: string | null; sensei_signature_url: string | null; sensei_name: string;
 };
 
+// Tira o fundo branco da foto da assinatura: so o traco fica, em branco, para ler bem sobre o azul escuro.
+async function whiteInk(url: string): Promise<string> {
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const el = new Image();
+    el.crossOrigin = "anonymous";
+    el.onload = () => resolve(el);
+    el.onerror = () => reject(new Error("load"));
+    el.src = url;
+  });
+  const scale = Math.min(1, 1400 / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.max(1, Math.round(img.naturalWidth * scale));
+  const h = Math.max(1, Math.round(img.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h);
+  ctx.drawImage(img, 0, 0, w, h);
+  const frame = ctx.getImageData(0, 0, w, h);
+  const px = frame.data;
+  const lum = new Uint8Array(w * h);
+  const hist = new Uint32Array(256);
+  for (let i = 0; i < w * h; i++) {
+    const l = Math.round(0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2]);
+    lum[i] = l; hist[l]++;
+  }
+  // nivel do papel = percentil 90 da luminosidade (compensa sombra e luz da foto)
+  let acc = 0, paper = 255;
+  for (let l = 0; l < 256; l++) { acc += hist[l]; if (acc >= w * h * 0.9) { paper = l; break; } }
+  paper = Math.max(paper, 120);
+  let minX = w, minY = h, maxX = -1, maxY = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = y * w + x;
+    const alpha = Math.max(0, Math.min(1, (paper * 0.82 - lum[i]) / (paper * 0.42)));
+    const a = Math.round(alpha * 255);
+    px[i * 4] = 255; px[i * 4 + 1] = 255; px[i * 4 + 2] = 255; px[i * 4 + 3] = a;
+    if (a > 90) { if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
+  }
+  if (maxX < 0) throw new Error("empty");
+  ctx.clearRect(0, 0, w, h);
+  ctx.putImageData(frame, 0, 0);
+  const pad = Math.round(Math.max(maxX - minX, maxY - minY) * 0.02) + 2;
+  const sx = Math.max(0, minX - pad), sy = Math.max(0, minY - pad);
+  const sw = Math.min(w - sx, maxX - minX + 1 + pad * 2), sh = Math.min(h - sy, maxY - minY + 1 + pad * 2);
+  const out = document.createElement("canvas");
+  out.width = sw; out.height = sh;
+  out.getContext("2d")!.drawImage(canvas, sx, sy, sw, sh, 0, 0, sw, sh);
+  return out.toDataURL("image/png");
+}
+
 const cardClass = "member-card relative aspect-[85.6/53.98] w-full overflow-hidden rounded-[1.35rem] border border-amber-400/35 bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white shadow-2xl";
 const date = (value: string | null) => value ? new Date(`${value}T00:00:00`).toLocaleDateString("pt-BR") : "—";
 
 export default function CardView() {
   const [student, setStudent] = useState<Student | null>(null);
   const [message, setMessage] = useState("Carregando...");
+  const [ink, setInk] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -32,6 +82,11 @@ export default function CardView() {
       setStudent(found);
     })().catch(() => setMessage("Não foi possível carregar a carteirinha."));
   }, []);
+
+  useEffect(() => {
+    if (!student?.sensei_signature_url) return;
+    whiteInk(student.sensei_signature_url).then(setInk).catch(() => setInk(null));
+  }, [student]);
 
   if (!student) return <main className="min-h-screen bg-slate-950 p-10 text-center text-slate-300">{message}<p className="mt-4"><a href="/admin/cadastros/" className="font-bold text-amber-400 underline">Ir para o painel</a></p></main>;
 
@@ -100,8 +155,10 @@ export default function CardView() {
               <div className="mt-[4%] grid grid-cols-[1fr_23%] items-center gap-[4%] rounded-xl border border-white/10 bg-white/5 p-[4%]">
                 <div>
                   <p className="text-[clamp(0.4rem,0.9vw,0.62rem)] font-black uppercase tracking-widest text-amber-400">Aprovação do Sensei</p>
-                  <div className="mt-[5%] flex h-[clamp(1.6rem,4vw,2.6rem)] items-end justify-center border-b border-white/60 pb-[1%]">
-                    {student.sensei_signature_url && <img src={student.sensei_signature_url} alt="Assinatura do Sensei" className="max-h-full max-w-full rounded bg-white object-contain px-1" />}
+                  <div className="mt-[3%] flex h-[clamp(2.4rem,6vw,3.9rem)] items-end justify-center border-b border-white/60 pb-[1%]">
+                    {ink
+                      ? <img src={ink} alt="Assinatura do Sensei" className="h-full w-full object-contain object-bottom" />
+                      : student.sensei_signature_url && <img src={student.sensei_signature_url} alt="Assinatura do Sensei" className="max-h-full max-w-full rounded bg-white object-contain px-1" />}
                   </div>
                   <p className="mt-[1.5%] text-center text-[clamp(0.62rem,1.4vw,0.95rem)] font-black">{student.sensei_name || "Joaquim Guedes"}</p>
                   <p className="text-center text-[clamp(0.4rem,0.9vw,0.62rem)] text-slate-400">Sensei do Projeto Mão Com Mão</p>
