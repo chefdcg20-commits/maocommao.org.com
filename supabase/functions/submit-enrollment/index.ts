@@ -29,9 +29,12 @@ Deno.serve(async (request) => {
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   try {
+    const secretKeys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}");
+    const adminKey = secretKeys.default || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!adminKey) throw new Error("missing_admin_key");
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      adminKey,
       { auth: { persistSession: false } },
     );
     const data = await request.formData();
