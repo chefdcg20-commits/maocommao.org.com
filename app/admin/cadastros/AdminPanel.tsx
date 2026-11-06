@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { BELTS } from "../belts";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_ADMIN_ENDPOINT || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/admin-enrollments";
 const TOKEN_KEY = "mcm-admin-token";
@@ -13,6 +14,7 @@ type Enrollment = {
   address_state: string; emergency_contact_name: string | null; emergency_contact_phone: string | null;
   health_notes: string | null; image_consent: boolean; photo_url: string | null; signature_url: string | null;
   membership_number: string | null; card_valid_until: string | null; sensei_signature_url: string | null;
+  belt: string | null; belt_stripes: number;
 };
 
 const STATUS: Record<string, string> = {
@@ -148,6 +150,13 @@ export default function AdminPanel() {
     } catch { setBusy(false); setMessage("Não foi possível ler essa imagem."); }
   }
 
+  async function changeBelt(id: string, belt: string | null, stripes: number) {
+    const result = await call({ action: "set_belt", id, belt, stripes }, token);
+    if (result.status === 401) return logout("Sessão expirada. Entre novamente.");
+    if (!result.ok) return setMessage("Não foi possível salvar a faixa.");
+    setRows((current) => current.map((row) => row.id === id ? { ...row, belt, belt_stripes: belt ? stripes : 0 } : row));
+  }
+
   async function approve(id: string) {
     if (!confirm("Aprovar este cadastro e emitir a carteirinha com a assinatura do Sensei?")) return;
     setMessage(""); setBusy(true);
@@ -243,6 +252,18 @@ export default function AdminPanel() {
                   <div className="flex flex-wrap items-end gap-2 sm:col-span-2">
                     {row.status !== "approved" && <button onClick={() => approve(row.id)} disabled={busy} className="rounded-xl bg-amber-400 px-4 py-3 font-black text-slate-950 hover:bg-amber-300 disabled:opacity-60">Aprovar e emitir carteirinha</button>}
                     {row.status === "approved" && <a href={`/admin/carteirinha/?id=${row.id}`} className="rounded-xl bg-emerald-400 px-4 py-3 font-black text-slate-950 hover:bg-emerald-300">Imprimir carteirinha</a>}
+                  </div>
+                  <div>
+                    <dt className="font-bold text-slate-400">Faixa</dt>
+                    <dd className="flex gap-2">
+                      <select value={row.belt || ""} onChange={(e) => changeBelt(row.id, e.target.value || null, row.belt_stripes)} className={input}>
+                        <option value="">Sem faixa definida</option>
+                        {BELTS.map((belt) => <option key={belt.key} value={belt.key}>{belt.label}</option>)}
+                      </select>
+                      <select value={row.belt_stripes} disabled={!row.belt} onChange={(e) => changeBelt(row.id, row.belt, Number(e.target.value))} className={`${input} max-w-[7.5rem]`} aria-label="Graus">
+                        {[0, 1, 2, 3, 4].map((n) => <option key={n} value={n}>{n === 0 ? "Sem grau" : `${n} grau${n > 1 ? "s" : ""}`}</option>)}
+                      </select>
+                    </dd>
                   </div>
                   <div>
                     <dt className="font-bold text-slate-400">Status</dt>

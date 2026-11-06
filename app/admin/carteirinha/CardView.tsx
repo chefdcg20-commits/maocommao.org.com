@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BeltGraphic, beltByKey } from "../belts";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_ADMIN_ENDPOINT || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/admin-enrollments";
 const TOKEN_KEY = "mcm-admin-token";
@@ -9,6 +10,7 @@ type Student = {
   id: string; status: string; student_full_name: string; birth_date: string; training_time: string | null;
   membership_number: string | null; card_valid_until: string | null;
   photo_url: string | null; sensei_signature_url: string | null; sensei_name: string;
+  belt: string | null; belt_stripes: number;
 };
 
 // Tira o fundo branco da foto da assinatura: so o traco fica, em branco, para ler bem sobre o azul escuro.
@@ -124,8 +126,11 @@ export default function CardView() {
                 </div>
               </div>
               <div className="mt-[4%] grid flex-1 grid-cols-[27%_1fr] gap-[5%]">
-                <div className="aspect-[3/4] self-center overflow-hidden rounded-[12%] border-[3px] border-white/80 bg-slate-300 shadow-lg">
-                  {student.photo_url && <img src={student.photo_url} alt="Foto do aluno" className="h-full w-full object-cover" />}
+                <div className="flex flex-col justify-center gap-[5%] self-center pb-[5%]">
+                  <div className="relative aspect-[3/3.05] overflow-hidden rounded-[12%] border-[3px] border-white/80 bg-slate-300 shadow-lg">
+                    {student.photo_url && <img src={student.photo_url} alt="Foto do aluno" className="absolute inset-0 h-full w-full object-cover" />}
+                  </div>
+                  {beltByKey(student.belt) && <BeltGraphic belt={beltByKey(student.belt)!} stripes={student.belt_stripes} className="mx-auto w-[78%]" />}
                 </div>
                 <dl className="grid content-center grid-cols-2 gap-x-[4%] gap-y-[5%]">
                   <div className="col-span-2"><dt className="text-[clamp(0.4rem,0.9vw,0.62rem)] font-black uppercase tracking-widest text-amber-400">Aluno</dt><dd className="text-[clamp(0.78rem,1.8vw,1.2rem)] font-black uppercase leading-tight">{student.student_full_name}</dd></div>

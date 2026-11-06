@@ -17,6 +17,7 @@ const pickKey = (list: string | undefined, fallback: string | undefined) => {
   return fallback;
 };
 
+const BELTS = ["white", "grey_white", "grey", "grey_black", "yellow_white", "yellow", "yellow_black", "orange_white", "orange", "orange_black", "green_white", "green", "green_black", "blue", "purple", "brown", "black"];
 const STATUSES = ["pending", "under_review", "changes_requested", "approved", "rejected"];
 
 const SENSEI_BUCKET = "sensei-signatures";
@@ -140,6 +141,17 @@ Deno.serve(async (request) => {
       if (!id) return json({ error: "invalid_request" }, 400);
       const result = await approveEnrollment(supabase, id, userData.user.id);
       return result === "ok" ? json({ ok: true }) : json({ error: result }, result === "server_error" ? 500 : 400);
+    }
+
+    if (body.action === "set_belt") {
+      const id = String(body.id || "");
+      const belt = body.belt === null || body.belt === "" ? null : String(body.belt);
+      const stripes = Number(body.stripes ?? 0);
+      if (!id || (belt !== null && !BELTS.includes(belt)) || !Number.isInteger(stripes) || stripes < 0 || stripes > 4) return json({ error: "invalid_request" }, 400);
+      const { error } = await supabase.from("student_enrollments").update({ belt, belt_stripes: belt ? stripes : 0 }).eq("id", id);
+      if (error) { console.error(`[admin] stage=set_belt db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userData.user.id, event_type: "belt_changed", metadata: { belt, stripes } });
+      return json({ ok: true });
     }
 
     if (body.action === "replace_photo") {
