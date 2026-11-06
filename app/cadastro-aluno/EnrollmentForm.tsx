@@ -12,7 +12,7 @@ export default function EnrollmentForm() {
     event.preventDefault();
     if (!token) { setStatus("error"); return; }
     setStatus("sending");
-    const endpoint = process.env.NEXT_PUBLIC_ENROLLMENT_ENDPOINT;
+    const endpoint = process.env.NEXT_PUBLIC_ENROLLMENT_ENDPOINT || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/submit-enrollment";
     if (!endpoint) { setStatus("error"); return; }
     const body = new FormData(event.currentTarget);
     body.set("invite_token", token);

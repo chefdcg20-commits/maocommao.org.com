@@ -1,3 +1,4 @@
+// @ts-nocheck -- Supabase Edge Function executada pelo Deno, fora do compilador Next.js.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const cors = {
