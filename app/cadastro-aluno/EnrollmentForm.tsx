@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 
 const ERRORS: Record<string, string> = {
+  image_unreadable: "Não foi possível ler uma das imagens. Tente tirar a foto de novo ou escolha outra imagem (JPG ou PNG).",
   default: "Não foi possível enviar. Tente novamente em instantes.",
   invalid_invite: "Convite inválido. Solicite um novo link ao secretário do projeto.",
   expired_invite: "Este convite expirou. Solicite um novo link ao secretário do projeto.",
@@ -17,6 +18,39 @@ const ERRORS: Record<string, string> = {
   database_error: "Erro temporário ao salvar o cadastro. Tente novamente em alguns minutos.",
   server_misconfigured: "Erro temporário no servidor. Avise a equipe do projeto.",
 };
+
+// Reduz fotos grandes (ex.: 12 MP do celular) antes do envio: lado maior limitado e JPEG comprimido.
+async function shrinkImage(file: File, maxSide: number, maxBytes: number): Promise<File> {
+  if (file.size <= maxBytes && /^image\/(jpeg|png|webp)$/.test(file.type) && file.size < 1_000_000) return file;
+  let source: ImageBitmap | HTMLImageElement;
+  try {
+    source = await createImageBitmap(file, { imageOrientation: "from-image" });
+  } catch {
+    source = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("unreadable")); };
+      img.src = url;
+    });
+  }
+  const width = "naturalWidth" in source ? source.naturalWidth : source.width;
+  const height = "naturalHeight" in source ? source.naturalHeight : source.height;
+  const scale = Math.min(1, maxSide / Math.max(width, height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("unreadable");
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+  for (const quality of [0.85, 0.75, 0.65, 0.5]) {
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+    if (blob && blob.size <= maxBytes) return new File([blob], "imagem.jpg", { type: "image/jpeg" });
+  }
+  throw new Error("too_large");
+}
 
 const field = "mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-amber-400";
 
@@ -33,6 +67,14 @@ export default function EnrollmentForm() {
     const form = event.currentTarget;
     const body = new FormData(form);
     body.set("invite_token", token);
+    try {
+      body.set("student_photo", await shrinkImage(body.get("student_photo") as File, 1600, 3_500_000));
+      body.set("guardian_signature", await shrinkImage(body.get("guardian_signature") as File, 1200, 1_500_000));
+    } catch {
+      setErrorMessage(ERRORS.image_unreadable);
+      setStatus("error");
+      return;
+    }
     try {
       const response = await fetch(endpoint, { method: "POST", body });
       if (!response.ok) {
@@ -55,7 +97,7 @@ export default function EnrollmentForm() {
         <Label text="Nome completo"><input className={field} name="student_full_name" required /></Label>
         <Label text="Data de nascimento"><input className={field} type="date" name="birth_date" required /></Label>
         <Label text="Horário de treino"><select className={field} name="training_time" required defaultValue=""><option value="" disabled>Selecione o horário</option><option value="18:00">18h</option><option value="19:00">19h</option><option value="20:00">20h</option></select></Label>
-        <Label text="Foto atual do aluno"><input className={field} type="file" name="student_photo" accept="image/jpeg,image/png,image/webp" capture="user" required /><small className="mt-2 block text-slate-400">No celular, você poderá tirar a foto na hora.</small></Label>
+        <Label text="Foto atual do aluno"><input className={field} type="file" name="student_photo" accept="image/*" required /><small className="mt-2 block text-slate-400">No celular, você pode tirar a foto na hora ou escolher da galeria. A imagem é reduzida automaticamente.</small></Label>
       </Section>
       <Section title="Responsável legal">
         <Label text="Nome completo"><input className={field} name="guardian_full_name" required /></Label>
@@ -74,7 +116,7 @@ export default function EnrollmentForm() {
       </Section>
       <Section title="Autorizações">
         <label className="flex gap-3 rounded-xl border border-slate-700 p-4"><input type="checkbox" name="image_consent" value="true" required className="mt-1 h-5 w-5 accent-amber-400" /><span className="text-sm leading-6 text-slate-300">Como responsável legal, autorizo gratuitamente o uso da imagem e da voz do aluno em registros das atividades do Projeto Mão Com Mão, incluindo site, YouTube e redes sociais institucionais, sempre relacionados às finalidades do projeto. Estou ciente de que posso solicitar a revogação para usos futuros.</span></label>
-        <Label text="Assinatura do responsável"><input className={field} type="file" name="guardian_signature" accept="image/jpeg,image/png,image/webp" capture="environment" required /><small className="mt-2 block text-slate-400">Envie uma foto nítida da assinatura em papel branco.</small></Label>
+        <Label text="Assinatura do responsável"><input className={field} type="file" name="guardian_signature" accept="image/*" required /><small className="mt-2 block text-slate-400">Tire ou escolha uma foto nítida da assinatura em papel branco.</small></Label>
         <label className="flex gap-3"><input type="checkbox" required className="mt-1 h-5 w-5 accent-amber-400" /><span className="text-sm text-slate-300">Declaro que as informações são verdadeiras e que sou responsável legal pelo aluno.</span></label>
       </Section>
       {status === "error" && <p role="alert" className="rounded-xl bg-red-500/15 p-4 text-red-300">{errorMessage}</p>}
