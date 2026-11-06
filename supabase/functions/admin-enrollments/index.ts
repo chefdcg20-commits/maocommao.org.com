@@ -142,6 +142,30 @@ Deno.serve(async (request) => {
       return result === "ok" ? json({ ok: true }) : json({ error: result }, result === "server_error" ? 500 : 400);
     }
 
+    if (body.action === "replace_photo") {
+      const id = String(body.id || "");
+      const match = /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/.exec(String(body.data_url || ""));
+      if (!id || !match) return json({ error: "invalid_file_type" }, 400);
+      const bytes = Uint8Array.from(atob(match[2]), (c) => c.charCodeAt(0));
+      if (bytes.length > 5_000_000) return json({ error: "file_too_large" }, 400);
+      const { data: row, error: rowError } = await supabase.from("student_enrollments").select("photo_path").eq("id", id).maybeSingle();
+      if (rowError) { console.error(`[admin] stage=photo_lookup db_code=${rowError.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      if (!row) return json({ error: "not_found" }, 404);
+      const extension = match[1] === "image/png" ? "png" : match[1] === "image/webp" ? "webp" : "jpg";
+      const newPath = `${id}/aluno-${Date.now()}.${extension}`;
+      const upload = await supabase.storage.from("student-photos").upload(newPath, bytes, { contentType: match[1], upsert: false });
+      if (upload.error) { console.error(`[admin] stage=photo_upload message=${upload.error.message}`); return json({ error: "upload_failed" }, 500); }
+      const { error: updateError } = await supabase.from("student_enrollments").update({ photo_path: newPath }).eq("id", id);
+      if (updateError) {
+        console.error(`[admin] stage=photo_update db_code=${updateError.code ?? "?"}`);
+        await supabase.storage.from("student-photos").remove([newPath]);
+        return json({ error: "server_error" }, 500);
+      }
+      if (row.photo_path) await supabase.storage.from("student-photos").remove([row.photo_path]);
+      await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userData.user.id, event_type: "photo_replaced" });
+      return json({ ok: true });
+    }
+
     if (body.action === "upload_sensei_signature") {
       const match = /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/.exec(String(body.data_url || ""));
       if (!match) return json({ error: "invalid_file_type" }, 400);

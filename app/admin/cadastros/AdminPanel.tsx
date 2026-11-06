@@ -47,6 +47,24 @@ async function signatureDataUrl(file: File): Promise<string> {
   return flat.toDataURL("image/jpeg", 0.85);
 }
 
+// Reduz a foto do aluno (lado maior 1600 px, JPEG) antes de enviar.
+async function photoDataUrl(file: File): Promise<string> {
+  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("unreadable");
+  ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  for (const quality of [0.85, 0.7, 0.55]) {
+    const url = canvas.toDataURL("image/jpeg", quality);
+    if (url.length < 6_000_000) return url;
+  }
+  throw new Error("too_large");
+}
+
 const readToken = () => { try { return sessionStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; } };
 const saveToken = (value: string) => { try { value ? sessionStorage.setItem(TOKEN_KEY, value) : sessionStorage.removeItem(TOKEN_KEY); } catch { /* sem armazenamento */ } };
 
@@ -115,6 +133,17 @@ export default function AdminPanel() {
       const result = await call({ action: "upload_sensei_signature", data_url: await signatureDataUrl(file) }, token);
       if (result.status === 401) return logout("Sessão expirada. Entre novamente.");
       if (!result.ok) { setBusy(false); return setMessage(ERRORS[result.data?.error] || "Não foi possível salvar a assinatura."); }
+      await load(token);
+    } catch { setBusy(false); setMessage("Não foi possível ler essa imagem."); }
+  }
+
+  async function replacePhoto(id: string, file: File | undefined) {
+    if (!file) return;
+    setMessage(""); setBusy(true);
+    try {
+      const result = await call({ action: "replace_photo", id, data_url: await photoDataUrl(file) }, token);
+      if (result.status === 401) return logout("Sessão expirada. Entre novamente.");
+      if (!result.ok) { setBusy(false); return setMessage(ERRORS[result.data?.error] || "Não foi possível trocar a foto."); }
       await load(token);
     } catch { setBusy(false); setMessage("Não foi possível ler essa imagem."); }
   }
@@ -191,7 +220,13 @@ export default function AdminPanel() {
             {open === row.id && (
               <div className="grid gap-5 border-t border-slate-800 p-4 sm:grid-cols-[180px_1fr]">
                 <div className="space-y-3">
-                  {row.photo_url ? <img src={row.photo_url} alt="Foto do aluno" className="w-full rounded-xl border border-slate-700 object-cover" /> : <p className="text-sm text-slate-500">Sem foto</p>}
+                  <div className="relative">
+                    {row.photo_url ? <img src={row.photo_url} alt="Foto do aluno" className="w-full rounded-xl border border-slate-700 object-cover" /> : <div className="flex aspect-[3/4] w-full items-center justify-center rounded-xl border border-slate-700 text-sm text-slate-500">Sem foto</div>}
+                    <label title="Trocar foto" className="absolute bottom-2 right-2 inline-flex cursor-pointer items-center gap-1 rounded-full bg-amber-400 px-3 py-2 text-xs font-black text-slate-950 shadow-lg hover:bg-amber-300">
+                      <span aria-hidden>📷</span> Trocar
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => { replacePhoto(row.id, e.target.files?.[0]); e.target.value = ""; }} />
+                    </label>
+                  </div>
                   {row.signature_url && <img src={row.signature_url} alt="Assinatura do responsável" className="w-full rounded-xl border border-slate-700 bg-white object-contain" />}
                 </div>
                 <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
