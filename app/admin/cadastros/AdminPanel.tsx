@@ -12,6 +12,7 @@ type Enrollment = {
   address_number: string; address_complement: string | null; address_neighborhood: string; address_city: string;
   address_state: string; emergency_contact_name: string | null; emergency_contact_phone: string | null;
   health_notes: string | null; image_consent: boolean; photo_url: string | null; signature_url: string | null;
+  membership_number: string | null; card_valid_until: string | null; sensei_signature_url: string | null;
 };
 
 const STATUS: Record<string, string> = {
@@ -19,6 +20,32 @@ const STATUS: Record<string, string> = {
 };
 const TIMES = ["18:00", "19:00", "20:00"];
 const input = "mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-amber-400";
+
+const ERRORS: Record<string, string> = {
+  no_sensei_signature: "Envie primeiro a assinatura do Sensei (caixa no topo da página).",
+  file_too_large: "Imagem grande demais.",
+  invalid_file_type: "Use uma imagem JPG, PNG ou WebP.",
+  upload_failed: "Falha ao enviar a imagem. Tente novamente.",
+};
+
+// Reduz a imagem da assinatura (lado maior 900 px). Mantem PNG com transparencia; se ficar pesado, usa JPEG.
+async function signatureDataUrl(file: File): Promise<string> {
+  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  const scale = Math.min(1, 900 / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("unreadable");
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const png = canvas.toDataURL("image/png");
+  if (png.length < 1_800_000) return png;
+  const flat = document.createElement("canvas");
+  flat.width = canvas.width; flat.height = canvas.height;
+  const fctx = flat.getContext("2d")!;
+  fctx.fillStyle = "#ffffff"; fctx.fillRect(0, 0, flat.width, flat.height); fctx.drawImage(canvas, 0, 0);
+  return flat.toDataURL("image/jpeg", 0.85);
+}
 
 const readToken = () => { try { return sessionStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; } };
 const saveToken = (value: string) => { try { value ? sessionStorage.setItem(TOKEN_KEY, value) : sessionStorage.removeItem(TOKEN_KEY); } catch { /* sem armazenamento */ } };
@@ -41,6 +68,7 @@ export default function AdminPanel() {
   const [rows, setRows] = useState<Enrollment[]>([]);
   const [filter, setFilter] = useState("all");
   const [open, setOpen] = useState<string | null>(null);
+  const [sensei, setSensei] = useState<{ has_signature: boolean; url: string | null }>({ has_signature: false, url: null });
 
   const logout = useCallback((text = "") => { saveToken(""); setToken(""); setRows([]); setMessage(text); }, []);
 
@@ -53,6 +81,7 @@ export default function AdminPanel() {
     if (!result.ok) return setMessage("Não foi possível carregar os cadastros. Tente novamente.");
     setMessage("");
     setRows(result.data.enrollments || []);
+    setSensei(result.data.sensei || { has_signature: false, url: null });
   }, [logout]);
 
   useEffect(() => {
@@ -77,6 +106,26 @@ export default function AdminPanel() {
     if (result.status === 401) return logout("Sessão expirada. Entre novamente.");
     if (!result.ok) return setMessage("Não foi possível alterar o status.");
     setRows((current) => current.map((row) => row.id === id ? { ...row, status } : row));
+  }
+
+  async function uploadSensei(file: File | undefined) {
+    if (!file) return;
+    setMessage(""); setBusy(true);
+    try {
+      const result = await call({ action: "upload_sensei_signature", data_url: await signatureDataUrl(file) }, token);
+      if (result.status === 401) return logout("Sessão expirada. Entre novamente.");
+      if (!result.ok) { setBusy(false); return setMessage(ERRORS[result.data?.error] || "Não foi possível salvar a assinatura."); }
+      await load(token);
+    } catch { setBusy(false); setMessage("Não foi possível ler essa imagem."); }
+  }
+
+  async function approve(id: string) {
+    if (!confirm("Aprovar este cadastro e emitir a carteirinha com a assinatura do Sensei?")) return;
+    setMessage(""); setBusy(true);
+    const result = await call({ action: "approve", id }, token);
+    if (result.status === 401) return logout("Sessão expirada. Entre novamente.");
+    if (!result.ok) { setBusy(false); return setMessage(ERRORS[result.data?.error] || "Não foi possível aprovar."); }
+    await load(token);
   }
 
   const counts = useMemo(() => Object.fromEntries(TIMES.map((time) => [time, rows.filter((r) => r.training_time === time).length])), [rows]);
@@ -110,6 +159,20 @@ export default function AdminPanel() {
 
       {message && <p role="alert" className="rounded-xl bg-red-500/15 p-3 text-sm text-red-300">{message}</p>}
 
+      <section className="flex flex-wrap items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+        <div className="h-16 w-40 shrink-0 overflow-hidden rounded-lg bg-white">
+          {sensei.url ? <img src={sensei.url} alt="Assinatura do Sensei" className="h-full w-full object-contain" /> : <span className="flex h-full items-center justify-center text-xs text-slate-500">sem assinatura</span>}
+        </div>
+        <div className="min-w-[220px] flex-1">
+          <p className="font-bold">Assinatura do Sensei Joaquim Guedes</p>
+          <p className="text-sm text-slate-400">{sensei.has_signature ? "Cadastrada. Será usada nas próximas aprovações." : "Envie uma foto da assinatura para poder aprovar alunos."}</p>
+        </div>
+        <label className="cursor-pointer rounded-xl border border-slate-700 px-4 py-2 text-sm font-bold hover:border-amber-400">
+          {sensei.has_signature ? "Trocar assinatura" : "Enviar assinatura"}
+          <input type="file" accept="image/*" className="hidden" onChange={(e) => { uploadSensei(e.target.files?.[0]); e.target.value = ""; }} />
+        </label>
+      </section>
+
       <section className="grid gap-3 sm:grid-cols-5">
         <Stat label="Total" value={rows.length} active={filter === "all"} onClick={() => setFilter("all")} />
         {TIMES.map((time) => <Stat key={time} label={`Treino ${time.slice(0, 2)}h`} value={counts[time]} active={filter === time} onClick={() => setFilter(time)} />)}
@@ -141,6 +204,11 @@ export default function AdminPanel() {
                   <Item label="Emergência" value={[row.emergency_contact_name, row.emergency_contact_phone].filter(Boolean).join(" · ")} />
                   <Item label="Saúde" value={row.health_notes} />
                   <Item label="Uso de imagem" value={row.image_consent ? "Autorizado" : "Não autorizado"} />
+                  {row.membership_number && <Item label="Matrícula" value={`${row.membership_number} · válida até ${row.card_valid_until ? new Date(`${row.card_valid_until}T00:00:00`).toLocaleDateString("pt-BR") : "—"}`} />}
+                  <div className="flex flex-wrap items-end gap-2 sm:col-span-2">
+                    {row.status !== "approved" && <button onClick={() => approve(row.id)} disabled={busy} className="rounded-xl bg-amber-400 px-4 py-3 font-black text-slate-950 hover:bg-amber-300 disabled:opacity-60">Aprovar e emitir carteirinha</button>}
+                    {row.status === "approved" && <a href={`/admin/carteirinha/?id=${row.id}`} target="_blank" rel="noreferrer" className="rounded-xl bg-emerald-400 px-4 py-3 font-black text-slate-950 hover:bg-emerald-300">Imprimir carteirinha</a>}
+                  </div>
                   <div>
                     <dt className="font-bold text-slate-400">Status</dt>
                     <dd><select value={row.status} onChange={(e) => changeStatus(row.id, e.target.value)} className={input}>{Object.entries(STATUS).map(([value, text]) => <option key={value} value={value}>{text}</option>)}</select></dd>
