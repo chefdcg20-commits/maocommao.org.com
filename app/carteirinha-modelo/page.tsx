@@ -94,11 +94,17 @@ export default function CarteirinhaModeloPage() {
                 <Logo className="h-[clamp(3rem,7vw,4.4rem)] w-[clamp(3rem,7vw,4.4rem)]" />
               </div>
 
-              <div className="mt-[4%] rounded-xl border border-white/10 bg-white/5 p-[4%]">
-                <p className="text-[clamp(0.4rem,0.9vw,0.62rem)] font-black uppercase tracking-widest text-amber-400">Aprovação do Sensei</p>
-                <div className="mt-[5%] border-b border-white/60 pb-[1%] text-center font-serif text-[clamp(0.75rem,1.8vw,1.15rem)] italic text-slate-300">assinatura</div>
-                <p className="mt-[1.5%] text-center text-[clamp(0.62rem,1.4vw,0.95rem)] font-black">Joaquim Guedes</p>
-                <p className="text-center text-[clamp(0.4rem,0.9vw,0.62rem)] text-slate-400">Sensei do Projeto Mão Com Mão</p>
+              <div className="mt-[4%] grid grid-cols-[1fr_23%] items-center gap-[4%] rounded-xl border border-white/10 bg-white/5 p-[4%]">
+                <div>
+                  <p className="text-[clamp(0.4rem,0.9vw,0.62rem)] font-black uppercase tracking-widest text-amber-400">Aprovação do Sensei</p>
+                  <div className="mt-[5%] border-b border-white/60 pb-[1%] text-center font-serif text-[clamp(0.75rem,1.8vw,1.15rem)] italic text-slate-300">assinatura</div>
+                  <p className="mt-[1.5%] text-center text-[clamp(0.62rem,1.4vw,0.95rem)] font-black">Joaquim Guedes</p>
+                  <p className="text-center text-[clamp(0.4rem,0.9vw,0.62rem)] text-slate-400">Sensei do Projeto Mão Com Mão</p>
+                </div>
+                <div className="rounded-lg bg-white p-[7%] text-center shadow-lg">
+                  <Image src="/images/qr-site-mao-com-mao.png" alt="QR Code para acessar o site do Projeto Mão Com Mão" width={400} height={400} className="aspect-square w-full" />
+                  <span className="mt-[3%] block text-[clamp(0.32rem,0.7vw,0.5rem)] font-black uppercase tracking-wider text-slate-900">Acesse o site</span>
+                </div>
               </div>
 
               <div className="mt-auto flex items-end justify-between gap-3 text-[clamp(0.36rem,0.78vw,0.55rem)]">
