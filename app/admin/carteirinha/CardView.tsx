@@ -33,7 +33,7 @@ export default function CardView() {
     })().catch(() => setMessage("Não foi possível carregar a carteirinha."));
   }, []);
 
-  if (!student) return <main className="min-h-screen bg-slate-950 p-10 text-center text-slate-300">{message}</main>;
+  if (!student) return <main className="min-h-screen bg-slate-950 p-10 text-center text-slate-300">{message}<p className="mt-4"><a href="/admin/cadastros/" className="font-bold text-amber-400 underline">Ir para o painel</a></p></main>;
 
   return (
     <main className="min-h-screen bg-slate-950 px-5 py-10 text-white">
@@ -49,7 +49,10 @@ export default function CardView() {
       <div className="mx-auto max-w-6xl">
         <div className="screen-only flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-black text-amber-400">Carteirinha de {student.student_full_name}</h1>
-          <button onClick={() => window.print()} className="rounded-xl bg-amber-400 px-5 py-3 font-black text-slate-950 hover:bg-amber-300">Imprimir</button>
+          <div className="flex gap-2">
+            <a href="/admin/cadastros/" className="rounded-xl border border-slate-700 px-5 py-3 font-bold hover:border-amber-400">Voltar ao painel</a>
+            <button onClick={() => window.print()} className="rounded-xl bg-amber-400 px-5 py-3 font-black text-slate-950 hover:bg-amber-300">Imprimir</button>
+          </div>
         </div>
         <p className="screen-only mt-2 text-sm text-slate-400">Na impressão, escolha tamanho real (100%), sem margens. Saem duas páginas: frente e verso, no tamanho de um cartão (85,6 × 54 mm).</p>
 

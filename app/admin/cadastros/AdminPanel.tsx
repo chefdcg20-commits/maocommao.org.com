@@ -207,7 +207,7 @@ export default function AdminPanel() {
                   {row.membership_number && <Item label="Matrícula" value={`${row.membership_number} · válida até ${row.card_valid_until ? new Date(`${row.card_valid_until}T00:00:00`).toLocaleDateString("pt-BR") : "—"}`} />}
                   <div className="flex flex-wrap items-end gap-2 sm:col-span-2">
                     {row.status !== "approved" && <button onClick={() => approve(row.id)} disabled={busy} className="rounded-xl bg-amber-400 px-4 py-3 font-black text-slate-950 hover:bg-amber-300 disabled:opacity-60">Aprovar e emitir carteirinha</button>}
-                    {row.status === "approved" && <a href={`/admin/carteirinha/?id=${row.id}`} target="_blank" rel="noreferrer" className="rounded-xl bg-emerald-400 px-4 py-3 font-black text-slate-950 hover:bg-emerald-300">Imprimir carteirinha</a>}
+                    {row.status === "approved" && <a href={`/admin/carteirinha/?id=${row.id}`} className="rounded-xl bg-emerald-400 px-4 py-3 font-black text-slate-950 hover:bg-emerald-300">Imprimir carteirinha</a>}
                   </div>
                   <div>
                     <dt className="font-bold text-slate-400">Status</dt>
