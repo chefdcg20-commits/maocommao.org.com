@@ -186,6 +186,12 @@ Deno.serve(async (request) => {
       return json({ ok: true });
     }
 
+    // Biblioteca: toda a equipe le (itens "todos" e "equipe").
+    if (body.action === "library") {
+      const { data } = await supabase.from("library_items").select("id, category, title, description, url, audience").eq("active", true).order("category").order("sort_order").order("created_at");
+      return json({ items: data || [] });
+    }
+
     // Leitura liberada a toda a equipe: avisos e conteudo informativo do hall.
     if (body.action === "announcements_list") {
       const { data } = await supabase.from("announcements").select("id, title, body, created_at").eq("active", true).order("created_at", { ascending: false }).limit(50);
@@ -278,6 +284,30 @@ Deno.serve(async (request) => {
         supabase.from("family_messages").select("id", { count: "exact", head: true }).is("read_at", null),
       ]);
       return json({ pending: pending.count || 0, unread: unread.count || 0 });
+    }
+
+    // Biblioteca: so mestres criam, editam e removem itens.
+    if (body.action === "library_save") {
+      const categories = ["videoaulas", "tecnicas", "defesa-pessoal", "documentos", "professores"];
+      const category = String(body.category || "");
+      const title = String(body.title || "").trim().slice(0, 160);
+      const description = String(body.description || "").trim().slice(0, 2000) || null;
+      const url = String(body.url || "").trim() || null;
+      const audience = body.audience === "equipe" ? "equipe" : "todos";
+      if (!categories.includes(category) || !title) return json({ error: "missing_field" }, 400);
+      if (url && !/^https:\/\//i.test(url)) return json({ error: "invalid_url" }, 400);
+      const row = { category, title, description, url, audience, updated_at: new Date().toISOString() };
+      const id = String(body.id || "");
+      const { error } = id
+        ? await supabase.from("library_items").update(row).eq("id", id)
+        : await supabase.from("library_items").insert({ ...row, created_by: userId });
+      if (error) { console.error(`[staff] stage=library_save db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      return json({ ok: true });
+    }
+    if (body.action === "library_remove") {
+      const { error } = await supabase.from("library_items").update({ active: false, updated_at: new Date().toISOString() }).eq("id", String(body.id || ""));
+      if (error) return json({ error: "server_error" }, 500);
+      return json({ ok: true });
     }
 
     // Editar o conteudo informativo do hall.

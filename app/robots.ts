@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/', '/cadastro-aluno/', '/chamada/', '/familia/']
+      disallow: ['/admin/', '/cadastro-aluno/', '/chamada/', '/familia/', '/biblioteca/']
     },
     sitemap: [`${siteUrl}/sitemap.xml`, `${siteUrl}/video-sitemap.xml`]
   };

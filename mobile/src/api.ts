@@ -26,6 +26,7 @@ export type FamilyStudent = {
   membership_number: string | null; card_valid_until: string | null; photo_url: string | null;
   attendance_total: number; attendance_month: number; last_attendance: string | null;
 };
+export type LibraryItem = { id: string; category: string; title: string; description: string | null; url: string | null; audience: string };
 export type Section = { slug: string; title: string; body: string };
 export type Enrollment = {
   id: string; status: string; student_full_name: string; birth_date: string | null; training_time: string | null; belt: string | null; belt_stripes: number;

@@ -201,6 +201,12 @@ Deno.serve(async (request) => {
       return json({ ok: true });
     }
 
+    // Biblioteca: a familia (pais e alunos) so ve itens para "todos".
+    if (body.action === "library") {
+      const { data } = await supabase.from("library_items").select("id, category, title, description, url, audience").eq("active", true).eq("audience", "todos").order("category").order("sort_order").order("created_at");
+      return json({ items: data || [] });
+    }
+
     if (body.action === "content") {
       const { data } = await supabase.from("app_content").select("slug, title, body").order("sort_order").order("slug");
       return json({ sections: data || [] });

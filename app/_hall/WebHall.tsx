@@ -24,6 +24,7 @@ const RECEIPT = "https://wa.me/5511982984625?text=Ol%C3%A1%2C%20Daniel%21%20Fiz%
 
 export const COMMON_TILES: Tile[] = [
   { key: "info", icon: "ℹ️", label: "O projeto", hint: "Aulas, ações e documentos" },
+  { key: "biblioteca", icon: "📚", label: "Biblioteca", hint: "Videoaulas, técnicas e documentos", href: "/biblioteca/" },
   { key: "contact", icon: "🤝", label: "Contato e apoio", hint: "Redes, mapa e PIX" },
 ];
 

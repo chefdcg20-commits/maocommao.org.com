@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Linking, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
-import { Announcement, api, ApiError, errorText, Section, Target } from "../api";
+import { Announcement, api, ApiError, errorText, LibraryItem, Section, Target } from "../api";
 import { CNPJ, LINKS, PIX_KEY } from "../info";
 import { colors } from "../theme";
 import { Button, fmtDate, Header, styles } from "../ui";
@@ -145,3 +145,50 @@ export function ContactScreen() {
 }
 
 export { ApiError };
+
+const CATEGORIES: [string, string, string][] = [
+  ["videoaulas", "🎬", "Videoaulas"],
+  ["tecnicas", "🥋", "Técnicas e variações"],
+  ["defesa-pessoal", "🛡️", "Defesa pessoal"],
+  ["documentos", "📄", "Documentos"],
+  ["professores", "👨‍🏫", "Material para professores"],
+];
+
+// Biblioteca: videoaulas, tecnicas, defesa pessoal e documentos. Mestres cadastram os itens pelo site.
+export function LibraryScreen({ target, canEdit }: { target: Target; canEdit: boolean }) {
+  const [items, setItems] = useState<LibraryItem[] | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    api<{ items: LibraryItem[] }>({ action: "library" }, target).then((r) => setItems(r.items)).catch((e) => setError(errorText(e)));
+  }, [target]);
+
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 80 }}>
+      <Header title="Biblioteca" sub="Aulas, técnicas e documentos" />
+      <View style={[styles.card, { borderColor: colors.amber }]}>
+        <Text style={styles.text}>Tudo o que for arrecadado com as pulseiras é destinado ao Projeto Social Mão com Mão, para sustentar e fazer crescer o projeto.</Text>
+      </View>
+      {!!error && <Text style={styles.error}>{error}</Text>}
+      {items === null && !error && <ActivityIndicator color={colors.amber} style={{ marginTop: 30 }} />}
+      {items && CATEGORIES.map(([key, icon, label]) => {
+        if (key === "professores" && target === "family") return null;
+        const list = items.filter((i) => i.category === key);
+        return (
+          <View key={key} style={{ marginTop: 10 }}>
+            <Text style={[styles.strong, { fontSize: 18, marginBottom: 6 }]}>{icon} {label}</Text>
+            {!list.length && <Text style={[styles.muted, { marginBottom: 6 }]}>Em breve.</Text>}
+            {list.map((item) => (
+              <View key={item.id} style={styles.card}>
+                <Text style={styles.strong}>{item.title}{item.audience === "equipe" ? "  · equipe" : ""}</Text>
+                {!!item.description && <Text style={[styles.text, { marginTop: 4 }]}>{item.description}</Text>}
+                {!!item.url && <View style={{ marginTop: 8 }}><Button label="Abrir" onPress={() => open(item.url as string)} /></View>}
+              </View>
+            ))}
+          </View>
+        );
+      })}
+      {canEdit && <Button label="Adicionar ou remover itens (abre o site)" kind="secondary" onPress={() => open(LINKS.library)} />}
+    </ScrollView>
+  );
+}

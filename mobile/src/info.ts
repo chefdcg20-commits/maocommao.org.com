@@ -8,6 +8,7 @@ export const LINKS = {
   facebook: "https://www.facebook.com/share/1Pf1rx1mYQ/",
   maps: "https://maps.app.goo.gl/UwXmbHq4v2GXDK336?g_st=ac",
   statute: `${SITE}documentos/estatuto-social-mao-com-mao.pdf`,
+  library: `${SITE}biblioteca/`,
   adminPanel: `${SITE}admin/cadastros/`,
   receipt:
     "https://wa.me/5511982984625?text=Ol%C3%A1%2C%20Daniel%21%20Fiz%20uma%20doa%C3%A7%C3%A3o%20para%20o%20Projeto%20M%C3%A3o%20Com%20M%C3%A3o.%20Vou%20enviar%20o%20comprovante%20nesta%20conversa.",
