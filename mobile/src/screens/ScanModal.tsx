@@ -4,12 +4,12 @@ import { api, errorText, ScanResult, Student } from "../api";
 import { cancelRead, nfcStatus, openNfcSettings, readUid } from "../nfc";
 import { colors } from "../theme";
 
-type Props = { mode: "attendance" | "link"; student?: Student; onClose: (changed: boolean) => void };
+type Props = { mode: "attendance" | "link"; student?: Student; kind?: "card" | "belt"; onClose: (changed: boolean) => void };
 type Shown = { kind: "ok" | "warn" | "error"; title: string; subtitle?: string; photo?: string | null };
 
 // mode "attendance": le cartoes em sequencia e registra a presenca.
 // mode "link": le um cartao e vincula ao aluno escolhido.
-export default function ScanModal({ mode, student, onClose }: Props) {
+export default function ScanModal({ mode, student, kind = "card", onClose }: Props) {
   const [status, setStatus] = useState<"checking" | "ok" | "unsupported" | "disabled">("checking");
   const [shown, setShown] = useState<Shown | null>(null);
   const [count, setCount] = useState(0);
@@ -29,9 +29,9 @@ export default function ScanModal({ mode, student, onClose }: Props) {
       if (!alive.current) return;
       try {
         if (mode === "link" && student) {
-          await api({ action: "link_card", enrollment_id: student.id, tag_uid: uid });
+          await api({ action: "link_card", enrollment_id: student.id, tag_uid: uid, kind });
           changed.current = true;
-          setShown({ kind: "ok", title: "Cartão vinculado!", subtitle: student.name, photo: student.photo_url });
+          setShown({ kind: "ok", title: kind === "belt" ? "Chip da faixa vinculado!" : "Carteirinha vinculada!", subtitle: student.name, photo: student.photo_url });
           return;
         }
         const result = await api<ScanResult>({ action: "scan", tag_uid: uid });
@@ -50,7 +50,7 @@ export default function ScanModal({ mode, student, onClose }: Props) {
       await new Promise((r) => setTimeout(r, 2200));
       if (alive.current) setShown(null);
     }
-  }, [mode, student]);
+  }, [mode, student, kind]);
 
   useEffect(() => {
     alive.current = true;
@@ -72,7 +72,7 @@ export default function ScanModal({ mode, student, onClose }: Props) {
   return (
     <Modal animationType="slide" onRequestClose={() => onClose(changed.current)}>
       <View style={styles.wrap}>
-        <Text style={styles.title}>{mode === "link" ? `Vincular cartão\n${student?.name}` : "Chamada por cartão"}</Text>
+        <Text style={styles.title}>{mode === "link" ? `Vincular cartão\n${student?.name}` : "Chamada por chip"}</Text>
         {status === "unsupported" && <Text style={styles.msg}>Este celular não tem NFC.</Text>}
         {status === "disabled" && (
           <>
@@ -93,8 +93,8 @@ export default function ScanModal({ mode, student, onClose }: Props) {
             ) : (
               <>
                 <Text style={styles.nfc}>)))</Text>
-                <Text style={styles.big}>Encoste o cartão no celular</Text>
-                <Text style={styles.msg}>{mode === "attendance" ? "Fica lendo em sequência." : "Aproxime a carteirinha da parte de trás do celular."}</Text>
+                <Text style={styles.big}>Encoste o chip no celular</Text>
+                <Text style={styles.msg}>{mode === "attendance" ? "Fica lendo em sequência." : "Aproxime a carteirinha ou a faixa da parte de trás do celular."}</Text>
               </>
             )}
           </View>

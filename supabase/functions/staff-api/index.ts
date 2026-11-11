@@ -91,10 +91,11 @@ Deno.serve(async (request) => {
       if (error) { console.error(`[staff] stage=roster db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
       const ids = rows.map((r) => r.id);
       const [{ data: cards }, { data: present }] = await Promise.all([
-        supabase.from("nfc_cards").select("enrollment_id").eq("status", "active").in("enrollment_id", ids),
+        supabase.from("nfc_cards").select("enrollment_id, kind").eq("status", "active").in("enrollment_id", ids),
         supabase.from("attendance").select("enrollment_id").eq("session_date", date).in("enrollment_id", ids),
       ]);
-      const withCard = new Set((cards || []).map((c) => c.enrollment_id));
+      const withCard = new Set((cards || []).filter((c) => c.kind === "card").map((c) => c.enrollment_id));
+      const withBelt = new Set((cards || []).filter((c) => c.kind === "belt").map((c) => c.enrollment_id));
       const presentSet = new Set((present || []).map((p) => p.enrollment_id));
       const paths = rows.map((r) => r.photo_path).filter(Boolean);
       const photos: Record<string, string> = {};
@@ -107,7 +108,7 @@ Deno.serve(async (request) => {
         students: rows.map((r) => ({
           id: r.id, name: r.student_full_name, training_time: r.training_time, belt: r.belt, belt_stripes: r.belt_stripes,
           membership_number: r.membership_number, photo_url: photos[r.photo_path] || null,
-          has_card: withCard.has(r.id), present_today: presentSet.has(r.id),
+          has_card: withCard.has(r.id), has_belt_tag: withBelt.has(r.id), present_today: presentSet.has(r.id),
         })),
       });
     }
@@ -151,35 +152,130 @@ Deno.serve(async (request) => {
       return json({ ok: true, already_present: Boolean(existing), student: { id: student.id, name: student.student_full_name, training_time: student.training_time, belt: student.belt, belt_stripes: student.belt_stripes, photo_url } });
     }
 
-    // Vincular cartao a um aluno aprovado (professor ou mestre). Trocar cartao ja vinculado exige mestre.
+    // Vincular chip (carteirinha ou faixa) a um aluno aprovado. Professor ou mestre.
+    // Trocar a CARTEIRINHA ja vinculada exige mestre; o chip da FAIXA qualquer um da equipe troca (graduacao).
     if (body.action === "link_card") {
       const uid = normalizeUid(body.tag_uid);
       const id = String(body.enrollment_id || "");
+      const kind = body.kind === "belt" ? "belt" : "card";
       if (!uid || !id) return json({ error: "invalid_request" }, 400);
       const { data: student } = await supabase.from("student_enrollments").select("id").eq("id", id).eq("status", "approved").maybeSingle();
       if (!student) return json({ error: "not_found" }, 404);
       const hash = await sha256(uid);
-      const { data: tagInUse } = await supabase.from("nfc_cards").select("enrollment_id").eq("tag_hash", hash).eq("status", "active").maybeSingle();
+      const { data: tagInUse } = await supabase.from("nfc_cards").select("enrollment_id, kind").eq("tag_hash", hash).eq("status", "active").maybeSingle();
       if (tagInUse) return json({ error: tagInUse.enrollment_id === id ? "already_linked" : "tag_in_use" }, 409);
-      const { data: current } = await supabase.from("nfc_cards").select("id").eq("enrollment_id", id).eq("status", "active").maybeSingle();
+      const { data: current } = await supabase.from("nfc_cards").select("id").eq("enrollment_id", id).eq("kind", kind).eq("status", "active").maybeSingle();
       if (current) {
-        if (!isMestre) return json({ error: "student_has_card" }, 403);
+        if (!isMestre && kind === "card") return json({ error: "student_has_card" }, 403);
         await supabase.from("nfc_cards").update({ status: "revoked", revoked_by: userId, revoked_at: new Date().toISOString(), revoke_reason: "replaced" }).eq("id", current.id);
       }
-      const { error } = await supabase.from("nfc_cards").insert({ enrollment_id: id, tag_hash: hash, linked_by: userId });
+      const { error } = await supabase.from("nfc_cards").insert({ enrollment_id: id, tag_hash: hash, kind, linked_by: userId });
       if (error) { console.error(`[staff] stage=link db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
-      await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userId, event_type: current ? "nfc_card_replaced" : "nfc_card_linked" });
+      await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userId, event_type: current ? "nfc_card_replaced" : "nfc_card_linked", metadata: { kind } });
       return json({ ok: true });
     }
 
-    // Cartao perdido: so mestre revoga.
+    // Chip perdido: so mestre revoga (so o tipo informado).
     if (body.action === "revoke_card") {
       if (!isMestre) return json({ error: "forbidden" }, 403);
       const id = String(body.enrollment_id || "");
-      const { error } = await supabase.from("nfc_cards").update({ status: "revoked", revoked_by: userId, revoked_at: new Date().toISOString(), revoke_reason: String(body.reason || "lost").slice(0, 60) }).eq("enrollment_id", id).eq("status", "active");
+      const kind = body.kind === "belt" ? "belt" : "card";
+      const { error } = await supabase.from("nfc_cards").update({ status: "revoked", revoked_by: userId, revoked_at: new Date().toISOString(), revoke_reason: String(body.reason || "lost").slice(0, 60) }).eq("enrollment_id", id).eq("kind", kind).eq("status", "active");
       if (error) { console.error(`[staff] stage=revoke db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
-      await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userId, event_type: "nfc_card_revoked" });
+      await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userId, event_type: "nfc_card_revoked", metadata: { kind } });
       return json({ ok: true });
+    }
+
+    // ---- Daqui para baixo: so mestres ----
+    if (!isMestre) return json({ error: "forbidden" }, 403);
+
+    // Relatorio de presenca por periodo (padrao: mes atual). Filtro opcional por horario.
+    if (body.action === "attendance_report") {
+      const isDate = (v: unknown) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
+      const now = today();
+      const from = isDate(body.from) ? String(body.from) : `${now.slice(0, 8)}01`;
+      const to = isDate(body.to) ? String(body.to) : now;
+      const time = ["18:00", "19:00", "20:00"].includes(body.training_time) ? body.training_time : null;
+      let studentsQuery = supabase.from("student_enrollments").select("id, student_full_name, training_time, belt, belt_stripes").eq("status", "approved").order("student_full_name");
+      if (time) studentsQuery = studentsQuery.eq("training_time", time);
+      const { data: students, error } = await studentsQuery;
+      if (error) { console.error(`[staff] stage=report db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      // O servidor devolve no maximo 1000 linhas por consulta: le em paginas.
+      const rows: { enrollment_id: string; session_date: string }[] = [];
+      for (let page = 0; page < 40; page++) {
+        const { data: chunk, error: chunkError } = await supabase.from("attendance").select("enrollment_id, session_date")
+          .gte("session_date", from).lte("session_date", to).order("session_date").order("enrollment_id").range(page * 1000, page * 1000 + 999);
+        if (chunkError) { console.error(`[staff] stage=report_page db_code=${chunkError.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+        rows.push(...(chunk || []));
+        if (!chunk || chunk.length < 1000) break;
+      }
+      const perStudent = new Map<string, string[]>();
+      const days = new Set<string>();
+      for (const r of rows || []) {
+        days.add(r.session_date);
+        if (!perStudent.has(r.enrollment_id)) perStudent.set(r.enrollment_id, []);
+        perStudent.get(r.enrollment_id)!.push(r.session_date);
+      }
+      return json({
+        from, to, training_days: days.size,
+        students: students.map((s) => {
+          const dates = (perStudent.get(s.id) || []).sort();
+          return { id: s.id, name: s.student_full_name, training_time: s.training_time, belt: s.belt, belt_stripes: s.belt_stripes, count: dates.length, last: dates[dates.length - 1] || null, dates };
+        }),
+      });
+    }
+
+    // Caixa de mensagens da familia.
+    if (body.action === "inbox") {
+      const { data: msgs, error } = await supabase.from("family_messages").select("id, user_id, enrollment_id, body, created_at, read_at").order("created_at", { ascending: false }).limit(100);
+      if (error) { console.error(`[staff] stage=inbox db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      const eIds = [...new Set(msgs.map((m) => m.enrollment_id))];
+      const uIds = [...new Set(msgs.map((m) => m.user_id))];
+      const [{ data: studs }, { data: fams }] = await Promise.all([
+        eIds.length ? supabase.from("student_enrollments").select("id, student_full_name").in("id", eIds) : { data: [] },
+        uIds.length ? supabase.from("family_accounts").select("user_id, full_name").in("user_id", uIds) : { data: [] },
+      ]);
+      const sName = new Map((studs || []).map((x) => [x.id, x.student_full_name]));
+      const fName = new Map((fams || []).map((x) => [x.user_id, x.full_name]));
+      return json({ messages: msgs.map((m) => ({ id: m.id, student: sName.get(m.enrollment_id) || "", from: fName.get(m.user_id) || "", body: m.body, created_at: m.created_at, read: Boolean(m.read_at) })) });
+    }
+
+    if (body.action === "mark_message_read") {
+      const { error } = await supabase.from("family_messages").update({ read_at: new Date().toISOString(), read_by: userId }).eq("id", String(body.id || ""));
+      if (error) return json({ error: "server_error" }, 500);
+      return json({ ok: true });
+    }
+
+    // Avisos para a familia.
+    if (body.action === "announcements_list") {
+      const { data } = await supabase.from("announcements").select("id, title, body, created_at").eq("active", true).order("created_at", { ascending: false }).limit(50);
+      return json({ announcements: data || [] });
+    }
+    if (body.action === "announce") {
+      const title = String(body.title || "").trim().slice(0, 120);
+      const text = String(body.body || "").trim().slice(0, 2000);
+      if (!title || !text) return json({ error: "missing_field" }, 400);
+      const { error } = await supabase.from("announcements").insert({ title, body: text, created_by: userId });
+      if (error) return json({ error: "server_error" }, 500);
+      return json({ ok: true });
+    }
+    if (body.action === "remove_announcement") {
+      const { error } = await supabase.from("announcements").update({ active: false }).eq("id", String(body.id || ""));
+      if (error) return json({ error: "server_error" }, 500);
+      return json({ ok: true });
+    }
+
+    // Codigo de cadastro da familia (compartilhado so no grupo).
+    if (body.action === "get_signup_code") {
+      const { data } = await supabase.from("app_settings").select("value").eq("key", "family_signup_code").maybeSingle();
+      return json({ code: data?.value || "" });
+    }
+    if (body.action === "set_signup_code") {
+      const code = String(body.code || "").trim().toUpperCase().replace(/[^A-Z0-9-]/g, "");
+      if (code.length < 6 || code.length > 24) return json({ error: "invalid_code" }, 400);
+      const { error } = await supabase.from("app_settings").upsert({ key: "family_signup_code", value: code, updated_at: new Date().toISOString() });
+      if (error) return json({ error: "server_error" }, 500);
+      return json({ ok: true, code });
     }
 
     return json({ error: "invalid_request" }, 400);

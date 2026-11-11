@@ -1,0 +1,13 @@
+{
+  "name": "Mão Com Mão — Família",
+  "short_name": "Mão Com Mão",
+  "start_url": "/familia/",
+  "scope": "/familia/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/images/logo-mao-com-mao-circular-carteirinha.png", "sizes": "1254x1254", "type": "image/png", "purpose": "any" }
+  ]
+}

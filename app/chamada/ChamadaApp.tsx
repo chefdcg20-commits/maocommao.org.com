@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { AnnounceView, InboxView, ReportView } from "./StaffExtras";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_STAFF_ENDPOINT || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/staff-api";
 const ACCESS = "mcm-staff-access";
@@ -68,9 +69,11 @@ export default function ChamadaApp() {
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [tab, setTab] = useState("roster");
 
   const signOut = useCallback((text = "") => {
     store.set(ACCESS, ""); store.set(REFRESH, "");
+    setTab("roster");
     setSignedIn(false); setStudents([]); setMessage(text);
   }, []);
 
@@ -135,9 +138,24 @@ export default function ChamadaApp() {
   }
 
   const present = visible.filter((s) => s.present_today).length;
+  const isMestre = role === "mestre";
+  const TABS = [["roster", "Chamada"], ["report", "Relatório"], ["inbox", "Mensagens"], ["news", "Avisos"]];
+
+  if (isMestre && tab !== "roster") {
+    return (
+      <div className="space-y-4 pb-20">
+        {tab === "report" && <ReportView call={api} />}
+        {tab === "inbox" && <InboxView call={api} />}
+        {tab === "news" && <AnnounceView call={api} />}
+        <nav className="fixed inset-x-0 bottom-0 flex border-t border-slate-800 bg-slate-950 pb-4 pt-2">
+          {TABS.map(([key, label]) => <button key={key} onClick={() => setTab(key)} className={`flex-1 py-2 text-sm font-bold ${tab === key ? "text-amber-400" : "text-slate-400"}`}>{label}</button>)}
+        </nav>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${isMestre ? "pb-20" : ""}`}>
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black text-amber-400">Chamada</h1>
@@ -181,6 +199,11 @@ export default function ChamadaApp() {
           );
         })}
       </ul>
+      {isMestre && (
+        <nav className="fixed inset-x-0 bottom-0 flex border-t border-slate-800 bg-slate-950 pb-4 pt-2">
+          {TABS.map(([key, label]) => <button key={key} onClick={() => setTab(key)} className={`flex-1 py-2 text-sm font-bold ${tab === key ? "text-amber-400" : "text-slate-400"}`}>{label}</button>)}
+        </nav>
+      )}
     </div>
   );
 }

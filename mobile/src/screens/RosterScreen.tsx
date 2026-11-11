@@ -12,21 +12,19 @@ const FILTERS = [
   { key: "20:00", label: "20h" },
 ];
 
-export default function RosterScreen({ onLogout }: { onLogout: () => void }) {
+export default function RosterScreen({ role, onLogout }: { role: "mestre" | "professor"; onLogout: () => void }) {
   const [students, setStudents] = useState<Student[]>([]);
   const [date, setDate] = useState("");
-  const [role, setRole] = useState<"mestre" | "professor">("professor");
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [scan, setScan] = useState<null | { mode: "attendance" | "link"; student?: Student }>(null);
+  const [scan, setScan] = useState<null | { mode: "attendance" | "link"; student?: Student; kind?: "card" | "belt" }>(null);
 
   const load = useCallback(async () => {
     try {
-      const [me, roster] = await Promise.all([api({ action: "me" }), api({ action: "roster" })]);
-      setRole(me.role);
+      const roster = await api({ action: "roster" });
       setStudents(roster.students);
       setDate(roster.date);
       setError("");
@@ -78,26 +76,34 @@ export default function RosterScreen({ onLogout }: { onLogout: () => void }) {
     }
   }
 
-  function menu(student: Student) {
-    const buttons: { text: string; style?: "cancel" | "destructive"; onPress?: () => void }[] = [
-      { text: student.has_card ? "Trocar cartão" : "Vincular cartão", onPress: () => setScan({ mode: "link", student }) },
-    ];
-    if (role === "mestre" && student.has_card) {
-      buttons.push({
-        text: "Cartão perdido (desativar)",
+  function revoke(student: Student, kind: "card" | "belt") {
+    Alert.alert(kind === "card" ? "Carteirinha perdida?" : "Chip da faixa perdido?", `${student.name}
+O chip antigo deixa de funcionar.`, [
+      { text: "Não", style: "cancel" },
+      {
+        text: "Desativar",
         style: "destructive",
         onPress: async () => {
           try {
-            await api({ action: "revoke_card", enrollment_id: student.id, reason: "lost" });
+            await api({ action: "revoke_card", enrollment_id: student.id, kind, reason: "lost" });
             await load();
           } catch (e) {
             Alert.alert("Erro", errorText(e));
           }
         },
-      });
-    }
+      },
+    ]);
+  }
+
+  function menu(student: Student) {
+    const buttons: { text: string; style?: "cancel" | "destructive"; onPress?: () => void }[] = [
+      { text: student.has_card ? "Trocar chip da carteirinha" : "Vincular chip da carteirinha", onPress: () => setScan({ mode: "link", student, kind: "card" }) },
+      { text: student.has_belt_tag ? "Trocar chip da faixa" : "Vincular chip da faixa", onPress: () => setScan({ mode: "link", student, kind: "belt" }) },
+    ];
+    if (role === "mestre" && student.has_card) buttons.push({ text: "Carteirinha perdida (desativar)", style: "destructive", onPress: () => revoke(student, "card") });
+    if (role === "mestre" && student.has_belt_tag) buttons.push({ text: "Chip da faixa perdido (desativar)", style: "destructive", onPress: () => revoke(student, "belt") });
     buttons.push({ text: "Cancelar", style: "cancel" });
-    Alert.alert(student.name, student.has_card ? "Cartão vinculado." : "Sem cartão vinculado.", buttons);
+    Alert.alert(student.name, `Carteirinha: ${student.has_card ? "vinculada" : "não"} · Faixa: ${student.has_belt_tag ? "vinculado" : "não"}`, buttons);
   }
 
   const dateLabel = date ? date.split("-").reverse().join("/") : "";
@@ -142,7 +148,7 @@ export default function RosterScreen({ onLogout }: { onLogout: () => void }) {
                   <View style={styles.meta}>
                     <Text style={styles.metaText}>{item.training_time ? `${item.training_time.slice(0, 2)}h` : "sem horário"}</Text>
                     {belt && <View style={[styles.beltDot, { backgroundColor: belt.main, borderColor: belt.stripe || colors.border }]} />}
-                    <Text style={styles.metaText}>{item.has_card ? "💳" : "sem cartão"}</Text>
+                    <Text style={styles.metaText}>{item.has_card || item.has_belt_tag ? `${item.has_card ? "💳" : ""}${item.has_belt_tag ? "🥋" : ""}` : "sem chip"}</Text>
                   </View>
                 </View>
                 <Text style={[styles.check, item.present_today && { color: colors.green }]}>{item.present_today ? "✓" : "○"}</Text>
@@ -160,6 +166,7 @@ export default function RosterScreen({ onLogout }: { onLogout: () => void }) {
         <ScanModal
           mode={scan.mode}
           student={scan.student}
+          kind={scan.kind}
           onClose={(changed) => {
             setScan(null);
             if (changed) load();

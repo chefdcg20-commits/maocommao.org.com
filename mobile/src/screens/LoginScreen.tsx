@@ -3,7 +3,7 @@ import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, St
 import { errorText, login } from "../api";
 import { colors } from "../theme";
 
-export default function LoginScreen({ onDone }: { onDone: () => void }) {
+export default function LoginScreen({ onDone, onRegister }: { onDone: () => void; onRegister: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -27,12 +27,15 @@ export default function LoginScreen({ onDone }: { onDone: () => void }) {
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.wrap}>
       <Image source={require("../../assets/icon.png")} style={styles.logo} />
       <Text style={styles.title}>Mão Com Mão</Text>
-      <Text style={styles.sub}>Acesso da equipe</Text>
+      <Text style={styles.sub}>Equipe, pais e alunos</Text>
       <TextInput style={styles.input} placeholder="E-mail" placeholderTextColor={colors.muted} autoCapitalize="none" keyboardType="email-address" autoComplete="email" value={email} onChangeText={setEmail} />
       <TextInput style={styles.input} placeholder="Senha" placeholderTextColor={colors.muted} secureTextEntry autoComplete="password" value={password} onChangeText={setPassword} onSubmitEditing={submit} />
       {!!error && <Text style={styles.error}>{error}</Text>}
       <Pressable style={[styles.button, busy && { opacity: 0.6 }]} onPress={submit} disabled={busy}>
         {busy ? <ActivityIndicator color="#020617" /> : <Text style={styles.buttonText}>Entrar</Text>}
+      </Pressable>
+      <Pressable onPress={onRegister}>
+        <Text style={{ color: colors.muted, textAlign: "center", padding: 16 }}>Sou pai, mãe ou aluno · <Text style={{ color: colors.amber, fontWeight: "800" }}>Criar conta</Text></Text>
       </Pressable>
     </KeyboardAvoidingView>
   );
