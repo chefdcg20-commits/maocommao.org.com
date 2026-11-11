@@ -81,7 +81,18 @@ export default function BraceletScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 90 }}>
-      <Header title="Liberação da pulseira" sub="Só os mestres liberam" />
+      <Header title="Liberação da pulseira" sub="Exclusivo dos mestres" />
+      <View style={[styles.card, { borderColor: colors.amber }]}>
+        <Text style={[styles.strong, { color: colors.amber }]}>O que é isto?</Text>
+        <Text style={[styles.text, { marginTop: 4, lineHeight: 21 }]}>
+          É o passo que ATIVA uma pulseira antes de ela ser enviada. Sem esta liberação, a pulseira não abre a Biblioteca.
+        </Text>
+        <Text style={[styles.strong, { color: colors.amber, marginTop: 10 }]}>Como fazer</Text>
+        <Text style={[styles.text, { marginTop: 4, lineHeight: 21 }]}>
+          1. Toque em "Escanear pulseira".{"\n"}2. Encoste a pulseira na parte de trás do celular e espere a palavra OSS! ficar verde.{"\n"}3. Imprima o QR Code dessa pulseira e envie junto com ela.
+        </Text>
+        <Text style={[styles.muted, { marginTop: 8 }]}>Quem recebe a pulseira entra na Biblioteca encostando o celular nela ou lendo o QR Code.</Text>
+      </View>
       <View style={[styles.card, { alignItems: "center", paddingVertical: 18, gap: 8 }]}>
         <ScannerView state={phase === "ready" ? "idle" : scanState} />
         {phase === "ready" && <Text style={[styles.text, { textAlign: "center" }]}>Encoste a pulseira no celular para liberar o acesso à Biblioteca.</Text>}

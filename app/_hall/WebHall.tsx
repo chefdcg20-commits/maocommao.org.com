@@ -4,6 +4,7 @@ import { ReactNode, useCallback, useEffect, useState } from "react";
 
 export type Call = (body: Record<string, unknown>) => Promise<{ ok: boolean; status: number; data: any }>;
 export type Tile = { key: string; icon: string; label: string; hint?: string; badge?: number; href?: string };
+export type Featured = { title: string; text: string; href: string };
 
 const input = "w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-amber-400";
 const btn = "w-full rounded-xl bg-amber-400 px-5 py-3 font-black text-slate-950 hover:bg-amber-300 disabled:opacity-60";
@@ -29,7 +30,7 @@ export const COMMON_TILES: Tile[] = [
 ];
 
 // Hall de entrada com blocos conforme o perfil.
-export function Hall({ name, roleLabel, group, tiles, onPick, onLogout }: { name: string; roleLabel: string; group: string; tiles: Tile[]; onPick: (key: string) => void; onLogout: () => void }) {
+export function Hall({ name, roleLabel, group, tiles, onPick, onLogout, featured }: { name: string; roleLabel: string; group: string; tiles: Tile[]; onPick: (key: string) => void; onLogout: () => void; featured?: Featured }) {
   const card = "relative flex min-h-28 flex-col justify-end rounded-2xl border border-slate-800 bg-slate-900 p-4 text-left";
   const inner = (t: Tile) => (
     <>
@@ -56,6 +57,19 @@ export function Hall({ name, roleLabel, group, tiles, onPick, onLogout }: { name
         </div>
         <button onClick={onLogout} className="rounded-xl border border-slate-700 px-3 py-2 text-sm font-bold">Sair</button>
       </header>
+      {featured && (
+        <>
+          <p className="text-xs font-extrabold uppercase tracking-widest text-slate-400">Exclusivo dos mestres</p>
+          <a href={featured.href} className="flex items-center gap-3 rounded-2xl border-2 border-amber-200 bg-amber-400 p-4 text-slate-950">
+            <span className="text-4xl">📿</span>
+            <span className="flex-1">
+              <span className="block text-base font-black tracking-wide">{featured.title}</span>
+              <span className="block text-sm leading-snug text-slate-800">{featured.text}</span>
+            </span>
+            <span className="text-3xl font-black">›</span>
+          </a>
+        </>
+      )}
       <p className="text-xs font-extrabold uppercase tracking-widest text-slate-400">{group}</p>
       {grid(tiles)}
       <p className="text-xs font-extrabold uppercase tracking-widest text-slate-400">Projeto</p>

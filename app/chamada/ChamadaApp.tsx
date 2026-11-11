@@ -159,7 +159,7 @@ export default function ChamadaApp() {
           { key: "roster", icon: "✅", label: "Chamada dos alunos", hint: "Lista por toque" },
           { key: "news", icon: "📢", label: "Avisos" },
         ];
-    if (tab === "hall") return <Hall name={nameState} roleLabel={isMestre ? "Mestre" : "Professor"} group="Equipe" tiles={tiles} onPick={setTab} onLogout={() => signOut()} />;
+    if (tab === "hall") return <Hall name={nameState} roleLabel={isMestre ? "Mestre" : "Professor"} group="Equipe" tiles={tiles} onPick={setTab} onLogout={() => signOut()} featured={isMestre ? { title: "LIBERAÇÃO DA PULSEIRA", text: "Ativa a pulseira antes do envio e imprime o QR Code dela. A leitura do chip é feita no app Android; aqui você vê as pulseiras e imprime os QR Codes.", href: "/admin/pulseiras/" } : undefined} />;
     return (
       <Frame onBack={() => setTab("hall")}>
         {tab === "report" && <ReportView call={api} />}

@@ -36,7 +36,6 @@ export default function Shell({ role, onLogout }: { role: Role; onLogout: () => 
       ? [
           { key: "roster", icon: "✅", label: "Chamada dos alunos", hint: "Leitura de chip e lista" },
           { key: "enrollments", icon: "📝", label: "Cadastros e carteirinhas", hint: "Aprovar alunos", badge: counts.pending },
-          { key: "bracelet", icon: "📿", label: "Liberação da pulseira", hint: "Scanner OSS!" },
           { key: "report", icon: "📊", label: "Relatório de presença" },
           { key: "inbox", icon: "✉️", label: "Mensagens", hint: "Dos pais e alunos", badge: counts.unread },
           { key: "announce", icon: "📢", label: "Avisos", hint: "Publicar e código" },
@@ -69,6 +68,19 @@ export default function Shell({ role, onLogout }: { role: Role; onLogout: () => 
           <Pressable onPress={onLogout}><Text style={styles.logout}>Sair</Text></Pressable>
         </View>
 
+        {kind === "mestre" && (
+          <>
+            <Text style={styles.group}>Exclusivo dos mestres</Text>
+            <Pressable style={styles.featured} onPress={() => setScreen("bracelet")} accessibilityRole="button" accessibilityLabel="Liberação da pulseira">
+              <Text style={styles.featuredIcon}>📿</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.featuredTitle}>LIBERAÇÃO DA PULSEIRA</Text>
+                <Text style={styles.featuredText}>Ativa a pulseira antes do envio: você escaneia o chip e libera o acesso à Biblioteca. Só os mestres fazem isso.</Text>
+              </View>
+              <Text style={styles.featuredArrow}>›</Text>
+            </Pressable>
+          </>
+        )}
         <Text style={styles.group}>{isStaff ? "Equipe" : "Acompanhamento"}</Text>
         <Grid tiles={mine} onPick={setScreen} />
         <Text style={styles.group}>Projeto</Text>
@@ -118,6 +130,11 @@ function Grid({ tiles, onPick }: { tiles: Tile[]; onPick: (key: Screen) => void 
 
 const styles = StyleSheet.create({
   hall: { flex: 1, backgroundColor: colors.bg },
+  featured: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.amber, borderRadius: 20, padding: 16, borderWidth: 2, borderColor: "#fde68a" },
+  featuredIcon: { fontSize: 34 },
+  featuredTitle: { color: "#020617", fontSize: 17, fontWeight: "900", letterSpacing: 1 },
+  featuredText: { color: "#1e293b", fontSize: 13, marginTop: 3, lineHeight: 18 },
+  featuredArrow: { color: "#020617", fontSize: 30, fontWeight: "900" },
   top: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 },
   logo: { width: 56, height: 56, borderRadius: 28 },
   hello: { color: colors.amber, fontSize: 24, fontWeight: "900" },
