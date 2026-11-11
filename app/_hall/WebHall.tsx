@@ -43,7 +43,7 @@ export function Hall({ name, roleLabel, group, tiles, onPick, onLogout, featured
   const grid = (list: Tile[]) => (
     <div className="grid grid-cols-2 gap-3">
       {list.map((t) => t.href
-        ? <a key={t.key} href={t.href} target="_blank" rel="noopener noreferrer" className={card}>{inner(t)}</a>
+        ? <a key={t.key} href={t.href} {...(t.href.startsWith("/") ? {} : { target: "_blank", rel: "noopener noreferrer" })} className={card}>{inner(t)}</a>
         : <button key={t.key} onClick={() => onPick(t.key)} className={card}>{inner(t)}</button>)}
     </div>
   );

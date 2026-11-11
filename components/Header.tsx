@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { FiHeart, FiMenu, FiX } from 'react-icons/fi';
+import { FiHeart, FiLock, FiMenu, FiX } from 'react-icons/fi';
 
 const links = [
   ['Quem somos', '/#quem-somos'],
@@ -42,6 +42,9 @@ export function Header() {
               {label}
             </a>
           ))}
+          <a href="/acesso/" className="focus-ring inline-flex items-center gap-2 rounded-full border border-brand-200 px-4 py-2.5 text-sm font-bold text-brand-800 transition hover:border-brand-500 hover:bg-brand-50">
+            <FiLock aria-hidden /> Acesso administrativo
+          </a>
           <a href="/#doacao" className="focus-ring inline-flex items-center gap-2 rounded-full bg-gold px-5 py-3 text-sm font-black text-brand-900 transition hover:-translate-y-0.5 hover:shadow-lg">
             <FiHeart aria-hidden /> Doe agora
           </a>
@@ -66,6 +69,9 @@ export function Header() {
                 {label}
               </a>
             ))}
+            <a href="/acesso/" onClick={() => setOpen(false)} className="focus-ring mt-3 flex items-center justify-center gap-2 rounded-lg border border-brand-200 px-4 py-3 text-center font-black text-brand-800">
+              <FiLock aria-hidden /> Acesso administrativo
+            </a>
             <a href="/#doacao" onClick={() => setOpen(false)} className="focus-ring mt-3 rounded-lg bg-gold px-4 py-3 text-center font-black text-brand-900">
               Fazer uma doação
             </a>

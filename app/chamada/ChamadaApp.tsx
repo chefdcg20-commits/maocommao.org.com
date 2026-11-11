@@ -93,6 +93,7 @@ export default function ChamadaApp() {
     setMessage("");
     setSignedIn(true);
     setRole(me.data?.role || "");
+    if (me.data?.role === "mestre") { try { sessionStorage.setItem("mcm-admin-token", store.get(ACCESS)); } catch { /* sem armazenamento */ } }
     setNameState(me.data?.name || "");
     setStudents(roster.data.students);
     setDate(roster.data.date);

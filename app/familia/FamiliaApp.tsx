@@ -106,6 +106,7 @@ export default function FamiliaApp() {
 
   useEffect(() => {
     setReady(true);
+    try { if (new URLSearchParams(window.location.search).has("cadastro")) setMode("register"); } catch { /* sem URL */ }
     if (store.get(ACCESS)) load();
   }, [load]);
 
