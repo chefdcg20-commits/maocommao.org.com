@@ -12,7 +12,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#020617",
-        "foregroundImage": "./assets/icon.png"
+        "foregroundImage": "./assets/adaptive-foreground.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "org.maocommao.chamada",
