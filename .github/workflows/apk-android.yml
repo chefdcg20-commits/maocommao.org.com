@@ -26,6 +26,6 @@ jobs:
         working-directory: mobile/android
       - uses: actions/upload-artifact@v4
         with:
-          name: maocommao-chamada-apk-v${{ github.run_number }}
+          name: maocommao-chamada-apk-1.2.0
           path: mobile/android/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
