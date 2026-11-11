@@ -23,6 +23,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { Header } from '@/components/Header';
 import { ContactForm } from '@/components/ContactForm';
 import { PixDonation } from '@/components/PixDonation';
+import { MotionEffects } from '@/components/MotionEffects';
 import { diarioPosts } from '@/lib/diario';
 
 const team = [
@@ -73,6 +74,7 @@ export default function Home() {
   return (
     <main>
       <Header />
+      <MotionEffects />
 
       <section id="inicio" className="relative min-h-[690px] overflow-hidden bg-brand-900 text-white">
         <Image
@@ -80,11 +82,11 @@ export default function Home() {
           alt="Professores do Projeto Mão com Mão no tatame"
           fill
           priority
-          className="object-cover object-[55%_0%] md:object-[center_5%]"
+          className="hero-zoom object-cover object-[55%_0%] md:object-[center_5%]"
         />
         <div className="hero-overlay absolute inset-0" />
         <div className="container-site relative flex min-h-[690px] items-center py-20">
-          <div className="max-w-3xl">
+          <div className="hero-in max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-bold backdrop-blur">
               <FiMapPin aria-hidden /> Diadema, São Paulo
             </span>

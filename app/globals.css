@@ -47,3 +47,37 @@ body {
     padding-block: 3.75rem;
   }
 }
+
+/* ===== Animacoes da pagina inicial (so rodam se o aparelho nao pediu "reduzir movimento") ===== */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes mcm-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  @keyframes mcm-fade-up { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes mcm-fade-down { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes mcm-hero-zoom { from { transform: scale(1); } to { transform: scale(1.09); } }
+  @keyframes mcm-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.55); } 50% { box-shadow: 0 0 0 14px rgba(251, 191, 36, 0); } }
+
+  /* Topo: foto com zoom lento, texto entrando em sequencia, menu descendo */
+  .hero-zoom { animation: mcm-hero-zoom 22s ease-in-out infinite alternate; will-change: transform; }
+  .hero-in > * { opacity: 0; animation: mcm-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  .hero-in > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero-in > *:nth-child(2) { animation-delay: 0.28s; }
+  .hero-in > *:nth-child(3) { animation-delay: 0.46s; }
+  .hero-in > *:nth-child(4) { animation-delay: 0.64s; }
+  header.sticky { animation: mcm-fade-down 0.6s ease-out both; }
+
+  /* Icones flutuando */
+  .icon-float { animation: mcm-float 4.2s ease-in-out infinite; animation-delay: var(--float-delay, 0s); will-change: transform; }
+
+  /* Botao de doacao do topo pulsando */
+  .cta-glow { animation: mcm-glow 2.6s ease-out infinite; }
+
+  /* Entrada ao rolar (so esconde depois que o JS confirma que as animacoes estao ativas) */
+  .motion-ready .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: var(--reveal-delay, 0ms); }
+  .motion-ready .reveal.reveal-in { opacity: 1; transform: none; }
+
+  /* Cartoes: sobem e o icone da um pulinho ao passar o mouse ou tocar */
+  .card-fx { transition: transform 0.35s ease, box-shadow 0.35s ease; }
+  .card-fx:hover { transform: translateY(-6px); box-shadow: 0 18px 38px -16px rgba(16, 35, 79, 0.45); }
+  .card-fx svg { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .card-fx:hover svg { animation: none; transform: translateY(-5px) scale(1.18) rotate(-6deg); }
+}
