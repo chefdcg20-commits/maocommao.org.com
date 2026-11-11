@@ -1,9 +1,11 @@
 "use client";
 
+import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import { BeltGraphic, beltByKey } from "../belts";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_ADMIN_ENDPOINT || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/admin-enrollments";
+const STAFF_ENDPOINT = process.env.NEXT_PUBLIC_STAFF_ENDPOINT || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/staff-api";
 const TOKEN_KEY = "mcm-admin-token";
 
 type Student = {
@@ -69,6 +71,9 @@ export default function CardView() {
   const [student, setStudent] = useState<Student | null>(null);
   const [message, setMessage] = useState("Carregando...");
   const [ink, setInk] = useState<string | null>(null);
+  // QR individual do aluno: abre a Biblioteca ja liberada. Enquanto carrega nao imprime; se falhar, usa o QR do site.
+  const [qr, setQr] = useState<string | null>(null);
+  const [qrState, setQrState] = useState<"loading" | "ok" | "fallback">("loading");
 
   useEffect(() => {
     (async () => {
@@ -84,6 +89,19 @@ export default function CardView() {
       setStudent(found);
     })().catch(() => setMessage("Não foi possível carregar a carteirinha."));
   }, []);
+
+  useEffect(() => {
+    if (!student) return;
+    (async () => {
+      let token = "";
+      try { token = sessionStorage.getItem(TOKEN_KEY) || ""; } catch { /* sem armazenamento */ }
+      const response = await fetch(STAFF_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ action: "student_key", enrollment_id: student.id }) });
+      if (!response.ok) throw new Error("key");
+      const { url } = await response.json();
+      setQr(await QRCode.toDataURL(url, { errorCorrectionLevel: "M", margin: 0, width: 480, color: { dark: "#020617", light: "#ffffff" } }));
+      setQrState("ok");
+    })().catch(() => setQrState("fallback"));
+  }, [student]);
 
   useEffect(() => {
     if (!student?.sensei_signature_url) return;
@@ -108,9 +126,10 @@ export default function CardView() {
           <h1 className="text-2xl font-black text-amber-400">Carteirinha de {student.student_full_name}</h1>
           <div className="flex gap-2">
             <a href="/admin/cadastros/" className="rounded-xl border border-slate-700 px-5 py-3 font-bold hover:border-amber-400">Voltar ao painel</a>
-            <button onClick={() => window.print()} className="rounded-xl bg-amber-400 px-5 py-3 font-black text-slate-950 hover:bg-amber-300">Imprimir</button>
+            <button onClick={() => window.print()} disabled={qrState === "loading"} className="rounded-xl bg-amber-400 px-5 py-3 font-black text-slate-950 hover:bg-amber-300 disabled:opacity-50">{qrState === "loading" ? "Gerando QR..." : "Imprimir"}</button>
           </div>
         </div>
+        {qrState === "fallback" && <p className="screen-only mt-2 rounded-xl bg-amber-400/15 p-3 text-sm text-amber-200">Não foi possível gerar o QR individual do aluno. A carteirinha está com o QR geral do site.</p>}
         <p className="screen-only mt-2 text-sm text-slate-400">Na impressão, escolha tamanho real (100%), sem margens. Saem duas páginas: frente e verso, no tamanho de um cartão (85,6 × 54 mm).</p>
 
         <div className="cards-grid mt-8 grid gap-8 lg:grid-cols-2">
@@ -169,7 +188,7 @@ export default function CardView() {
                   <p className="text-center text-[clamp(0.4rem,0.9vw,0.62rem)] text-slate-400">Sensei do Projeto Mão Com Mão</p>
                 </div>
                 <div className="rounded-lg bg-white p-[7%] text-center shadow-lg">
-                  <img src="/images/qr-site-mao-com-mao.png" alt="QR Code do site" className="aspect-square w-full" />
+                  <img src={qrState === "ok" && qr ? qr : "/images/qr-site-mao-com-mao.png"} alt="QR Code do aluno" className="aspect-square w-full" />
                   <span className="mt-[3%] block text-[clamp(0.32rem,0.7vw,0.5rem)] font-black uppercase tracking-wider text-slate-900">Acesse o site</span>
                 </div>
               </div>

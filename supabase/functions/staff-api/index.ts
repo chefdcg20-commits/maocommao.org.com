@@ -30,6 +30,11 @@ const normalizeUid = (raw: unknown) => {
   return value.length >= 8 && value.length <= 20 ? value : null;
 };
 
+// Codigo secreto de acesso a biblioteca (62 simbolos, ~143 bits).
+const TOKEN_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const newToken = () => Array.from(crypto.getRandomValues(new Uint8Array(24)), (b) => TOKEN_CHARS[b % 62]).join("");
+const LIBRARY_URL = "https://maocommao-org-com.vercel.app/biblioteca/?k=";
+
 // Data do treino no fuso de Sao Paulo (AAAA-MM-DD).
 const today = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(new Date());
 
@@ -202,8 +207,52 @@ Deno.serve(async (request) => {
       return json({ sections: data || [] });
     }
 
+    // Chave de acesso do aluno (QR da carteirinha e chip): cria na primeira vez e devolve o mesmo link depois.
+    if (body.action === "student_key") {
+      const id = String(body.enrollment_id || "");
+      const { data: student } = await supabase.from("student_enrollments").select("id").eq("id", id).eq("status", "approved").maybeSingle();
+      if (!student) return json({ error: "not_found" }, 404);
+      let { data: key } = await supabase.from("access_keys").select("token").eq("enrollment_id", id).eq("kind", "student").eq("status", "active").maybeSingle();
+      if (!key) {
+        const inserted = await supabase.from("access_keys").insert({ kind: "student", token: newToken(), enrollment_id: id, label: "Aluno", created_by: userId }).select("token").maybeSingle();
+        if (inserted.error && inserted.error.code !== "23505") { console.error(`[staff] stage=student_key db_code=${inserted.error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+        key = inserted.data || (await supabase.from("access_keys").select("token").eq("enrollment_id", id).eq("kind", "student").eq("status", "active").maybeSingle()).data;
+      }
+      if (!key) return json({ error: "server_error" }, 500);
+      return json({ url: `${LIBRARY_URL}${key.token}` });
+    }
+
     // ---- Daqui para baixo: so mestres ----
     if (!isMestre) return json({ error: "forbidden" }, 403);
+
+    // Liberacao da pulseira (so mestres): registra o chip, gera o codigo e devolve o link a ser gravado no chip e impresso no QR.
+    if (body.action === "bracelet_issue") {
+      const uid = normalizeUid(body.tag_uid);
+      if (!uid) return json({ error: "invalid_tag" }, 400);
+      const hash = await sha256(uid);
+      const { data: asStudentTag } = await supabase.from("nfc_cards").select("id").eq("tag_hash", hash).eq("status", "active").maybeSingle();
+      if (asStudentTag) return json({ error: "tag_in_use" }, 409);
+      const { data: existing } = await supabase.from("access_keys").select("id, token, label").eq("tag_hash", hash).eq("kind", "bracelet").eq("status", "active").maybeSingle();
+      if (existing) return json({ ok: true, already: true, id: existing.id, label: existing.label, url: `${LIBRARY_URL}${existing.token}` });
+      const { count } = await supabase.from("access_keys").select("id", { count: "exact", head: true }).eq("kind", "bracelet");
+      const label = `Pulseira nº ${(count || 0) + 1}`;
+      const { data: created, error } = await supabase.from("access_keys").insert({ kind: "bracelet", token: newToken(), tag_hash: hash, label, created_by: userId }).select("id, token, label").maybeSingle();
+      if (error || !created) { console.error(`[staff] stage=bracelet_issue db_code=${error?.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      return json({ ok: true, already: false, id: created.id, label: created.label, url: `${LIBRARY_URL}${created.token}` });
+    }
+
+    if (body.action === "bracelet_list") {
+      const { data } = await supabase.from("access_keys").select("id, label, status, token, created_at, last_used_at, uses").eq("kind", "bracelet").order("created_at", { ascending: false }).limit(200);
+      const rows = (data || []).map(({ token, ...rest }) => ({ ...rest, url: `${LIBRARY_URL}${token}` }));
+      return json({ total: rows.length, active: rows.filter((r) => r.status === "active").length, bracelets: rows });
+    }
+
+    if (body.action === "bracelet_revoke") {
+      const { error } = await supabase.from("access_keys").update({ status: "revoked", revoked_at: new Date().toISOString(), revoked_by: userId }).eq("id", String(body.id || "")).eq("kind", "bracelet");
+      if (error) return json({ error: "server_error" }, 500);
+      return json({ ok: true });
+    }
+
 
     // Relatorio de presenca por periodo (padrao: mes atual). Filtro opcional por horario.
     if (body.action === "attendance_report") {

@@ -1,4 +1,4 @@
-import NfcManager, { NfcTech } from "react-native-nfc-manager";
+import NfcManager, { Ndef, NfcTech } from "react-native-nfc-manager";
 
 let started = false;
 
@@ -17,6 +17,23 @@ export async function readUid(): Promise<string> {
     const tag = await NfcManager.getTag();
     if (!tag?.id) throw new Error("no_id");
     return tag.id;
+  } finally {
+    await NfcManager.cancelTechnologyRequest().catch(() => undefined);
+  }
+}
+
+const hex = (value: string) => value.replace(/[^0-9a-fA-F]/g, "").toUpperCase();
+
+// Grava um endereco (URL) no chip. So grava se for o MESMO chip que acabou de ser lido (confere o identificador).
+// O identificador do chip nao muda, entao a chamada por chip continua funcionando.
+export async function writeUrl(url: string, expectedUid: string): Promise<void> {
+  try {
+    await NfcManager.requestTechnology(NfcTech.Ndef);
+    const tag = await NfcManager.getTag();
+    if (!tag?.id || hex(tag.id) !== hex(expectedUid)) throw new Error("other_tag");
+    const bytes = Ndef.encodeMessage([Ndef.uriRecord(url)]);
+    if (!bytes) throw new Error("encode");
+    await NfcManager.ndefHandler.writeNdefMessage(bytes);
   } finally {
     await NfcManager.cancelTechnologyRequest().catch(() => undefined);
   }

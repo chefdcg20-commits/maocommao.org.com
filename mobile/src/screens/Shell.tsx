@@ -3,6 +3,7 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 import { api, Role } from "../api";
 import { colors } from "../theme";
 import AnnounceScreen from "./AnnounceScreen";
+import BraceletScreen from "./BraceletScreen";
 import EnrollmentsScreen from "./EnrollmentsScreen";
 import FamilyShell from "./FamilyShell";
 import { ContactScreen, InfoScreen, LibraryScreen, NewsScreen } from "./InfoScreens";
@@ -10,7 +11,7 @@ import InboxScreen from "./InboxScreen";
 import ReportScreen from "./ReportScreen";
 import RosterScreen from "./RosterScreen";
 
-type Screen = "hall" | "roster" | "enrollments" | "report" | "inbox" | "announce" | "news" | "students" | "info" | "library" | "contact";
+type Screen = "hall" | "roster" | "enrollments" | "report" | "inbox" | "announce" | "news" | "students" | "info" | "library" | "contact" | "bracelet";
 type Tile = { key: Screen; icon: string; label: string; hint?: string; badge?: number };
 
 const ROLE_LABEL = { mestre: "Mestre", professor: "Professor", family: "Família" } as const;
@@ -35,6 +36,7 @@ export default function Shell({ role, onLogout }: { role: Role; onLogout: () => 
       ? [
           { key: "roster", icon: "✅", label: "Chamada dos alunos", hint: "Leitura de chip e lista" },
           { key: "enrollments", icon: "📝", label: "Cadastros e carteirinhas", hint: "Aprovar alunos", badge: counts.pending },
+          { key: "bracelet", icon: "📿", label: "Liberação da pulseira", hint: "Scanner OSS!" },
           { key: "report", icon: "📊", label: "Relatório de presença" },
           { key: "inbox", icon: "✉️", label: "Mensagens", hint: "Dos pais e alunos", badge: counts.unread },
           { key: "announce", icon: "📢", label: "Avisos", hint: "Publicar e código" },
@@ -86,6 +88,7 @@ export default function Shell({ role, onLogout }: { role: Role; onLogout: () => 
   switch (screen) {
     case "roster": return frame(<RosterScreen role={kind === "mestre" ? "mestre" : "professor"} onLogout={onLogout} />);
     case "enrollments": return frame(<EnrollmentsScreen />);
+    case "bracelet": return frame(<BraceletScreen />);
     case "report": return frame(<ReportScreen />);
     case "inbox": return frame(<InboxScreen />);
     case "announce": return frame(<AnnounceScreen />);

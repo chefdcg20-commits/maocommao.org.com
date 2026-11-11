@@ -5,6 +5,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 const ROOT = process.env.NEXT_PUBLIC_FUNCTIONS_URL || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/";
 const ACCESS = "mcm-lib-access";
 const REFRESH = "mcm-lib-refresh";
+const KEY = "mcm-lib-key";
 
 type Item = { id: string; category: string; title: string; description: string | null; url: string | null; audience: string };
 type Who = { kind: "mestre" | "professor" | "family"; name: string };
@@ -46,6 +47,18 @@ async function api(fn: string, body: Record<string, unknown>) {
   return result;
 }
 
+// Video do YouTube (link normal, curto ou shorts) vira player dentro da propria biblioteca.
+function embedUrl(url: string | null) {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    let id = "";
+    if (u.hostname.endsWith("youtu.be")) id = u.pathname.slice(1);
+    else if (u.hostname.endsWith("youtube.com")) id = u.searchParams.get("v") || u.pathname.split("/").filter(Boolean).slice(-1)[0] || "";
+    return /^[A-Za-z0-9_-]{6,20}$/.test(id) ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+  } catch { return null; }
+}
+
 const input = "w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-amber-400";
 const btn = "w-full rounded-xl bg-amber-400 px-5 py-3 font-black text-slate-950 hover:bg-amber-300 disabled:opacity-60";
 const btn2 = "w-full rounded-xl border border-slate-700 px-5 py-3 font-bold";
@@ -57,6 +70,7 @@ export default function BibliotecaApp() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [keyed, setKeyed] = useState<Item[] | null>(null);
 
   const signOut = useCallback((text = "") => {
     store.set(ACCESS, ""); store.set(REFRESH, "");
@@ -82,10 +96,34 @@ export default function BibliotecaApp() {
     setMessage(""); setItems(library.data.items); setWho({ kind, name });
   }, [signOut]);
 
+  // Acesso por codigo (pulseira ou QR): valida no servidor e guarda o codigo neste aparelho.
+  const openWithKey = useCallback(async (key: string) => {
+    setBusy(true);
+    const result = await post("library-access", { action: "open", token: key });
+    setBusy(false);
+    if (result.ok) { store.set(KEY, key); setMessage(""); setKeyed(result.data.items); return true; }
+    store.set(KEY, "");
+    setMessage(result.status === 429 ? "Muitas tentativas. Aguarde um pouco." : "Código inválido ou desativado. Use o QR Code ou a pulseira original.");
+    return false;
+  }, []);
+
   useEffect(() => {
     setReady(true);
-    if (store.get(ACCESS)) load();
-  }, [load]);
+    let fromLink = "";
+    try {
+      const params = new URLSearchParams(window.location.search);
+      fromLink = params.get("k") || "";
+      if (fromLink) window.history.replaceState(null, "", window.location.pathname); // tira o codigo da barra de endereco
+    } catch { /* sem URL */ }
+    const key = fromLink || store.get(KEY);
+    if (key) openWithKey(key);
+    else if (store.get(ACCESS)) load();
+  }, [load, openWithKey]);
+
+  function leaveKey() {
+    store.set(KEY, "");
+    setKeyed(null);
+  }
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -121,25 +159,26 @@ export default function BibliotecaApp() {
     </p>
   );
 
-  if (!who) {
+  if (!who && !keyed) {
     return (
       <div className="mx-auto mt-6 max-w-sm space-y-4">
         <img src="/images/logo-mao-com-mao-circular-carteirinha.png" alt="Mão Com Mão" className="mx-auto h-24 w-24 rounded-full" />
         <h1 className="text-center text-2xl font-black text-amber-400">Biblioteca Mão com Mão</h1>
-        <p className="text-center text-sm text-slate-400">Videoaulas, técnicas, defesa pessoal e documentos. Entre com o seu login para ver.</p>
+        <p className="text-center text-sm text-slate-400">Videoaulas, técnicas, defesa pessoal e documentos. Para entrar, encoste o celular na pulseira ou escaneie o QR Code que veio com ela.</p>
         {Banner}
         <form onSubmit={login} className="space-y-3 rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
           <input className={input} type="email" name="email" placeholder="E-mail" autoComplete="username" required />
           <input className={input} type="password" name="password" placeholder="Senha" autoComplete="current-password" required />
           {message && <p role="alert" className="rounded-xl bg-red-500/15 p-3 text-sm text-red-300">{message}</p>}
           <button disabled={busy} className={btn}>{busy ? "Entrando..." : "Entrar"}</button>
-          <p className="text-center text-xs text-slate-500">Ainda não tem conta? Pais e alunos criam a conta em <a href="/familia/" className="underline">/familia/</a>, com o código do grupo.</p>
+          <p className="text-center text-xs text-slate-500">Acesso da equipe e das famílias (com login). Quem tem a pulseira não precisa de login.</p>
         </form>
       </div>
     );
   }
 
-  const isMestre = who.kind === "mestre";
+  const isMestre = who?.kind === "mestre";
+  const shown = who ? items : keyed || [];
 
   return (
     <div className="space-y-5">
@@ -147,9 +186,9 @@ export default function BibliotecaApp() {
         <img src="/images/logo-mao-com-mao-circular-carteirinha.png" alt="" className="h-14 w-14 rounded-full" />
         <div className="flex-1">
           <h1 className="text-2xl font-black text-amber-400">Biblioteca</h1>
-          <p className="text-sm text-slate-400">Olá{who.name ? `, ${who.name.split(" ")[0]}` : ""} · Projeto Mão Com Mão</p>
+          <p className="text-sm text-slate-400">{who ? `Olá${who.name ? `, ${who.name.split(" ")[0]}` : ""} · ` : ""}Projeto Mão Com Mão</p>
         </div>
-        <button onClick={() => signOut()} className="rounded-xl border border-slate-700 px-3 py-2 text-sm font-bold">Sair</button>
+        <button onClick={() => (who ? signOut() : leaveKey())} className="rounded-xl border border-slate-700 px-3 py-2 text-sm font-bold">Sair</button>
       </header>
       {Banner}
       {message && <p role="alert" className="rounded-xl bg-red-500/15 p-3 text-sm text-red-300">{message}</p>}
@@ -172,8 +211,8 @@ export default function BibliotecaApp() {
       )}
 
       {CATEGORIES.map(([key, icon, label]) => {
-        if (key === "professores" && who.kind === "family") return null;
-        const list = items.filter((i) => i.category === key);
+        if (key === "professores" && (!who || who.kind === "family")) return null;
+        const list = shown.filter((i) => i.category === key);
         return (
           <section key={key} className="space-y-2">
             <h2 className="text-lg font-black">{icon} {label}</h2>
@@ -182,8 +221,13 @@ export default function BibliotecaApp() {
               <div key={item.id} className="space-y-1 rounded-2xl border border-slate-800 bg-slate-900 p-3">
                 <p className="font-extrabold">{item.title}{item.audience === "equipe" && <span className="ml-2 rounded-full bg-slate-800 px-2 py-0.5 text-xs font-bold text-slate-300">equipe</span>}</p>
                 {item.description && <p className="whitespace-pre-line text-sm text-slate-300">{item.description}</p>}
+                {embedUrl(item.url) && (
+                  <div className="aspect-video overflow-hidden rounded-xl bg-black">
+                    <iframe src={embedUrl(item.url) as string} title={item.title} loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" className="h-full w-full border-0" />
+                  </div>
+                )}
                 <div className="flex gap-2 pt-1">
-                  {item.url && <a href={item.url} target="_blank" rel="noopener noreferrer" className="rounded-xl bg-amber-400 px-4 py-2 text-sm font-black text-slate-950">Abrir</a>}
+                  {item.url && !embedUrl(item.url) && <a href={item.url} target="_blank" rel="noopener noreferrer" className="rounded-xl bg-amber-400 px-4 py-2 text-sm font-black text-slate-950">Abrir</a>}
                   {isMestre && <button onClick={() => remove(item)} className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-bold">Remover</button>}
                 </div>
               </div>
