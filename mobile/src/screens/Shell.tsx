@@ -1,7 +1,6 @@
 import { ReactNode, useCallback, useEffect, useState } from "react";
-import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { api, Role } from "../api";
-import { LINKS } from "../info";
 import { colors } from "../theme";
 import AnnounceScreen from "./AnnounceScreen";
 import EnrollmentsScreen from "./EnrollmentsScreen";
@@ -71,9 +70,6 @@ export default function Shell({ role, onLogout }: { role: Role; onLogout: () => 
         <Grid tiles={mine} onPick={setScreen} />
         <Text style={styles.group}>Projeto</Text>
         <Grid tiles={common} onPick={setScreen} />
-        <Pressable style={styles.site} onPress={() => Linking.openURL(LINKS.site).catch(() => undefined)}>
-          <Text style={{ color: colors.muted }}>🌐 maocommao-org-com.vercel.app</Text>
-        </Pressable>
       </ScrollView>
     );
   }
@@ -130,7 +126,6 @@ const styles = StyleSheet.create({
   hint: { color: colors.muted, fontSize: 12, marginTop: 2 },
   badge: { position: "absolute", top: 10, right: 10, minWidth: 26, height: 26, borderRadius: 13, backgroundColor: colors.amber, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
   badgeText: { color: "#020617", fontWeight: "900" },
-  site: { alignItems: "center", padding: 24 },
   back: { paddingHorizontal: 16, paddingVertical: 6, alignSelf: "flex-start" },
   backText: { color: colors.amber, fontWeight: "800", fontSize: 16 },
 });

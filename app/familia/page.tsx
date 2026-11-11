@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import FamiliaApp from "./FamiliaApp";
+import { WebFooter } from "../_hall/WebFooter";
 
 export const metadata: Metadata = {
   title: "Família | Mão Com Mão",
@@ -14,10 +15,11 @@ export const viewport: Viewport = { themeColor: "#020617", width: "device-width"
 
 export default function FamiliaPage() {
   return (
-    <main className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100">
+    <main className="min-h-screen bg-slate-950 px-4 pb-28 pt-8 text-slate-100">
       <div className="mx-auto max-w-xl">
         <FamiliaApp />
       </div>
+      <WebFooter />
     </main>
   );
 }

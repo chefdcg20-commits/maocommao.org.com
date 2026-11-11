@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { detectRole, errorText, hasSession, logout, Role } from "./src/api";
+import Footer from "./src/Footer";
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 import Shell from "./src/screens/Shell";
@@ -44,6 +45,7 @@ export default function App() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <StatusBar style="light" />
+      <View style={{ flex: 1 }}>
       {state === "loading" && <ActivityIndicator color={colors.amber} style={{ flex: 1 }} />}
       {state === "login" && <LoginScreen onDone={enter} onRegister={() => setState("register")} />}
       {state === "register" && <RegisterScreen onDone={enter} onBack={() => setState("login")} />}
@@ -57,6 +59,8 @@ export default function App() {
           <Button label="Sair" kind="secondary" onPress={signOut} />
         </View>
       )}
+      </View>
+      <Footer />
     </View>
   );
 }
