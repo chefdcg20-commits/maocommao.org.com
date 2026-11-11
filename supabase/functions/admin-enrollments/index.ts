@@ -88,7 +88,7 @@ Deno.serve(async (request) => {
     const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
     const { data: userData, error: userError } = await supabase.auth.getUser(token);
     if (userError || !userData?.user) return json({ error: "unauthorized" }, 401);
-    const { data: admin, error: adminError } = await supabase.from("admin_profiles").select("user_id").eq("user_id", userData.user.id).eq("active", true).maybeSingle();
+    const { data: admin, error: adminError } = await supabase.from("admin_profiles").select("user_id").eq("user_id", userData.user.id).eq("active", true).eq("role", "mestre").maybeSingle();
     if (adminError) { console.error(`[admin] stage=admin_lookup db_code=${adminError.code ?? "?"}`); return json({ error: "server_error" }, 500); }
     if (!admin) return json({ error: "forbidden" }, 403);
 
