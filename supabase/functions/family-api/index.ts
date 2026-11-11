@@ -201,6 +201,11 @@ Deno.serve(async (request) => {
       return json({ ok: true });
     }
 
+    if (body.action === "content") {
+      const { data } = await supabase.from("app_content").select("slug, title, body").order("sort_order").order("slug");
+      return json({ sections: data || [] });
+    }
+
     if (body.action === "announcements") {
       const { data } = await supabase.from("announcements").select("id, title, body, created_at").eq("active", true).order("created_at", { ascending: false }).limit(30);
       return json({ announcements: data || [] });

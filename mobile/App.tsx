@@ -2,10 +2,9 @@ import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { detectRole, errorText, hasSession, logout, Role } from "./src/api";
-import FamilyShell from "./src/screens/FamilyShell";
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
-import StaffShell from "./src/screens/StaffShell";
+import Shell from "./src/screens/Shell";
 import { colors } from "./src/theme";
 import { Button } from "./src/ui";
 
@@ -48,7 +47,7 @@ export default function App() {
       {state === "loading" && <ActivityIndicator color={colors.amber} style={{ flex: 1 }} />}
       {state === "login" && <LoginScreen onDone={enter} onRegister={() => setState("register")} />}
       {state === "register" && <RegisterScreen onDone={enter} onBack={() => setState("login")} />}
-      {state === "ready" && role && (role.kind === "family" ? <FamilyShell name={role.name} onLogout={signOut} /> : <StaffShell role={role.kind} onLogout={signOut} />)}
+      {state === "ready" && role && <Shell role={role} onLogout={signOut} />}
       {(state === "norole" || state === "offline") && (
         <View style={{ flex: 1, justifyContent: "center", padding: 24, gap: 12 }}>
           <Text style={{ color: colors.text, textAlign: "center", fontSize: 18 }}>

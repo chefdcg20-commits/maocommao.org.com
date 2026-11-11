@@ -115,7 +115,6 @@ O chip antigo deixa de funcionar.`, [
           <Text style={styles.title}>Chamada</Text>
           <Text style={styles.sub}>{dateLabel} · {role === "mestre" ? "Mestre" : "Professor"}</Text>
         </View>
-        <Pressable onPress={onLogout}><Text style={styles.logout}>Sair</Text></Pressable>
       </View>
 
       <TextInput style={styles.search} placeholder="Buscar aluno" placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} />
@@ -178,7 +177,7 @@ O chip antigo deixa de funcionar.`, [
 }
 
 const styles = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: colors.bg, paddingTop: 48, paddingHorizontal: 16 },
+  wrap: { flex: 1, backgroundColor: colors.bg, paddingTop: 4, paddingHorizontal: 16 },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
   title: { color: colors.amber, fontSize: 28, fontWeight: "900" },
   sub: { color: colors.muted },

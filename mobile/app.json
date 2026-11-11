@@ -2,7 +2,7 @@
   "expo": {
     "name": "Mão Com Mão",
     "slug": "maocommao-chamada",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -16,7 +16,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "org.maocommao.chamada",
-      "versionCode": 3,
+      "versionCode": 4,
       "permissions": [
         "android.permission.NFC"
       ]

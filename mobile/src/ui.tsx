@@ -52,7 +52,7 @@ export function Chips({ items, value, onChange }: { items: { key: string; label:
 }
 
 export const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg, paddingTop: 48, paddingHorizontal: 16 },
+  screen: { flex: 1, backgroundColor: colors.bg, paddingTop: 4, paddingHorizontal: 16 },
   header: { flexDirection: "row", alignItems: "center", marginBottom: 12, gap: 8 },
   title: { color: colors.amber, fontSize: 28, fontWeight: "900" },
   sub: { color: colors.muted },

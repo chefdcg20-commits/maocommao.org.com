@@ -186,6 +186,16 @@ Deno.serve(async (request) => {
       return json({ ok: true });
     }
 
+    // Leitura liberada a toda a equipe: avisos e conteudo informativo do hall.
+    if (body.action === "announcements_list") {
+      const { data } = await supabase.from("announcements").select("id, title, body, created_at").eq("active", true).order("created_at", { ascending: false }).limit(50);
+      return json({ announcements: data || [] });
+    }
+    if (body.action === "content") {
+      const { data } = await supabase.from("app_content").select("slug, title, body").order("sort_order").order("slug");
+      return json({ sections: data || [] });
+    }
+
     // ---- Daqui para baixo: so mestres ----
     if (!isMestre) return json({ error: "forbidden" }, 403);
 
@@ -247,10 +257,6 @@ Deno.serve(async (request) => {
     }
 
     // Avisos para a familia.
-    if (body.action === "announcements_list") {
-      const { data } = await supabase.from("announcements").select("id, title, body, created_at").eq("active", true).order("created_at", { ascending: false }).limit(50);
-      return json({ announcements: data || [] });
-    }
     if (body.action === "announce") {
       const title = String(body.title || "").trim().slice(0, 120);
       const text = String(body.body || "").trim().slice(0, 2000);
@@ -262,6 +268,26 @@ Deno.serve(async (request) => {
     if (body.action === "remove_announcement") {
       const { error } = await supabase.from("announcements").update({ active: false }).eq("id", String(body.id || ""));
       if (error) return json({ error: "server_error" }, 500);
+      return json({ ok: true });
+    }
+
+    // Contadores do hall: cadastros aguardando aprovacao e mensagens nao lidas.
+    if (body.action === "summary") {
+      const [pending, unread] = await Promise.all([
+        supabase.from("student_enrollments").select("id", { count: "exact", head: true }).in("status", ["pending", "under_review", "changes_requested"]),
+        supabase.from("family_messages").select("id", { count: "exact", head: true }).is("read_at", null),
+      ]);
+      return json({ pending: pending.count || 0, unread: unread.count || 0 });
+    }
+
+    // Editar o conteudo informativo do hall.
+    if (body.action === "save_content") {
+      const slug = String(body.slug || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40);
+      const title = String(body.title || "").trim().slice(0, 120);
+      const text = String(body.body || "").slice(0, 6000);
+      if (!slug || !title) return json({ error: "missing_field" }, 400);
+      const { error } = await supabase.from("app_content").upsert({ slug, title, body: text, updated_by: userId, updated_at: new Date().toISOString() }, { onConflict: "slug" });
+      if (error) { console.error(`[staff] stage=save_content db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
       return json({ ok: true });
     }
 

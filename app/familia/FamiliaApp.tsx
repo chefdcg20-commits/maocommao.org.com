@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { ContactView, Frame, Hall, InfoView, NewsList } from "../_hall/WebHall";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_FAMILY_ENDPOINT || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/family-api";
 const ACCESS = "mcm-family-access";
@@ -83,14 +84,14 @@ export default function FamiliaApp() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
   const [students, setStudents] = useState<Student[]>([]);
-  const [view, setView] = useState<"home" | "link" | "news" | "student">("home");
+  const [view, setView] = useState<"hall" | "home" | "link" | "news" | "info" | "contact" | "student">("hall");
   const [current, setCurrent] = useState<Student | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
   const signOut = useCallback((text = "") => {
     store.set(ACCESS, ""); store.set(REFRESH, "");
-    setSignedIn(false); setStudents([]); setView("home"); setMessage(text);
+    setSignedIn(false); setStudents([]); setView("hall"); setMessage(text);
   }, []);
 
   const load = useCallback(async () => {
@@ -148,23 +149,24 @@ export default function FamiliaApp() {
     );
   }
 
+  if (view === "hall") {
+    return <Hall name={name} roleLabel="Família" group="Acompanhamento" onLogout={() => signOut()} onPick={(key) => setView(key === "students" ? "home" : (key as typeof view))}
+      tiles={[{ key: "students", icon: "🥋", label: "Meus alunos", hint: "Presenças e faixa" }, { key: "news", icon: "📢", label: "Avisos" }]} />;
+  }
+  if (view === "news") return <Frame onBack={() => setView("hall")}><NewsList call={api} action="announcements" /></Frame>;
+  if (view === "info") return <Frame onBack={() => setView("hall")}><InfoView call={api} canEdit={false} /></Frame>;
+  if (view === "contact") return <Frame onBack={() => setView("hall")}><ContactView /></Frame>;
   if (view === "link") return <LinkView onBack={(done) => { setView("home"); if (done) load(); }} />;
-  if (view === "news") return <NewsView onBack={() => setView("home")} />;
   if (view === "student" && current) return <StudentView student={current} onBack={(removed) => { setView("home"); if (removed) load(); }} />;
 
   return (
     <div className="space-y-4">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-black text-amber-400">Mão Com Mão</h1>
-          {name && <p className="text-sm text-slate-400">Olá, {name.split(" ")[0]}</p>}
-        </div>
-        <button onClick={() => signOut()} className="rounded-xl border border-slate-700 px-3 py-2 text-sm font-bold">Sair</button>
+      <button onClick={() => setView("hall")} className="font-extrabold text-amber-400">‹ Início</button>
+      <header>
+        <h1 className="text-3xl font-black text-amber-400">Meus alunos</h1>
+        <p className="text-sm text-slate-400">Pais, responsáveis e alunos</p>
       </header>
-      <div className="flex gap-2">
-        <button className={btn} onClick={() => setView("link")}>Vincular aluno</button>
-        <button className={btn2} onClick={() => setView("news")}>Avisos</button>
-      </div>
+      <button className={btn} onClick={() => setView("link")}>Vincular aluno</button>
       {message && <p role="alert" className="rounded-xl bg-red-500/15 p-3 text-sm text-red-300">{message}</p>}
       {!students.length && !busy && <p className="p-6 text-center text-slate-400">Nenhum aluno vinculado ainda. Toque em "Vincular aluno" e informe a matrícula da carteirinha e a data de nascimento.</p>}
       <ul className="space-y-2">
@@ -216,27 +218,6 @@ function LinkView({ onBack }: { onBack: (done: boolean) => void }) {
       {error && <p role="alert" className="rounded-xl bg-red-500/15 p-3 text-sm text-red-300">{error}</p>}
       <button disabled={busy} className={btn}>{busy ? "Verificando..." : "Vincular"}</button>
     </form>
-  );
-}
-
-function NewsView({ onBack }: { onBack: () => void }) {
-  const [list, setList] = useState<any[] | null>(null);
-  useEffect(() => { api({ action: "announcements" }).then((r) => setList(r.ok ? r.data.announcements : [])); }, []);
-  return (
-    <div className="space-y-3">
-      <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-black text-amber-400">Avisos</h1>
-        <button onClick={onBack} className="rounded-xl border border-slate-700 px-3 py-2 text-sm font-bold">Voltar</button>
-      </header>
-      {list && !list.length && <p className="p-6 text-center text-slate-400">Nenhum aviso no momento.</p>}
-      {list?.map((a) => (
-        <div key={a.id} className="space-y-1 rounded-2xl border border-slate-800 bg-slate-900 p-3">
-          <p className="font-extrabold">{a.title}</p>
-          <p className="text-sm text-slate-400">{fmt(a.created_at)}</p>
-          <p>{a.body}</p>
-        </div>
-      ))}
-    </div>
   );
 }
 

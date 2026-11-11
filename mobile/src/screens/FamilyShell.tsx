@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Image, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
-import { Announcement, api, errorText, FamilyDetail, FamilyStudent } from "../api";
+import { api, errorText, FamilyDetail, FamilyStudent } from "../api";
 import { BELT_COLORS } from "../belts";
 import { colors } from "../theme";
 import { BeltBar, Button, fmtDate, Header, styles } from "../ui";
 
-type View_ = { name: "home" } | { name: "link" } | { name: "news" } | { name: "student"; student: FamilyStudent };
+type View_ = { name: "home" } | { name: "link" } | { name: "student"; student: FamilyStudent };
 
 // Area da familia: pais/responsaveis e alunos adultos veem so os alunos que vincularam.
-export default function FamilyShell({ name, onLogout }: { name: string | null; onLogout: () => void }) {
+export default function FamilyShell({ onLogout }: { onLogout: () => void }) {
   const [view, setView] = useState<View_>({ name: "home" });
   const [students, setStudents] = useState<FamilyStudent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,17 +31,13 @@ export default function FamilyShell({ name, onLogout }: { name: string | null; o
   useEffect(() => { load(); }, [load]);
 
   if (view.name === "link") return <LinkScreen onBack={(done) => { setView({ name: "home" }); if (done) load(); }} />;
-  if (view.name === "news") return <NewsScreen onBack={() => setView({ name: "home" })} />;
   if (view.name === "student") return <StudentScreen student={view.student} onBack={(removed) => { setView({ name: "home" }); if (removed) load(); }} />;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 60 }} refreshControl={<RefreshControl refreshing={loading} onRefresh={load} tintColor={colors.amber} />}>
-      <Header title="Mão Com Mão" sub={name ? `Olá, ${name.split(" ")[0]}` : undefined} right={<Pressable onPress={onLogout}><Text style={styles.link}>Sair</Text></Pressable>} />
+      <Header title="Meus alunos" sub="Pais, responsáveis e alunos" />
       {!!error && <Text style={styles.error}>{error}</Text>}
-      <View style={{ flexDirection: "row", gap: 8 }}>
-        <View style={{ flex: 1 }}><Button label="Vincular aluno" onPress={() => setView({ name: "link" })} /></View>
-        <View style={{ flex: 1 }}><Button label="Avisos" kind="secondary" onPress={() => setView({ name: "news" })} /></View>
-      </View>
+      <Button label="Vincular aluno" onPress={() => setView({ name: "link" })} />
       {loading && !students.length ? <ActivityIndicator color={colors.amber} style={{ marginTop: 30 }} /> : null}
       {!loading && !students.length && !error && (
         <Text style={styles.empty}>Nenhum aluno vinculado ainda.{"\n"}Toque em "Vincular aluno" e informe a matrícula da carteirinha e a data de nascimento.</Text>
@@ -101,29 +97,6 @@ function LinkScreen({ onBack }: { onBack: (done: boolean) => void }) {
       </Pressable>
       {!!error && <Text style={styles.error}>{error}</Text>}
       <Button label="Vincular" onPress={submit} busy={busy} />
-    </ScrollView>
-  );
-}
-
-function NewsScreen({ onBack }: { onBack: () => void }) {
-  const [list, setList] = useState<Announcement[] | null>(null);
-  const [error, setError] = useState("");
-  useEffect(() => {
-    api<{ announcements: Announcement[] }>({ action: "announcements" }, "family").then((r) => setList(r.announcements)).catch((e) => setError(errorText(e)));
-  }, []);
-  return (
-    <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 60 }}>
-      <Header title="Avisos" right={<Pressable onPress={onBack}><Text style={styles.link}>Voltar</Text></Pressable>} />
-      {!!error && <Text style={styles.error}>{error}</Text>}
-      {list === null && !error && <ActivityIndicator color={colors.amber} style={{ marginTop: 30 }} />}
-      {list?.length === 0 && <Text style={styles.empty}>Nenhum aviso no momento.</Text>}
-      {list?.map((a) => (
-        <View key={a.id} style={styles.card}>
-          <Text style={styles.strong}>{a.title}</Text>
-          <Text style={styles.muted}>{fmtDate(a.created_at)}</Text>
-          <Text style={[styles.text, { marginTop: 6 }]}>{a.body}</Text>
-        </View>
-      ))}
     </ScrollView>
   );
 }

@@ -1,0 +1,136 @@
+import { ReactNode, useCallback, useEffect, useState } from "react";
+import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { api, Role } from "../api";
+import { LINKS } from "../info";
+import { colors } from "../theme";
+import AnnounceScreen from "./AnnounceScreen";
+import EnrollmentsScreen from "./EnrollmentsScreen";
+import FamilyShell from "./FamilyShell";
+import { ContactScreen, InfoScreen, NewsScreen } from "./InfoScreens";
+import InboxScreen from "./InboxScreen";
+import ReportScreen from "./ReportScreen";
+import RosterScreen from "./RosterScreen";
+
+type Screen = "hall" | "roster" | "enrollments" | "report" | "inbox" | "announce" | "news" | "students" | "info" | "contact";
+type Tile = { key: Screen; icon: string; label: string; hint?: string; badge?: number };
+
+const ROLE_LABEL = { mestre: "Mestre", professor: "Professor", family: "Família" } as const;
+
+// Hall de entrada: o que aparece depende de quem entrou (mestre, professor ou familia).
+export default function Shell({ role, onLogout }: { role: Role; onLogout: () => void }) {
+  const [screen, setScreen] = useState<Screen>("hall");
+  const [counts, setCounts] = useState({ pending: 0, unread: 0 });
+  const kind = role.kind;
+  const isStaff = kind === "mestre" || kind === "professor";
+  const target = kind === "family" ? "family" : "staff";
+
+  const refreshCounts = useCallback(() => {
+    if (kind !== "mestre") return;
+    api<{ pending: number; unread: number }>({ action: "summary" }).then(setCounts).catch(() => undefined);
+  }, [kind]);
+
+  useEffect(() => { if (screen === "hall") refreshCounts(); }, [screen, refreshCounts]);
+
+  const mine: Tile[] =
+    kind === "mestre"
+      ? [
+          { key: "roster", icon: "✅", label: "Chamada dos alunos", hint: "Leitura de chip e lista" },
+          { key: "enrollments", icon: "📝", label: "Cadastros e carteirinhas", hint: "Aprovar alunos", badge: counts.pending },
+          { key: "report", icon: "📊", label: "Relatório de presença" },
+          { key: "inbox", icon: "✉️", label: "Mensagens", hint: "Dos pais e alunos", badge: counts.unread },
+          { key: "announce", icon: "📢", label: "Avisos", hint: "Publicar e código" },
+        ]
+      : kind === "professor"
+        ? [
+            { key: "roster", icon: "✅", label: "Chamada dos alunos", hint: "Leitura de chip e lista" },
+            { key: "news", icon: "📢", label: "Avisos" },
+          ]
+        : [
+            { key: "students", icon: "🥋", label: "Meus alunos", hint: "Presenças e faixa" },
+            { key: "news", icon: "📢", label: "Avisos" },
+          ];
+
+  const common: Tile[] = [
+    { key: "info", icon: "ℹ️", label: "O projeto", hint: "Aulas, ações e documentos" },
+    { key: "contact", icon: "🤝", label: "Contato e apoio", hint: "Redes, mapa e PIX" },
+  ];
+
+  if (screen === "hall") {
+    return (
+      <ScrollView style={styles.hall} contentContainerStyle={{ padding: 16, paddingTop: 56, paddingBottom: 40 }}>
+        <View style={styles.top}>
+          <Image source={require("../../assets/icon.png")} style={styles.logo} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.hello}>Olá{role.name ? `, ${role.name.split(" ")[0]}` : ""}!</Text>
+            <Text style={styles.role}>{ROLE_LABEL[kind]} · Projeto Mão Com Mão</Text>
+          </View>
+          <Pressable onPress={onLogout}><Text style={styles.logout}>Sair</Text></Pressable>
+        </View>
+
+        <Text style={styles.group}>{isStaff ? "Equipe" : "Acompanhamento"}</Text>
+        <Grid tiles={mine} onPick={setScreen} />
+        <Text style={styles.group}>Projeto</Text>
+        <Grid tiles={common} onPick={setScreen} />
+        <Pressable style={styles.site} onPress={() => Linking.openURL(LINKS.site).catch(() => undefined)}>
+          <Text style={{ color: colors.muted }}>🌐 maocommao-org-com.vercel.app</Text>
+        </Pressable>
+      </ScrollView>
+    );
+  }
+
+  const back = () => setScreen("hall");
+  const frame = (content: ReactNode) => (
+    <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: 44 }}>
+      <Pressable onPress={back} style={styles.back}><Text style={styles.backText}>‹ Início</Text></Pressable>
+      <View style={{ flex: 1 }}>{content}</View>
+    </View>
+  );
+
+  switch (screen) {
+    case "roster": return frame(<RosterScreen role={kind === "mestre" ? "mestre" : "professor"} onLogout={onLogout} />);
+    case "enrollments": return frame(<EnrollmentsScreen />);
+    case "report": return frame(<ReportScreen />);
+    case "inbox": return frame(<InboxScreen />);
+    case "announce": return frame(<AnnounceScreen />);
+    case "news": return frame(<NewsScreen target={target} />);
+    case "students": return frame(<FamilyShell onLogout={onLogout} />);
+    case "info": return frame(<InfoScreen target={target} canEdit={kind === "mestre"} />);
+    case "contact": return frame(<ContactScreen />);
+    default: return null;
+  }
+}
+
+function Grid({ tiles, onPick }: { tiles: Tile[]; onPick: (key: Screen) => void }) {
+  return (
+    <View style={styles.grid}>
+      {tiles.map((t) => (
+        <Pressable key={t.key} style={styles.tile} onPress={() => onPick(t.key)}>
+          <Text style={styles.icon}>{t.icon}</Text>
+          <Text style={styles.label}>{t.label}</Text>
+          {!!t.hint && <Text style={styles.hint}>{t.hint}</Text>}
+          {!!t.badge && <View style={styles.badge}><Text style={styles.badgeText}>{t.badge}</Text></View>}
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  hall: { flex: 1, backgroundColor: colors.bg },
+  top: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 },
+  logo: { width: 56, height: 56, borderRadius: 28 },
+  hello: { color: colors.amber, fontSize: 24, fontWeight: "900" },
+  role: { color: colors.muted },
+  logout: { color: colors.muted, padding: 8 },
+  group: { color: colors.muted, fontWeight: "800", textTransform: "uppercase", letterSpacing: 1, marginTop: 22, marginBottom: 10, fontSize: 12 },
+  grid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+  tile: { width: "47.5%", minHeight: 118, backgroundColor: colors.card, borderRadius: 20, borderWidth: 1, borderColor: colors.border, padding: 14, justifyContent: "flex-end" },
+  icon: { fontSize: 30, marginBottom: 8 },
+  label: { color: colors.text, fontSize: 16, fontWeight: "800" },
+  hint: { color: colors.muted, fontSize: 12, marginTop: 2 },
+  badge: { position: "absolute", top: 10, right: 10, minWidth: 26, height: 26, borderRadius: 13, backgroundColor: colors.amber, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
+  badgeText: { color: "#020617", fontWeight: "900" },
+  site: { alignItems: "center", padding: 24 },
+  back: { paddingHorizontal: 16, paddingVertical: 6, alignSelf: "flex-start" },
+  backText: { color: colors.amber, fontWeight: "800", fontSize: 16 },
+});

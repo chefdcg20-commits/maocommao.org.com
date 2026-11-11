@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { AnnounceView, InboxView, ReportView } from "./StaffExtras";
+import { ContactView, Frame, Hall, InfoView, NewsList, Tile } from "../_hall/WebHall";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_STAFF_ENDPOINT || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/staff-api";
 const ACCESS = "mcm-staff-access";
@@ -63,17 +64,22 @@ export default function ChamadaApp() {
   const [ready, setReady] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [role, setRole] = useState("");
+  const [nameState, setNameState] = useState("");
   const [students, setStudents] = useState<Student[]>([]);
   const [date, setDate] = useState("");
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const [tab, setTab] = useState("roster");
+  const [tab, setTab] = useState("hall");
+  const [counts, setCounts] = useState({ pending: 0, unread: 0 });
+  useEffect(() => {
+    if (signedIn && tab === "hall" && role === "mestre") api({ action: "summary" }).then((r) => r.ok && setCounts(r.data));
+  }, [signedIn, tab, role]);
 
   const signOut = useCallback((text = "") => {
     store.set(ACCESS, ""); store.set(REFRESH, "");
-    setTab("roster");
+    setTab("hall");
     setSignedIn(false); setStudents([]); setMessage(text);
   }, []);
 
@@ -87,6 +93,7 @@ export default function ChamadaApp() {
     setMessage("");
     setSignedIn(true);
     setRole(me.data?.role || "");
+    setNameState(me.data?.name || "");
     setStudents(roster.data.students);
     setDate(roster.data.date);
   }, [signOut]);
@@ -139,23 +146,35 @@ export default function ChamadaApp() {
 
   const present = visible.filter((s) => s.present_today).length;
   const isMestre = role === "mestre";
-  const TABS = [["roster", "Chamada"], ["report", "Relatório"], ["inbox", "Mensagens"], ["news", "Avisos"]];
-
-  if (isMestre && tab !== "roster") {
+  if (tab !== "roster") {
+    const tiles: Tile[] = isMestre
+      ? [
+          { key: "roster", icon: "✅", label: "Chamada dos alunos", hint: "Lista por toque" },
+          { key: "cad", icon: "📝", label: "Cadastros e carteirinhas", hint: "Aprovar alunos", badge: counts.pending, href: "/admin/cadastros/" },
+          { key: "report", icon: "📊", label: "Relatório de presença" },
+          { key: "inbox", icon: "✉️", label: "Mensagens", hint: "Dos pais e alunos", badge: counts.unread },
+          { key: "announce", icon: "📢", label: "Avisos", hint: "Publicar e código" },
+        ]
+      : [
+          { key: "roster", icon: "✅", label: "Chamada dos alunos", hint: "Lista por toque" },
+          { key: "news", icon: "📢", label: "Avisos" },
+        ];
+    if (tab === "hall") return <Hall name={nameState} roleLabel={isMestre ? "Mestre" : "Professor"} group="Equipe" tiles={tiles} onPick={setTab} onLogout={() => signOut()} />;
     return (
-      <div className="space-y-4 pb-20">
+      <Frame onBack={() => setTab("hall")}>
         {tab === "report" && <ReportView call={api} />}
         {tab === "inbox" && <InboxView call={api} />}
-        {tab === "news" && <AnnounceView call={api} />}
-        <nav className="fixed inset-x-0 bottom-0 flex border-t border-slate-800 bg-slate-950 pb-4 pt-2">
-          {TABS.map(([key, label]) => <button key={key} onClick={() => setTab(key)} className={`flex-1 py-2 text-sm font-bold ${tab === key ? "text-amber-400" : "text-slate-400"}`}>{label}</button>)}
-        </nav>
-      </div>
+        {tab === "announce" && <AnnounceView call={api} />}
+        {tab === "news" && <NewsList call={api} action="announcements_list" />}
+        {tab === "info" && <InfoView call={api} canEdit={isMestre} />}
+        {tab === "contact" && <ContactView />}
+      </Frame>
     );
   }
 
   return (
-    <div className={`space-y-4 ${isMestre ? "pb-20" : ""}`}>
+    <div className="space-y-4">
+      <button onClick={() => setTab("hall")} className="font-extrabold text-amber-400">‹ Início</button>
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black text-amber-400">Chamada</h1>
@@ -163,7 +182,6 @@ export default function ChamadaApp() {
         </div>
         <div className="flex gap-2">
           <button onClick={load} disabled={busy} className="rounded-xl border border-slate-700 px-3 py-2 text-sm font-bold">{busy ? "..." : "Atualizar"}</button>
-          <button onClick={() => signOut()} className="rounded-xl border border-slate-700 px-3 py-2 text-sm font-bold">Sair</button>
         </div>
       </header>
 
@@ -199,11 +217,6 @@ export default function ChamadaApp() {
           );
         })}
       </ul>
-      {isMestre && (
-        <nav className="fixed inset-x-0 bottom-0 flex border-t border-slate-800 bg-slate-950 pb-4 pt-2">
-          {TABS.map(([key, label]) => <button key={key} onClick={() => setTab(key)} className={`flex-1 py-2 text-sm font-bold ${tab === key ? "text-amber-400" : "text-slate-400"}`}>{label}</button>)}
-        </nav>
-      )}
     </div>
   );
 }

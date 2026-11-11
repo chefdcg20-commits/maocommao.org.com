@@ -1,8 +1,8 @@
 import * as SecureStore from "expo-secure-store";
 
 const ROOT = "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/";
-export type Target = "staff" | "family";
-const ENDPOINT: Record<Target, string> = { staff: `${ROOT}staff-api`, family: `${ROOT}family-api` };
+export type Target = "staff" | "family" | "admin";
+const ENDPOINT: Record<Target, string> = { staff: `${ROOT}staff-api`, family: `${ROOT}family-api`, admin: `${ROOT}admin-enrollments` };
 const ACCESS = "mcm-access";
 const REFRESH = "mcm-refresh";
 
@@ -25,6 +25,13 @@ export type FamilyStudent = {
   id: string; name: string; training_time: string | null; belt: string | null; belt_stripes: number;
   membership_number: string | null; card_valid_until: string | null; photo_url: string | null;
   attendance_total: number; attendance_month: number; last_attendance: string | null;
+};
+export type Section = { slug: string; title: string; body: string };
+export type Enrollment = {
+  id: string; status: string; student_full_name: string; birth_date: string | null; training_time: string | null; belt: string | null; belt_stripes: number;
+  guardian_full_name: string | null; guardian_relationship: string | null; guardian_phone: string | null; guardian_email: string | null;
+  emergency_contact_name: string | null; emergency_contact_phone: string | null; health_notes: string | null; image_consent: boolean | null;
+  membership_number: string | null; card_valid_until: string | null; created_at: string; photo_url: string | null;
 };
 export type FamilyDetail = { attendance: string[]; belt_history: { at: string; belt: string | null; stripes: number }[] };
 
@@ -49,6 +56,7 @@ const MESSAGES: Record<string, string> = {
   missing_field: "Preencha todos os campos.",
   no_match: "Não encontramos um aluno com essa matrícula e data de nascimento. Confira a carteirinha.",
   too_many_attempts: "Muitas tentativas. Aguarde um pouco e tente de novo.",
+  no_sensei_signature: "Falta enviar a assinatura do sensei. Envie pelo painel do site e tente de novo.",
   network: "Sem conexão com a internet. Tente novamente.",
 };
 export const errorText = (error: unknown) =>
@@ -103,7 +111,7 @@ export async function api<T = any>(body: Record<string, unknown>, target: Target
     const refresh = await SecureStore.getItemAsync(REFRESH);
     if (!refresh) throw error;
     try {
-      const fresh = await post(target, { action: "refresh", refresh_token: refresh });
+      const fresh = await post(target === "family" ? "family" : "staff", { action: "refresh", refresh_token: refresh });
       await saveTokens(fresh);
       return await post(target, body, fresh.access_token);
     } catch {
