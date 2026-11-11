@@ -1,0 +1,13 @@
+{
+  "name": "Mão Com Mão — Chamada",
+  "short_name": "Chamada",
+  "start_url": "/chamada/",
+  "scope": "/chamada/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/images/logo-mao-com-mao-circular-carteirinha.png", "sizes": "1254x1254", "type": "image/png", "purpose": "any" }
+  ]
+}
