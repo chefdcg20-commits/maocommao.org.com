@@ -1,0 +1,20 @@
+// Cores das faixas (mesmas chaves do banco e do painel web).
+export const BELT_COLORS: Record<string, { main: string; stripe?: string; label: string }> = {
+  white: { main: "#f4f4f5", label: "Branca" },
+  grey_white: { main: "#9ca3af", stripe: "#f4f4f5", label: "Cinza e branca" },
+  grey: { main: "#9ca3af", label: "Cinza" },
+  grey_black: { main: "#9ca3af", stripe: "#111111", label: "Cinza e preta" },
+  yellow_white: { main: "#facc15", stripe: "#f4f4f5", label: "Amarela e branca" },
+  yellow: { main: "#facc15", label: "Amarela" },
+  yellow_black: { main: "#facc15", stripe: "#111111", label: "Amarela e preta" },
+  orange_white: { main: "#f97316", stripe: "#f4f4f5", label: "Laranja e branca" },
+  orange: { main: "#f97316", label: "Laranja" },
+  orange_black: { main: "#f97316", stripe: "#111111", label: "Laranja e preta" },
+  green_white: { main: "#16a34a", stripe: "#f4f4f5", label: "Verde e branca" },
+  green: { main: "#16a34a", label: "Verde" },
+  green_black: { main: "#16a34a", stripe: "#111111", label: "Verde e preta" },
+  blue: { main: "#2563eb", label: "Azul" },
+  purple: { main: "#7e22ce", label: "Roxa" },
+  brown: { main: "#78350f", label: "Marrom" },
+  black: { main: "#111111", label: "Preta" },
+};
