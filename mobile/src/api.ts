@@ -27,6 +27,7 @@ export type FamilyStudent = {
   attendance_total: number; attendance_month: number; last_attendance: string | null;
 };
 export type BraceletRow = { id: string; label: string; status: string; created_at: string; last_used_at: string | null; uses: number };
+export type NewsPost = { id: string; category: string; title: string; summary: string | null; source_name: string | null; source_url: string | null; event_date: string | null; pinned: boolean; created_at: string };
 export type LibraryItem = { id: string; category: string; title: string; description: string | null; url: string | null; audience: string };
 export type Section = { slug: string; title: string; body: string };
 export type Enrollment = {

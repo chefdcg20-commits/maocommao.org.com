@@ -52,7 +52,9 @@ Deno.serve(async (request) => {
     const { data: items, error } = await supabase.from("library_items").select("id, category, title, description, url, audience")
       .eq("active", true).eq("audience", "todos").order("category").order("sort_order").order("created_at");
     if (error) { console.error(`[library] stage=items db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
-    return json({ kind: key.kind, items: items || [] });
+    const { data: posts } = await supabase.from("news_posts").select("id, category, title, summary, source_name, source_url, event_date, pinned, created_at")
+      .eq("active", true).order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(100);
+    return json({ kind: key.kind, items: items || [], posts: posts || [] });
   } catch (error) {
     console.error(`[library] stage=unexpected message=${error instanceof Error ? error.message : "unknown"}`);
     return json({ error: "server_error" }, 500);

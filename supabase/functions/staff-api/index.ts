@@ -197,6 +197,12 @@ Deno.serve(async (request) => {
       return json({ items: data || [] });
     }
 
+    // Jornal do Jiu-Jitsu: toda a equipe le.
+    if (body.action === "news") {
+      const { data } = await supabase.from("news_posts").select("id, category, title, summary, source_name, source_url, event_date, pinned, created_at").eq("active", true).order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(100);
+      return json({ posts: data || [] });
+    }
+
     // Leitura liberada a toda a equipe: avisos e conteudo informativo do hall.
     if (body.action === "announcements_list") {
       const { data } = await supabase.from("announcements").select("id, title, body, created_at").eq("active", true).order("created_at", { ascending: false }).limit(50);
@@ -355,6 +361,31 @@ Deno.serve(async (request) => {
     }
     if (body.action === "library_remove") {
       const { error } = await supabase.from("library_items").update({ active: false, updated_at: new Date().toISOString() }).eq("id", String(body.id || ""));
+      if (error) return json({ error: "server_error" }, 500);
+      return json({ ok: true });
+    }
+
+    // Jornal do Jiu-Jitsu: so mestres publicam, editam e removem.
+    if (body.action === "news_save") {
+      const categories = ["resultados", "calendario", "alertas", "noticias"];
+      const category = String(body.category || "");
+      const title = String(body.title || "").trim().slice(0, 160);
+      const summary = String(body.summary || "").trim().slice(0, 1200) || null;
+      const source_name = String(body.source_name || "").trim().slice(0, 80) || null;
+      const source_url = String(body.source_url || "").trim() || null;
+      const event_date = /^\d{4}-\d{2}-\d{2}$/.test(String(body.event_date || "")) ? String(body.event_date) : null;
+      if (!categories.includes(category) || !title) return json({ error: "missing_field" }, 400);
+      if (source_url && !/^https:\/\//i.test(source_url)) return json({ error: "invalid_url" }, 400);
+      const row = { category, title, summary, source_name, source_url, event_date, pinned: body.pinned === true, updated_at: new Date().toISOString() };
+      const id = String(body.id || "");
+      const { error } = id
+        ? await supabase.from("news_posts").update(row).eq("id", id)
+        : await supabase.from("news_posts").insert({ ...row, created_by: userId });
+      if (error) { console.error(`[staff] stage=news_save db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      return json({ ok: true });
+    }
+    if (body.action === "news_remove") {
+      const { error } = await supabase.from("news_posts").update({ active: false, updated_at: new Date().toISOString() }).eq("id", String(body.id || ""));
       if (error) return json({ error: "server_error" }, 500);
       return json({ ok: true });
     }

@@ -6,12 +6,13 @@ import AnnounceScreen from "./AnnounceScreen";
 import BraceletScreen from "./BraceletScreen";
 import EnrollmentsScreen from "./EnrollmentsScreen";
 import FamilyShell from "./FamilyShell";
+import JornalScreen from "./JornalScreen";
 import { ContactScreen, InfoScreen, LibraryScreen, NewsScreen } from "./InfoScreens";
 import InboxScreen from "./InboxScreen";
 import ReportScreen from "./ReportScreen";
 import RosterScreen from "./RosterScreen";
 
-type Screen = "hall" | "roster" | "enrollments" | "report" | "inbox" | "announce" | "news" | "students" | "info" | "library" | "contact" | "bracelet";
+type Screen = "hall" | "roster" | "enrollments" | "report" | "inbox" | "announce" | "news" | "students" | "info" | "library" | "contact" | "bracelet" | "jornal";
 type Tile = { key: Screen; icon: string; label: string; hint?: string; badge?: number };
 
 const ROLE_LABEL = { mestre: "Mestre", professor: "Professor", family: "Família" } as const;
@@ -52,6 +53,7 @@ export default function Shell({ role, onLogout }: { role: Role; onLogout: () => 
 
   const common: Tile[] = [
     { key: "info", icon: "ℹ️", label: "O projeto", hint: "Aulas, ações e documentos" },
+    { key: "jornal", icon: "📰", label: "Jornal do Jiu-Jitsu", hint: "Resultados, competições e alertas" },
     { key: "library", icon: "📚", label: "Biblioteca", hint: "Videoaulas, técnicas e documentos" },
     { key: "contact", icon: "🤝", label: "Contato e apoio", hint: "Redes, mapa e PIX" },
   ];
@@ -108,6 +110,7 @@ export default function Shell({ role, onLogout }: { role: Role; onLogout: () => 
     case "students": return frame(<FamilyShell onLogout={onLogout} />);
     case "info": return frame(<InfoScreen target={target} canEdit={kind === "mestre"} />);
     case "library": return frame(<LibraryScreen target={target} canEdit={kind === "mestre"} />);
+    case "jornal": return frame(<JornalScreen target={target} canEdit={kind === "mestre"} />);
     case "contact": return frame(<ContactScreen />);
     default: return null;
   }

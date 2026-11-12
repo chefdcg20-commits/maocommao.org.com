@@ -207,6 +207,12 @@ Deno.serve(async (request) => {
       return json({ items: data || [] });
     }
 
+    // Jornal do Jiu-Jitsu (leitura).
+    if (body.action === "news") {
+      const { data } = await supabase.from("news_posts").select("id, category, title, summary, source_name, source_url, event_date, pinned, created_at").eq("active", true).order("pinned", { ascending: false }).order("created_at", { ascending: false }).limit(100);
+      return json({ posts: data || [] });
+    }
+
     if (body.action === "content") {
       const { data } = await supabase.from("app_content").select("slug, title, body").order("sort_order").order("slug");
       return json({ sections: data || [] });
