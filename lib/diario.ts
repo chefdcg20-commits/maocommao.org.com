@@ -29,6 +29,38 @@ export type DiarioPost = {
 
 export const diarioPosts: DiarioPost[] = [
   {
+    slug: 'aniversario-no-tatame-jiu-jitsu-social',
+    title: 'Aniversário no tatame: treino, união e celebração no Mão Com Mão',
+    seoTitle: 'Aniversário no Tatame: jiu-jítsu social em Diadema',
+    excerpt:
+      'O novo vídeo do Projeto Mão Com Mão reúne treino de jiu-jítsu, cabo de guerra, oração e uma celebração especial para os aniversariantes da nossa comunidade.',
+    keywords: [
+      'aniversário no tatame',
+      'jiu-jítsu social em Diadema',
+      'jiu-jítsu infantil em Diadema',
+      'Projeto Mão Com Mão',
+      'treino de jiu-jítsu para crianças'
+    ],
+    category: 'Vídeo',
+    publishedAt: '2026-11-13',
+    publishedLabel: '13 de novembro de 2026',
+    eventDate: '2026-11-13',
+    eventDateLabel: 'Sexta-feira, 13 de novembro de 2026',
+    image: '/images/diario-aniversario-no-tatame.jpg',
+    imageAlt: 'Capa do vídeo Aniversário no Tatame do Projeto Mão Com Mão, com alunos e professores de jiu-jítsu',
+    imageOrientation: 'wide',
+    youtubeId: 'sc6o8UuEv8U',
+    youtubeUrl: 'https://youtu.be/sc6o8UuEv8U',
+    videoPublishedAt: '2026-11-13T11:36:14-03:00',
+    paragraphs: [
+      'O novo vídeo do canal Mão Com Mão mostra um dia especial no projeto: treino de jiu-jítsu, brincadeiras, união e uma comemoração no tatame para os aniversariantes da nossa comunidade.',
+      'Além das atividades técnicas, a turma participou de um animado cabo de guerra. A dinâmica fortalece o espírito de equipe, a cooperação e a amizade entre crianças, jovens e professores.',
+      'O encontro também teve um momento de oração e agradecimento pela vida dos aniversariantes. Celebrar juntos reforça os vínculos que tornam o Projeto Mão Com Mão uma grande família dentro e fora do tatame.',
+      'No jiu-jítsu social, cada aula é uma oportunidade de ensinar disciplina, respeito, solidariedade e convivência. O esporte aproxima as famílias e ajuda a construir experiências positivas para toda a comunidade de Diadema.',
+      'Assista a “Aniversário no Tatame”, inscreva-se no canal e compartilhe. Cada visualização ajuda o Projeto Mão Com Mão a alcançar novas famílias e fortalecer o esporte social. Oss!'
+    ]
+  },
+  {
     slug: 'turma-expandindo-projeto-pede-espaco-maior',
     title: 'A turma está expandindo: projeto continua pedindo um espaço maior',
     seoTitle: 'Projeto de jiu-jítsu cresce e pede espaço maior em Diadema',
