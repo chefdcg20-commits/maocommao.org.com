@@ -154,6 +154,45 @@ Deno.serve(async (request) => {
       return json({ ok: true });
     }
 
+    // Dados de um aluno para edicao no aplicativo (foto temporaria assinada).
+    if (body.action === "get") {
+      const id = String(body.id || "");
+      const { data: row } = await supabase.from("student_enrollments").select("id, status, student_full_name, birth_date, photo_path, guardian_full_name, guardian_phone, guardian_email").eq("id", id).maybeSingle();
+      if (!row) return json({ error: "not_found" }, 404);
+      const signed = row.photo_path ? (await supabase.storage.from("student-photos").createSignedUrl(row.photo_path, 600)).data?.signedUrl || null : null;
+      return json({ student: { ...row, photo_path: undefined, photo_url: signed } });
+    }
+
+    // Corrigir nome, data de nascimento e dados do responsavel (mestres).
+    if (body.action === "update_student") {
+      const id = String(body.id || "");
+      const name = String(body.student_full_name || "").trim().replace(/\s+/g, " ").slice(0, 120);
+      const birth = String(body.birth_date || "");
+      const guardian = String(body.guardian_full_name || "").trim().replace(/\s+/g, " ").slice(0, 120);
+      const phone = String(body.guardian_phone || "").trim().slice(0, 30);
+      const email = String(body.guardian_email || "").trim().slice(0, 160) || null;
+      if (!id || name.length < 3 || !/^\d{4}-\d{2}-\d{2}$/.test(birth) || Number.isNaN(Date.parse(birth)) || birth > new Date().toISOString().slice(0, 10) || birth < "1930-01-01") return json({ error: "invalid_request" }, 400);
+      if (!guardian || !phone) return json({ error: "invalid_request" }, 400);
+      const norm = (v) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+      const { data: others } = await supabase.from("student_enrollments").select("id, student_full_name, birth_date").neq("id", id).neq("status", "rejected").limit(5000);
+      if ((others || []).some((r) => norm(r.student_full_name) === norm(name) && r.birth_date === birth)) return json({ error: "duplicate_enrollment" }, 409);
+      const { error } = await supabase.from("student_enrollments").update({ student_full_name: name, birth_date: birth, guardian_full_name: guardian, guardian_phone: phone, guardian_email: email, updated_at: new Date().toISOString() }).eq("id", id);
+      if (error) { console.error(`[admin] stage=update_student db_code=${error.code ?? "?"}`); return json({ error: error.code === "23505" ? "duplicate_enrollment" : "server_error" }, error.code === "23505" ? 409 : 500); }
+      await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userData.user.id, event_type: "student_edited" });
+      return json({ ok: true });
+    }
+
+    // Duplicado: sai da lista (status "recusado", com anotacao), sem apagar nada do historico.
+    if (body.action === "mark_duplicate") {
+      const id = String(body.id || "");
+      if (!id) return json({ error: "invalid_request" }, 400);
+      const { error } = await supabase.from("student_enrollments").update({ status: "rejected", approved_at: null, approved_by: null, internal_notes: `Cadastro duplicado, retirado da lista em ${new Date().toISOString().slice(0, 10)}.`, updated_at: new Date().toISOString() }).eq("id", id);
+      if (error) { console.error(`[admin] stage=mark_duplicate db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      await supabase.from("nfc_cards").update({ status: "revoked", revoked_by: userData.user.id, revoked_at: new Date().toISOString(), revoke_reason: "duplicate" }).eq("enrollment_id", id).eq("status", "active");
+      await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userData.user.id, event_type: "marked_duplicate" });
+      return json({ ok: true });
+    }
+
     if (body.action === "replace_photo") {
       const id = String(body.id || "");
       const match = /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/.exec(String(body.data_url || ""));

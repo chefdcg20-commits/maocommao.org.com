@@ -17,7 +17,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "org.maocommao.chamada",
-      "versionCode": 6,
+      "versionCode": 7,
       "permissions": [
         "android.permission.NFC"
       ]
@@ -27,6 +27,14 @@
     },
     "plugins": [
       "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Escolher a foto do aluno para o cadastro.",
+          "cameraPermission": "Tirar a foto do aluno para o cadastro.",
+          "microphonePermission": false
+        }
+      ],
       [
         "react-native-nfc-manager",
         {

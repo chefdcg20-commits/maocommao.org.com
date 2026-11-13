@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, Image, Modal, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from "react-native";
 import { api, errorText, Student } from "../api";
 import { BELT_COLORS } from "../belts";
 import { colors } from "../theme";
+import EditStudentModal from "./EditStudentModal";
 import ScanModal from "./ScanModal";
 
 const FILTERS = [
@@ -20,6 +21,8 @@ export default function RosterScreen({ role, onLogout }: { role: "mestre" | "pro
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [menuFor, setMenuFor] = useState<Student | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
   const [scan, setScan] = useState<null | { mode: "attendance" | "link"; student?: Student; kind?: "card" | "belt" }>(null);
 
   const load = useCallback(async () => {
@@ -95,16 +98,17 @@ O chip antigo deixa de funcionar.`, [
     ]);
   }
 
-  function menu(student: Student) {
-    const buttons: { text: string; style?: "cancel" | "destructive"; onPress?: () => void }[] = [
-      { text: student.has_card ? "Trocar chip da carteirinha" : "Vincular chip da carteirinha", onPress: () => setScan({ mode: "link", student, kind: "card" }) },
-      { text: student.has_belt_tag ? "Trocar chip da faixa" : "Vincular chip da faixa", onPress: () => setScan({ mode: "link", student, kind: "belt" }) },
-    ];
-    if (role === "mestre" && student.has_card) buttons.push({ text: "Carteirinha perdida (desativar)", style: "destructive", onPress: () => revoke(student, "card") });
-    if (role === "mestre" && student.has_belt_tag) buttons.push({ text: "Chip da faixa perdido (desativar)", style: "destructive", onPress: () => revoke(student, "belt") });
-    buttons.push({ text: "Cancelar", style: "cancel" });
-    Alert.alert(student.name, `Carteirinha: ${student.has_card ? "vinculada" : "não"} · Faixa: ${student.has_belt_tag ? "vinculado" : "não"}`, buttons);
+  // Menu do aluno (segurar o dedo na linha). Painel proprio: o Alert do Android mostra no maximo 3 botoes.
+  function menuItems(student: Student) {
+    const items: { text: string; danger?: boolean; onPress: () => void }[] = [];
+    if (role === "mestre") items.push({ text: "✎ Editar cadastro (nome, foto, nascimento)", onPress: () => setEditing(student.id) });
+    items.push({ text: student.has_card ? "Trocar chip da carteirinha" : "Vincular chip da carteirinha", onPress: () => setScan({ mode: "link", student, kind: "card" }) });
+    items.push({ text: student.has_belt_tag ? "Trocar chip da faixa" : "Vincular chip da faixa", onPress: () => setScan({ mode: "link", student, kind: "belt" }) });
+    if (role === "mestre" && student.has_card) items.push({ text: "Carteirinha perdida (desativar)", danger: true, onPress: () => revoke(student, "card") });
+    if (role === "mestre" && student.has_belt_tag) items.push({ text: "Chip da faixa perdido (desativar)", danger: true, onPress: () => revoke(student, "belt") });
+    return items;
   }
+  const menu = (student: Student) => setMenuFor(student);
 
   const dateLabel = date ? date.split("-").reverse().join("/") : "";
 
@@ -160,6 +164,27 @@ O chip antigo deixa de funcionar.`, [
       <Pressable style={styles.fab} onPress={() => setScan({ mode: "attendance" })}>
         <Text style={styles.fabText}>Ler cartão (NFC)</Text>
       </Pressable>
+
+      {menuFor && (
+        <Modal transparent animationType="fade" onRequestClose={() => setMenuFor(null)}>
+          <Pressable style={{ flex: 1, backgroundColor: "#000a", justifyContent: "flex-end" }} onPress={() => setMenuFor(null)}>
+            <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, paddingBottom: 30 }}>
+              <Text style={{ color: colors.text, fontSize: 18, fontWeight: "900" }}>{menuFor.name}</Text>
+              <Text style={{ color: colors.muted, marginBottom: 8 }}>Carteirinha: {menuFor.has_card ? "vinculada" : "não"} · Faixa: {menuFor.has_belt_tag ? "vinculado" : "não"}</Text>
+              {menuItems(menuFor).map((item) => (
+                <Pressable key={item.text} onPress={() => { setMenuFor(null); item.onPress(); }} style={{ paddingVertical: 14, borderTopWidth: 1, borderTopColor: colors.border }}>
+                  <Text style={{ color: item.danger ? colors.red : colors.text, fontSize: 16, fontWeight: "700" }}>{item.text}</Text>
+                </Pressable>
+              ))}
+              <Pressable onPress={() => setMenuFor(null)} style={{ paddingVertical: 14, borderTopWidth: 1, borderTopColor: colors.border }}>
+                <Text style={{ color: colors.muted, fontSize: 16, textAlign: "center" }}>Cancelar</Text>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Modal>
+      )}
+
+      {editing && <EditStudentModal id={editing} onClose={(changed) => { setEditing(null); if (changed) load(); }} />}
 
       {scan && (
         <ScanModal

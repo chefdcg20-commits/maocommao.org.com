@@ -24,6 +24,20 @@ const sha256 = async (value: string) => {
   return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
 };
 
+// Cadastro repetido: mesmo nome (sem acento, maiuscula ou espaco extra) com a mesma data de nascimento,
+// o mesmo telefone ou o mesmo e-mail do responsavel. Cadastros recusados nao contam.
+const norm = (value: unknown) => String(value || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+const digits = (value: unknown) => String(value || "").replace(/\D/g, "");
+const findDuplicate = async (supabase, student: { name: string; birth: string; phone: string; email: string | null }) => {
+  const { data } = await supabase.from("student_enrollments").select("id, student_full_name, birth_date, guardian_phone, guardian_email").neq("status", "rejected").limit(5000);
+  const name = norm(student.name);
+  return (data || []).find((row) => norm(row.student_full_name) === name && (
+    row.birth_date === student.birth
+    || (digits(student.phone) && digits(row.guardian_phone) === digits(student.phone))
+    || (student.email && row.guardian_email && String(row.guardian_email).toLowerCase() === student.email.toLowerCase())
+  )) || null;
+};
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
@@ -58,6 +72,14 @@ Deno.serve(async (request) => {
 
     const trainingTime = text(data, "training_time");
     if (!["18:00", "19:00", "20:00"].includes(trainingTime!)) return json({ error: "invalid_training_time" }, 400);
+
+    const duplicate = await findDuplicate(supabase, {
+      name: text(data, "student_full_name")!,
+      birth: text(data, "birth_date")!,
+      phone: text(data, "guardian_phone")!,
+      email: text(data, "guardian_email", false),
+    });
+    if (duplicate) { console.error("[enroll] stage=duplicate result=blocked"); return json({ error: "duplicate_enrollment" }, 409); }
 
     const photo = data.get("student_photo");
     const signature = data.get("guardian_signature");
@@ -113,6 +135,7 @@ Deno.serve(async (request) => {
         supabase.storage.from("guardian-signatures").remove([signaturePath]),
       ]);
       console.error(`[enroll] stage=insert db_code=${error.code ?? "?"} db_message=${error.message}`);
+      if (error.code === "23505" && /student_unique/.test(error.message)) return json({ error: "duplicate_enrollment" }, 409);
       return json({ error: "database_error" }, 500);
     }
 

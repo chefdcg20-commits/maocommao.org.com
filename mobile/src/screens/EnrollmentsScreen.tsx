@@ -4,6 +4,7 @@ import { api, ApiError, Enrollment, errorText } from "../api";
 import { BELT_COLORS } from "../belts";
 import { LINKS } from "../info";
 import { colors } from "../theme";
+import EditStudentModal from "./EditStudentModal";
 import { BeltBar, Button, Chips, fmtDate, Header, styles } from "../ui";
 
 const STATUS: Record<string, string> = {
@@ -17,6 +18,7 @@ export default function EnrollmentsScreen() {
   const [filter, setFilter] = useState("waiting");
   const [open, setOpen] = useState<string | null>(null);
   const [beltFor, setBeltFor] = useState<Enrollment | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -89,7 +91,7 @@ export default function EnrollmentsScreen() {
           contentContainerStyle={{ paddingBottom: 90 }}
           renderItem={({ item: r }) => (
             <View style={styles.card}>
-              <Pressable onPress={() => setOpen(open === r.id ? null : r.id)} style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+              <Pressable onPress={() => setOpen(open === r.id ? null : r.id)} onLongPress={() => setEditing(r.id)} delayLongPress={450} style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
                 {r.photo_url ? <Image source={{ uri: r.photo_url }} style={styles.photo} /> : <View style={[styles.photo, { backgroundColor: colors.border }]} />}
                 <View style={{ flex: 1, gap: 3 }}>
                   <Text style={styles.strong} numberOfLines={1}>{r.student_full_name}</Text>
@@ -112,6 +114,7 @@ export default function EnrollmentsScreen() {
                   <View style={{ height: 8 }} />
                   {r.status !== "approved" && <Button label="Aprovar e gerar carteirinha" onPress={() => approve(r)} busy={busy === r.id} />}
                   {r.status !== "approved" && <Button label="Pedir ajustes ou recusar" kind="secondary" onPress={() => reject(r)} disabled={busy === r.id} />}
+                  <Button label="Editar cadastro (nome, foto, nascimento)" kind="secondary" onPress={() => setEditing(r.id)} />
                   <Button label={r.belt ? "Alterar faixa" : "Definir faixa"} kind="secondary" onPress={() => setBeltFor(r)} />
                   {r.status === "approved" && <Button label="Imprimir carteirinha (abre o site)" kind="secondary" onPress={() => Linking.openURL(`${LINKS.adminPanel}`).catch(() => undefined)} />}
                 </View>
@@ -121,6 +124,7 @@ export default function EnrollmentsScreen() {
         />
       )}
 
+      {editing && <EditStudentModal id={editing} onClose={(changed) => { setEditing(null); if (changed) load(); }} />}
       {beltFor && <BeltPicker row={beltFor} onClose={() => setBeltFor(null)} onPick={(belt, stripes) => { const id = beltFor.id; setBeltFor(null); run(id, { action: "set_belt", id, belt, stripes }); }} />}
     </View>
   );

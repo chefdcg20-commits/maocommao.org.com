@@ -16,6 +16,7 @@ const ERRORS: Record<string, string> = {
   upload_failed: "Falha ao enviar as imagens. Tente novamente em instantes.",
   invite_lookup_failed: "Erro temporário no servidor. Tente novamente em alguns minutos.",
   database_error: "Erro temporário ao salvar o cadastro. Tente novamente em alguns minutos.",
+  duplicate_enrollment: "Este aluno já tem cadastro no projeto. Não é preciso cadastrar de novo. Se algum dado precisa ser corrigido, fale com a equipe do projeto.",
   server_misconfigured: "Erro temporário no servidor. Avise a equipe do projeto.",
 };
 
