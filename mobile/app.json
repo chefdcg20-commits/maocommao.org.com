@@ -17,7 +17,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "org.maocommao.chamada",
-      "versionCode": 7,
+      "versionCode": 8,
       "permissions": [
         "android.permission.NFC"
       ]
