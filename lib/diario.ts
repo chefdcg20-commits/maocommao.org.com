@@ -29,6 +29,38 @@ export type DiarioPost = {
 
 export const diarioPosts: DiarioPost[] = [
   {
+    slug: 'futuros-faixas-pretas-dia-de-treino-jiu-jitsu-social',
+    title: 'Futuros faixas-pretas: um dia de treino no Projeto Mão Com Mão',
+    seoTitle: 'Jiu-jítsu social em Diadema: futuros faixas-pretas em treino',
+    excerpt:
+      'O novo vídeo acompanha as turmas infantis das 18h e 19h e o treino adulto das 20h, com uma aula sobre os três pontos fundamentais para executar uma raspagem.',
+    keywords: [
+      'jiu-jítsu social em Diadema',
+      'jiu-jítsu infantil em Diadema',
+      'aula de raspagem no jiu-jítsu',
+      'Projeto Mão Com Mão',
+      'treino de jiu-jítsu para crianças e adultos'
+    ],
+    category: 'Vídeo',
+    publishedAt: '2026-11-20',
+    publishedLabel: '20 de novembro de 2026',
+    eventDate: '2026-11-20',
+    eventDateLabel: 'Sexta-feira, 20 de novembro de 2026',
+    image: '/images/diario-futuros-faixa-preta-treino-mao-com-mao.jpg',
+    imageAlt: 'Capa do vídeo Futuros Faixa Preta com alunos e professores do Projeto Mão Com Mão reunidos no tatame',
+    imageOrientation: 'wide',
+    youtubeId: 'aFMA2NMfqdE',
+    youtubeUrl: 'https://youtu.be/aFMA2NMfqdE',
+    videoPublishedAt: '2026-11-20T11:50:13-03:00',
+    paragraphs: [
+      'O vídeo mais recente do canal Mão Com Mão acompanha um dia completo de atividades no projeto social de jiu-jítsu em Diadema, reunindo crianças, jovens e adultos no mesmo propósito de evolução.',
+      'A programação começa com a turma infantil das 18h e continua com os alunos das 19h. Às 20h, o treino adulto encerra a sequência, mostrando como o projeto atende diferentes idades e fortalece os vínculos entre atletas e famílias.',
+      'Durante a aula, os alunos aprendem os três pontos fundamentais para executar uma raspagem. A técnica ensina a sair de uma posição inferior, desequilibrar o adversário e conquistar uma posição mais favorável com controle e segurança.',
+      'Cada treino representa o começo de uma caminhada. Os futuros faixas-pretas são formados com constância, respeito, disciplina e apoio coletivo — valores que o Projeto Mão Com Mão trabalha dentro e fora do tatame.',
+      'Assista ao vídeo, inscreva-se no canal e compartilhe. Cada visualização ajuda o projeto a alcançar novas famílias e fortalecer o jiu-jítsu social em Diadema. Oss!'
+    ]
+  },
+  {
     slug: 'aniversario-no-tatame-jiu-jitsu-social',
     title: 'Aniversário no tatame: treino, união e celebração no Mão Com Mão',
     seoTitle: 'Aniversário no Tatame: jiu-jítsu social em Diadema',
