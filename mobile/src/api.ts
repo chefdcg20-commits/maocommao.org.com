@@ -63,6 +63,8 @@ const MESSAGES: Record<string, string> = {
   too_many_attempts: "Muitas tentativas. Aguarde um pouco e tente de novo.",
   no_sensei_signature: "Falta enviar a assinatura do sensei. Envie pelo painel do site e tente de novo.",
   network: "Sem conexão com a internet. Tente novamente.",
+  duplicate_enrollment: "Este aluno já tem outro cadastro ativo (mesmo nome e data de nascimento). Este cadastro é repetido e não pode ser aprovado.",
+  enrollment_rejected: "Este cadastro foi recusado (repetido). Não é possível alterar a faixa.",
   invalid_height: "Confira a altura (entre 50 e 230 cm).",
   invalid_weight: "Confira o peso (entre 10 e 250 kg).",
 };

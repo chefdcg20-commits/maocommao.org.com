@@ -31,10 +31,14 @@ const currentSenseiPath = async (supabase) => {
 const approveEnrollment = async (supabase, id: string, userId: string) => {
   const signaturePath = await currentSenseiPath(supabase);
   if (!signaturePath) return "no_sensei_signature";
-  const { data: row, error } = await supabase.from("student_enrollments").select("status, membership_number").eq("id", id).maybeSingle();
+  const { data: row, error } = await supabase.from("student_enrollments").select("status, membership_number, student_full_name, birth_date").eq("id", id).maybeSingle();
   if (error) { console.error(`[admin] stage=approve_lookup db_code=${error.code ?? "?"}`); return "server_error"; }
   if (!row) return "not_found";
   if (row.status === "approved") return "ok";
+  // Ja existe outro cadastro ativo do mesmo aluno (mesmo nome e nascimento): nao aprova de novo.
+  const nameKey = (v) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+  const { data: sameBirth } = await supabase.from("student_enrollments").select("id, student_full_name").neq("id", id).neq("status", "rejected").eq("birth_date", row.birth_date);
+  if ((sameBirth || []).some((r) => nameKey(r.student_full_name) === nameKey(row.student_full_name))) return "duplicate_enrollment";
   let membership = row.membership_number;
   if (!membership) {
     const generated = await supabase.rpc("next_membership_number");
@@ -151,6 +155,8 @@ Deno.serve(async (request) => {
       const belt = body.belt === null || body.belt === "" ? null : String(body.belt);
       const stripes = Number(body.stripes ?? 0);
       if (!id || (belt !== null && !BELTS.includes(belt)) || !Number.isInteger(stripes) || stripes < 0 || stripes > 4) return json({ error: "invalid_request" }, 400);
+      const { data: current } = await supabase.from("student_enrollments").select("status").eq("id", id).maybeSingle();
+      if (current?.status === "rejected") return json({ error: "enrollment_rejected" }, 409);
       const { error } = await supabase.from("student_enrollments").update({ belt, belt_stripes: belt ? stripes : 0 }).eq("id", id);
       if (error) { console.error(`[admin] stage=set_belt db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
       await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userData.user.id, event_type: "belt_changed", metadata: { belt, stripes } });
