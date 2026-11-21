@@ -93,8 +93,11 @@ Deno.serve(async (request) => {
     if (!admin) return json({ error: "forbidden" }, 403);
 
     if (body.action === "list") {
-      const { data: rows, error } = await supabase.from("student_enrollments").select("*").order("created_at", { ascending: false });
+      const { data: found, error } = await supabase.from("student_enrollments").select("*");
       if (error) { console.error(`[admin] stage=list db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      // Ordem alfabetica (sem diferenciar acento nem maiuscula): todo aluno novo entra no lugar certo.
+      const collator = new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true });
+      const rows = [...found].sort((a, b) => collator.compare(String(a.student_full_name || "").trim(), String(b.student_full_name || "").trim()) || String(a.created_at).localeCompare(String(b.created_at)));
       const sign = async (bucket: string, paths: string[]) => {
         const map: Record<string, string> = {};
         if (!paths.length) return map;
@@ -157,7 +160,7 @@ Deno.serve(async (request) => {
     // Dados de um aluno para edicao no aplicativo (foto temporaria assinada).
     if (body.action === "get") {
       const id = String(body.id || "");
-      const { data: row } = await supabase.from("student_enrollments").select("id, status, student_full_name, birth_date, photo_path, guardian_full_name, guardian_phone, guardian_email").eq("id", id).maybeSingle();
+      const { data: row } = await supabase.from("student_enrollments").select("id, status, student_full_name, birth_date, photo_path, guardian_full_name, guardian_phone, guardian_email, height_cm, weight_kg").eq("id", id).maybeSingle();
       if (!row) return json({ error: "not_found" }, 404);
       const signed = row.photo_path ? (await supabase.storage.from("student-photos").createSignedUrl(row.photo_path, 600)).data?.signedUrl || null : null;
       return json({ student: { ...row, photo_path: undefined, photo_url: signed } });
@@ -173,10 +176,17 @@ Deno.serve(async (request) => {
       const email = String(body.guardian_email || "").trim().slice(0, 160) || null;
       if (!id || name.length < 3 || !/^\d{4}-\d{2}-\d{2}$/.test(birth) || Number.isNaN(Date.parse(birth)) || birth > new Date().toISOString().slice(0, 10) || birth < "1930-01-01") return json({ error: "invalid_request" }, 400);
       if (!guardian || !phone) return json({ error: "invalid_request" }, 400);
+      // Altura e peso: em branco = nao muda; preenchidos precisam estar em faixa realista.
+      const body_patch: Record<string, unknown> = {};
+      const hRaw = String(body.height_cm ?? "").replace(",", ".").trim();
+      const wRaw = String(body.weight_kg ?? "").replace(",", ".").trim();
+      if (hRaw) { const h = Math.round(Number(hRaw)); if (!(h >= 50 && h <= 230)) return json({ error: "invalid_height" }, 400); body_patch.height_cm = h; }
+      if (wRaw) { const w = Math.round(Number(wRaw) * 10) / 10; if (!(w >= 10 && w <= 250)) return json({ error: "invalid_weight" }, 400); body_patch.weight_kg = w; }
+      if (Object.keys(body_patch).length) body_patch.body_updated_at = new Date().toISOString();
       const norm = (v) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
       const { data: others } = await supabase.from("student_enrollments").select("id, student_full_name, birth_date").neq("id", id).neq("status", "rejected").limit(5000);
       if ((others || []).some((r) => norm(r.student_full_name) === norm(name) && r.birth_date === birth)) return json({ error: "duplicate_enrollment" }, 409);
-      const { error } = await supabase.from("student_enrollments").update({ student_full_name: name, birth_date: birth, guardian_full_name: guardian, guardian_phone: phone, guardian_email: email, updated_at: new Date().toISOString() }).eq("id", id);
+      const { error } = await supabase.from("student_enrollments").update({ student_full_name: name, birth_date: birth, guardian_full_name: guardian, guardian_phone: phone, guardian_email: email, ...body_patch, updated_at: new Date().toISOString() }).eq("id", id);
       if (error) { console.error(`[admin] stage=update_student db_code=${error.code ?? "?"}`); return json({ error: error.code === "23505" ? "duplicate_enrollment" : "server_error" }, error.code === "23505" ? 409 : 500); }
       await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userData.user.id, event_type: "student_edited" });
       return json({ ok: true });

@@ -14,7 +14,7 @@ type Enrollment = {
   address_state: string; emergency_contact_name: string | null; emergency_contact_phone: string | null;
   health_notes: string | null; image_consent: boolean; photo_url: string | null; signature_url: string | null;
   membership_number: string | null; card_valid_until: string | null; sensei_signature_url: string | null;
-  belt: string | null; belt_stripes: number;
+  belt: string | null; belt_stripes: number; height_cm: number | null; weight_kg: number | null;
 };
 
 const STATUS: Record<string, string> = {
@@ -241,6 +241,8 @@ export default function AdminPanel() {
                 <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
                   <Item label="Protocolo" value={row.protocol} />
                   <Item label="Nascimento" value={new Date(`${row.birth_date}T00:00:00`).toLocaleDateString("pt-BR")} />
+                  <Item label="Idade" value={`${Math.floor((Date.now() - new Date(`${row.birth_date}T00:00:00`).getTime()) / 31_557_600_000)} anos`} />
+                  <Item label="Altura e peso" value={row.height_cm || row.weight_kg ? `${row.height_cm ? `${row.height_cm} cm` : "altura —"} · ${row.weight_kg ? `${String(row.weight_kg).replace(".", ",")} kg` : "peso —"}` : "não informado"} />
                   <Item label="Responsável" value={`${row.guardian_full_name} (${row.guardian_relationship})`} />
                   <Item label="WhatsApp" value={row.guardian_phone} />
                   <Item label="E-mail" value={row.guardian_email} />

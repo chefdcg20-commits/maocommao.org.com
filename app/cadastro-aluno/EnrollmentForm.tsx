@@ -17,6 +17,8 @@ const ERRORS: Record<string, string> = {
   invite_lookup_failed: "Erro temporário no servidor. Tente novamente em alguns minutos.",
   database_error: "Erro temporário ao salvar o cadastro. Tente novamente em alguns minutos.",
   duplicate_enrollment: "Este aluno já tem cadastro no projeto. Não é preciso cadastrar de novo. Se algum dado precisa ser corrigido, fale com a equipe do projeto.",
+  invalid_height: "Confira a altura do aluno (entre 50 e 230 cm).",
+  invalid_weight: "Confira o peso do aluno (entre 10 e 250 kg).",
   server_misconfigured: "Erro temporário no servidor. Avise a equipe do projeto.",
 };
 
@@ -97,6 +99,8 @@ export default function EnrollmentForm() {
       <Section title="Dados do aluno">
         <Label text="Nome completo"><input className={field} name="student_full_name" required /></Label>
         <Label text="Data de nascimento"><input className={field} type="date" name="birth_date" required /></Label>
+        <div className="grid gap-4 sm:grid-cols-2"><Label text="Altura (cm)"><input className={field} name="height_cm" type="number" inputMode="numeric" min={50} max={230} step={1} required placeholder="Ex.: 140" /></Label><Label text="Peso (kg)"><input className={field} name="weight_kg" type="number" inputMode="decimal" min={10} max={250} step="0.1" required placeholder="Ex.: 38,5" /></Label></div>
+        <small className="-mt-2 block text-slate-400">Usamos a altura e o peso para escolher a faixa e a categoria na graduação. Você poderá atualizar depois pelo aplicativo.</small>
         <Label text="Horário de treino"><select className={field} name="training_time" required defaultValue=""><option value="" disabled>Selecione o horário</option><option value="18:00">18h</option><option value="19:00">19h</option><option value="20:00">20h</option></select></Label>
         <Label text="Foto atual do aluno"><input className={field} type="file" name="student_photo" accept="image/*" required /><small className="mt-2 block text-slate-400">No celular, você pode tirar a foto na hora ou escolher da galeria. A imagem é reduzida automaticamente.</small></Label>
       </Section>

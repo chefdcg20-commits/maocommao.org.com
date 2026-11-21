@@ -104,6 +104,7 @@ export default function EnrollmentsScreen() {
               {open === r.id && (
                 <View style={{ marginTop: 10, gap: 4 }}>
                   <Text style={styles.muted}>Nascimento: <Text style={styles.text}>{fmtDate(r.birth_date)}</Text></Text>
+                  <Text style={styles.muted}>Altura e peso: <Text style={styles.text}>{r.height_cm || r.weight_kg ? `${r.height_cm ? `${r.height_cm} cm` : "altura —"} · ${r.weight_kg ? `${String(r.weight_kg).replace(".", ",")} kg` : "peso —"}` : "não informado"}</Text></Text>
                   <Text style={styles.muted}>Responsável: <Text style={styles.text}>{r.guardian_full_name || "—"}{r.guardian_relationship ? ` (${r.guardian_relationship})` : ""}</Text></Text>
                   <Text style={styles.muted}>Telefone: <Text style={styles.text}>{r.guardian_phone || "—"}</Text></Text>
                   <Text style={styles.muted}>E-mail: <Text style={styles.text}>{r.guardian_email || "—"}</Text></Text>

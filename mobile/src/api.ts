@@ -25,6 +25,7 @@ export type FamilyStudent = {
   id: string; name: string; training_time: string | null; belt: string | null; belt_stripes: number;
   membership_number: string | null; card_valid_until: string | null; photo_url: string | null;
   attendance_total: number; attendance_month: number; last_attendance: string | null;
+  birth_date: string | null; height_cm: number | null; weight_kg: number | null; body_updated_at: string | null;
 };
 export type BraceletRow = { id: string; label: string; status: string; created_at: string; last_used_at: string | null; uses: number };
 export type NewsPost = { id: string; category: string; title: string; summary: string | null; source_name: string | null; source_url: string | null; event_date: string | null; pinned: boolean; created_at: string };
@@ -35,6 +36,7 @@ export type Enrollment = {
   guardian_full_name: string | null; guardian_relationship: string | null; guardian_phone: string | null; guardian_email: string | null;
   emergency_contact_name: string | null; emergency_contact_phone: string | null; health_notes: string | null; image_consent: boolean | null;
   membership_number: string | null; card_valid_until: string | null; created_at: string; photo_url: string | null;
+  height_cm: number | null; weight_kg: number | null;
 };
 export type FamilyDetail = { attendance: string[]; belt_history: { at: string; belt: string | null; stripes: number }[] };
 
@@ -61,6 +63,8 @@ const MESSAGES: Record<string, string> = {
   too_many_attempts: "Muitas tentativas. Aguarde um pouco e tente de novo.",
   no_sensei_signature: "Falta enviar a assinatura do sensei. Envie pelo painel do site e tente de novo.",
   network: "Sem conexão com a internet. Tente novamente.",
+  invalid_height: "Confira a altura (entre 50 e 230 cm).",
+  invalid_weight: "Confira o peso (entre 10 e 250 kg).",
 };
 export const errorText = (error: unknown) =>
   error instanceof ApiError ? MESSAGES[error.code] || "Algo deu errado. Tente novamente." : "Algo deu errado. Tente novamente.";

@@ -5,7 +5,7 @@ import { api, errorText } from "../api";
 import { colors } from "../theme";
 import { Button, styles } from "../ui";
 
-type Detail = { id: string; student_full_name: string; birth_date: string; photo_url: string | null; guardian_full_name: string; guardian_phone: string; guardian_email: string | null };
+type Detail = { id: string; student_full_name: string; birth_date: string; photo_url: string | null; guardian_full_name: string; guardian_phone: string; guardian_email: string | null; height_cm: number | null; weight_kg: number | null };
 
 const toBr = (iso: string) => iso.slice(0, 10).split("-").reverse().join("/");
 const toIso = (br: string) => {
@@ -22,6 +22,8 @@ export default function EditStudentModal({ id, onClose }: { id: string; onClose:
   const [guardian, setGuardian] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
   const [photo, setPhoto] = useState<{ uri: string; dataUrl: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -35,6 +37,8 @@ export default function EditStudentModal({ id, onClose }: { id: string; onClose:
         setGuardian(student.guardian_full_name);
         setPhone(student.guardian_phone);
         setEmail(student.guardian_email || "");
+        setHeight(student.height_cm ? String(student.height_cm) : "");
+        setWeight(student.weight_kg ? String(student.weight_kg).replace(".", ",") : "");
       })
       .catch((e) => setError(errorText(e)));
   }, [id]);
@@ -56,7 +60,7 @@ export default function EditStudentModal({ id, onClose }: { id: string; onClose:
     setBusy(true);
     setError("");
     try {
-      await api({ action: "update_student", id, student_full_name: name, birth_date: iso, guardian_full_name: guardian, guardian_phone: phone, guardian_email: email }, "admin");
+      await api({ action: "update_student", id, student_full_name: name, birth_date: iso, guardian_full_name: guardian, guardian_phone: phone, guardian_email: email, height_cm: height, weight_kg: weight }, "admin");
       if (photo) await api({ action: "replace_photo", id, data_url: photo.dataUrl }, "admin");
       onClose(true);
     } catch (e) {
@@ -110,6 +114,16 @@ export default function EditStudentModal({ id, onClose }: { id: string; onClose:
               <TextInput style={styles.input} value={name} onChangeText={setName} maxLength={120} autoCapitalize="words" />
               <Text style={styles.muted}>Data de nascimento (DD/MM/AAAA)</Text>
               <TextInput style={styles.input} value={birth} onChangeText={setBirth} keyboardType="numbers-and-punctuation" maxLength={10} placeholder="DD/MM/AAAA" placeholderTextColor={colors.muted} />
+              <View style={{ flexDirection: "row", gap: 10 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.muted}>Altura (cm)</Text>
+                  <TextInput style={styles.input} value={height} onChangeText={setHeight} keyboardType="number-pad" maxLength={3} placeholder="Ex.: 140" placeholderTextColor={colors.muted} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.muted}>Peso (kg)</Text>
+                  <TextInput style={styles.input} value={weight} onChangeText={setWeight} keyboardType="decimal-pad" maxLength={5} placeholder="Ex.: 38,5" placeholderTextColor={colors.muted} />
+                </View>
+              </View>
               <Text style={styles.muted}>Responsável</Text>
               <TextInput style={styles.input} value={guardian} onChangeText={setGuardian} maxLength={120} autoCapitalize="words" />
               <Text style={styles.muted}>Telefone / WhatsApp do responsável</Text>

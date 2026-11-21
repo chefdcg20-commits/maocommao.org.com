@@ -73,6 +73,12 @@ Deno.serve(async (request) => {
     const trainingTime = text(data, "training_time");
     if (!["18:00", "19:00", "20:00"].includes(trainingTime!)) return json({ error: "invalid_training_time" }, 400);
 
+    // Altura (cm) e peso (kg): aceitam virgula ("38,5") e precisam estar em faixa realista.
+    const heightCm = Math.round(Number(String(data.get("height_cm") || "").replace(",", ".")));
+    const weightKg = Math.round(Number(String(data.get("weight_kg") || "").replace(",", ".")) * 10) / 10;
+    if (!(heightCm >= 50 && heightCm <= 230)) return json({ error: "invalid_height" }, 400);
+    if (!(weightKg >= 10 && weightKg <= 250)) return json({ error: "invalid_weight" }, 400);
+
     const duplicate = await findDuplicate(supabase, {
       name: text(data, "student_full_name")!,
       birth: text(data, "birth_date")!,
@@ -107,6 +113,9 @@ Deno.serve(async (request) => {
       student_full_name: text(data, "student_full_name"),
       training_time: trainingTime,
       birth_date: text(data, "birth_date"),
+      height_cm: heightCm,
+      weight_kg: weightKg,
+      body_updated_at: new Date().toISOString(),
       photo_path: photoPath,
       guardian_full_name: text(data, "guardian_full_name"),
       guardian_relationship: text(data, "guardian_relationship"),

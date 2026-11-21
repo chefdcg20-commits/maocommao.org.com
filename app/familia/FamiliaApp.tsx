@@ -11,6 +11,7 @@ type Student = {
   id: string; name: string; training_time: string | null; belt: string | null; belt_stripes: number;
   membership_number: string | null; card_valid_until: string | null; photo_url: string | null;
   attendance_total: number; attendance_month: number; last_attendance: string | null;
+  birth_date: string | null; height_cm: number | null; weight_kg: number | null;
 };
 
 const BELT: Record<string, { main: string; stripe?: string; label: string }> = {
@@ -23,6 +24,8 @@ const BELT: Record<string, { main: string; stripe?: string; label: string }> = {
 
 const ERRORS: Record<string, string> = {
   invalid_credentials: "E-mail ou senha incorretos.",
+  invalid_height: "Confira a altura (entre 50 e 230 cm).",
+  invalid_weight: "Confira o peso (entre 10 e 250 kg).",
   unauthorized: "Sessão expirada. Entre novamente.",
   forbidden: "Esta conta não é de pais ou alunos. Se você é da equipe, use a página de chamada.",
   invalid_code: "Código do grupo incorreto.",
@@ -238,6 +241,16 @@ function StudentView({ student, onBack }: { student: Student; onBack: (removed: 
     if (!result.ok) return setError(errorText(result.data));
     setText(""); setError(""); alert("Enviado! Sua mensagem chegou aos mestres.");
   }
+  const [height, setHeight] = useState(student.height_cm ? String(student.height_cm) : "");
+  const [weight, setWeight] = useState(student.weight_kg ? String(student.weight_kg).replace(".", ",") : "");
+  const age = student.birth_date ? Math.floor((Date.now() - new Date(`${student.birth_date}T00:00:00`).getTime()) / 31_557_600_000) : null;
+  async function saveBody() {
+    setBusy(true);
+    const result = await api({ action: "update_body", enrollment_id: student.id, height_cm: height, weight_kg: weight });
+    setBusy(false);
+    if (!result.ok) return setError(errorText(result.data));
+    setError(""); alert("Altura e peso atualizados.");
+  }
   async function unlink() {
     if (!confirm(`Desvincular ${student.name}? Você pode vincular de novo depois.`)) return;
     const result = await api({ action: "unlink_student", enrollment_id: student.id });
@@ -265,6 +278,15 @@ function StudentView({ student, onBack }: { student: Student; onBack: (removed: 
         <div className="rounded-2xl border border-slate-800 bg-slate-900 p-3"><p className="text-3xl font-black text-emerald-400">{student.attendance_month}</p><p className="text-xs text-slate-400">no mês</p></div>
         <div className="rounded-2xl border border-slate-800 bg-slate-900 p-3"><p className="text-3xl font-black text-amber-400">{student.attendance_total}</p><p className="text-xs text-slate-400">no total</p></div>
         <div className="rounded-2xl border border-slate-800 bg-slate-900 p-3"><p className="mt-2 font-black">{fmt(student.last_attendance)}</p><p className="text-xs text-slate-400">última</p></div>
+      </div>
+      <h2 className="font-extrabold">Altura e peso{age !== null ? ` · ${age} anos` : ""}</h2>
+      <div className="space-y-2 rounded-2xl border border-slate-800 bg-slate-900 p-3">
+        <p className="text-sm text-slate-400">Mantenha atualizado: usamos para escolher a faixa e a categoria na graduação. A idade é calculada pela data de nascimento.</p>
+        <div className="grid grid-cols-2 gap-2">
+          <label className="text-sm text-slate-400">Altura (cm)<input className={`${input} mt-1`} type="number" inputMode="numeric" min={50} max={230} value={height} onChange={(e) => setHeight(e.target.value)} /></label>
+          <label className="text-sm text-slate-400">Peso (kg)<input className={`${input} mt-1`} type="number" inputMode="decimal" step="0.1" min={10} max={250} value={weight} onChange={(e) => setWeight(e.target.value)} /></label>
+        </div>
+        <button className={btn} disabled={busy || !height || !weight} onClick={saveBody}>Salvar altura e peso</button>
       </div>
       <h2 className="font-extrabold">Presenças (últimos 6 meses)</h2>
       <p className="rounded-2xl border border-slate-800 bg-slate-900 p-3 text-sm text-slate-400">{detail ? (detail.attendance.length ? detail.attendance.map(fmt).join("  ·  ") : "Nenhuma presença registrada ainda.") : "Carregando..."}</p>

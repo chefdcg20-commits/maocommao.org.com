@@ -90,10 +90,13 @@ Deno.serve(async (request) => {
     // Lista de chamada: so alunos aprovados e so o minimo necessario.
     if (body.action === "roster") {
       const date = today();
-      const { data: rows, error } = await supabase.from("student_enrollments")
+      const { data: found, error } = await supabase.from("student_enrollments")
         .select("id, student_full_name, training_time, photo_path, belt, belt_stripes, membership_number")
-        .eq("status", "approved").order("student_full_name", { ascending: true });
+        .eq("status", "approved");
       if (error) { console.error(`[staff] stage=roster db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      // Ordem alfabetica (sem diferenciar acento nem maiuscula).
+      const collator = new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true });
+      const rows = [...found].sort((a, b) => collator.compare(String(a.student_full_name || "").trim(), String(b.student_full_name || "").trim()));
       const ids = rows.map((r) => r.id);
       const [{ data: cards }, { data: present }] = await Promise.all([
         supabase.from("nfc_cards").select("enrollment_id, kind").eq("status", "active").in("enrollment_id", ids),
@@ -267,9 +270,11 @@ Deno.serve(async (request) => {
       const from = isDate(body.from) ? String(body.from) : `${now.slice(0, 8)}01`;
       const to = isDate(body.to) ? String(body.to) : now;
       const time = ["18:00", "19:00", "20:00"].includes(body.training_time) ? body.training_time : null;
-      let studentsQuery = supabase.from("student_enrollments").select("id, student_full_name, training_time, belt, belt_stripes").eq("status", "approved").order("student_full_name");
+      let studentsQuery = supabase.from("student_enrollments").select("id, student_full_name, training_time, belt, belt_stripes").eq("status", "approved");
       if (time) studentsQuery = studentsQuery.eq("training_time", time);
-      const { data: students, error } = await studentsQuery;
+      const { data: foundStudents, error } = await studentsQuery;
+      const reportCollator = new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true });
+      const students = (foundStudents || []).sort((a, b) => reportCollator.compare(String(a.student_full_name || "").trim(), String(b.student_full_name || "").trim()));
       if (error) { console.error(`[staff] stage=report db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
       // O servidor devolve no maximo 1000 linhas por consulta: le em paginas.
       const rows: { enrollment_id: string; session_date: string }[] = [];

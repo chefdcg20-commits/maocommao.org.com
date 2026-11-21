@@ -121,7 +121,7 @@ Deno.serve(async (request) => {
       const ids = await linkedIds();
       if (!ids.length) return json({ students: [] });
       const { data: rows } = await supabase.from("student_enrollments")
-        .select("id, student_full_name, training_time, photo_path, belt, belt_stripes, membership_number, card_valid_until")
+        .select("id, student_full_name, training_time, photo_path, belt, belt_stripes, membership_number, card_valid_until, birth_date, height_cm, weight_kg, body_updated_at")
         .in("id", ids).eq("status", "approved").order("student_full_name");
       const since = `${today().slice(0, 8)}01`;
       const { data: att } = await supabase.from("attendance").select("enrollment_id, session_date").in("enrollment_id", ids);
@@ -143,6 +143,7 @@ Deno.serve(async (request) => {
         students: (rows || []).map((r) => ({
           id: r.id, name: r.student_full_name, training_time: r.training_time, belt: r.belt, belt_stripes: r.belt_stripes,
           membership_number: r.membership_number, card_valid_until: r.card_valid_until, photo_url: photos[r.photo_path] || null,
+          birth_date: r.birth_date, height_cm: r.height_cm, weight_kg: r.weight_kg, body_updated_at: r.body_updated_at,
           attendance_total: total.get(r.id) || 0, attendance_month: month.get(r.id) || 0, last_attendance: last.get(r.id) || null,
         })),
       });
@@ -185,6 +186,21 @@ Deno.serve(async (request) => {
         attendance: (att || []).map((a) => a.session_date),
         belt_history: (events || []).map((e) => ({ at: e.created_at, belt: e.metadata?.belt ?? null, stripes: e.metadata?.stripes ?? 0 })),
       });
+    }
+
+    // A familia atualiza altura e peso do aluno vinculado (a idade e calculada pela data de nascimento).
+    if (body.action === "update_body") {
+      const id = String(body.enrollment_id || "");
+      if (!(await linkedIds()).includes(id)) return json({ error: "not_found" }, 404);
+      const height = Math.round(Number(String(body.height_cm ?? "").replace(",", ".")));
+      const weight = Math.round(Number(String(body.weight_kg ?? "").replace(",", ".")) * 10) / 10;
+      if (!(height >= 50 && height <= 230)) return json({ error: "invalid_height" }, 400);
+      if (!(weight >= 10 && weight <= 250)) return json({ error: "invalid_weight" }, 400);
+      const now = new Date().toISOString();
+      const { error } = await supabase.from("student_enrollments").update({ height_cm: height, weight_kg: weight, body_updated_at: now, updated_at: now }).eq("id", id);
+      if (error) { console.error(`[family] stage=update_body db_code=${error.code ?? "?"}`); return json({ error: "server_error" }, 500); }
+      await supabase.from("enrollment_events").insert({ enrollment_id: id, actor_id: userId, event_type: "body_updated", metadata: { height_cm: height, weight_kg: weight } });
+      return json({ ok: true });
     }
 
     // Mensagem/sugestao da familia para os mestres.

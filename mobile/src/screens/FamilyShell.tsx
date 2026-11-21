@@ -106,6 +106,22 @@ function StudentScreen({ student, onBack }: { student: FamilyStudent; onBack: (r
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [height, setHeight] = useState(student.height_cm ? String(student.height_cm) : "");
+  const [weight, setWeight] = useState(student.weight_kg ? String(student.weight_kg).replace(".", ",") : "");
+  const age = student.birth_date ? Math.floor((Date.now() - new Date(`${student.birth_date}T00:00:00`).getTime()) / 31_557_600_000) : null;
+
+  async function saveBody() {
+    setBusy(true);
+    setError("");
+    try {
+      await api({ action: "update_body", enrollment_id: student.id, height_cm: height, weight_kg: weight }, "family");
+      Alert.alert("Salvo", "Altura e peso atualizados.");
+    } catch (e) {
+      setError(errorText(e));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   useEffect(() => {
     api<FamilyDetail>({ action: "student_detail", enrollment_id: student.id }, "family").then(setDetail).catch((e) => setError(errorText(e)));
@@ -151,6 +167,22 @@ function StudentScreen({ student, onBack }: { student: FamilyStudent; onBack: (r
         <View style={[styles.card, { flex: 1, alignItems: "center" }]}><Text style={{ color: colors.green, fontSize: 28, fontWeight: "900" }}>{student.attendance_month}</Text><Text style={styles.muted}>no mês</Text></View>
         <View style={[styles.card, { flex: 1, alignItems: "center" }]}><Text style={{ color: colors.amber, fontSize: 28, fontWeight: "900" }}>{student.attendance_total}</Text><Text style={styles.muted}>no total</Text></View>
         <View style={[styles.card, { flex: 1, alignItems: "center" }]}><Text style={{ color: colors.text, fontSize: 16, fontWeight: "900", marginTop: 8 }}>{fmtDate(student.last_attendance)}</Text><Text style={styles.muted}>última</Text></View>
+      </View>
+
+      <Text style={[styles.strong, { marginVertical: 8 }]}>Altura e peso{age !== null ? ` · ${age} anos` : ""}</Text>
+      <View style={styles.card}>
+        <Text style={styles.muted}>Mantenha atualizado: usamos para escolher a faixa e a categoria na graduação. A idade é calculada pela data de nascimento.</Text>
+        <View style={{ flexDirection: "row", gap: 10, marginTop: 8 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.muted}>Altura (cm)</Text>
+            <TextInput style={styles.input} value={height} onChangeText={setHeight} keyboardType="number-pad" maxLength={3} placeholder="Ex.: 140" placeholderTextColor={colors.muted} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.muted}>Peso (kg)</Text>
+            <TextInput style={styles.input} value={weight} onChangeText={setWeight} keyboardType="decimal-pad" maxLength={5} placeholder="Ex.: 38,5" placeholderTextColor={colors.muted} />
+          </View>
+        </View>
+        <Button label="Salvar altura e peso" onPress={saveBody} busy={busy} />
       </View>
 
       <Text style={[styles.strong, { marginVertical: 8 }]}>Presenças (últimos 6 meses)</Text>
