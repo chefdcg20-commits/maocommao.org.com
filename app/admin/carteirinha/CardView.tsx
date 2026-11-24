@@ -8,7 +8,7 @@ const ENDPOINT = process.env.NEXT_PUBLIC_ADMIN_ENDPOINT || "https://dfggzyonudps
 const STAFF_ENDPOINT = process.env.NEXT_PUBLIC_STAFF_ENDPOINT || "https://dfggzyonudpsiyjkkmeh.supabase.co/functions/v1/staff-api";
 const TOKEN_KEY = "mcm-admin-token";
 
-type Student = {
+export type Student = {
   id: string; status: string; student_full_name: string; birth_date: string; training_time: string | null;
   membership_number: string | null; card_valid_until: string | null;
   photo_url: string | null; sensei_signature_url: string | null; sensei_name: string;
@@ -16,7 +16,7 @@ type Student = {
 };
 
 // Tira o fundo branco da foto da assinatura: so o traco fica, em branco, para ler bem sobre o azul escuro.
-async function whiteInk(url: string): Promise<string> {
+export async function whiteInk(url: string): Promise<string> {
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const el = new Image();
     el.crossOrigin = "anonymous";
@@ -64,8 +64,84 @@ async function whiteInk(url: string): Promise<string> {
   return out.toDataURL("image/png");
 }
 
-const cardClass = "member-card relative aspect-[85.6/53.98] w-full overflow-hidden rounded-[1.35rem] border border-amber-400/35 bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white shadow-2xl";
+export const cardClass = "member-card relative aspect-[85.6/53.98] w-full overflow-hidden rounded-[1.35rem] border border-amber-400/35 bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white shadow-2xl";
 const date = (value: string | null) => value ? new Date(`${value}T00:00:00`).toLocaleDateString("pt-BR") : "—";
+
+export function CardPair({ student, qr, qrState, ink, part = "both" }: { part?: "front" | "back" | "both"; student: Student; qr: string | null; qrState: "loading" | "ok" | "fallback"; ink: string | null }) {
+  return (
+    <>
+            {part !== "back" && (
+            <section aria-label="Frente da carteirinha" className={cardClass}>
+              <div className="absolute inset-x-0 top-0 h-[2.5%] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-600" />
+              <div className="flex h-full flex-col p-[5%]">
+                <div className="flex items-center gap-[3%]">
+                  <img src="/images/logo-mao-com-mao-circular-carteirinha.png" alt="" className="h-[clamp(3.2rem,8vw,4.8rem)] w-[clamp(3.2rem,8vw,4.8rem)] rounded-full border-2 border-amber-400 object-cover" />
+                  <div>
+                    <p className="text-[clamp(0.42rem,1vw,0.68rem)] font-black uppercase tracking-[0.2em] text-amber-400">Associação Mão Com Mão</p>
+                    <h2 className="text-[clamp(0.9rem,2.2vw,1.45rem)] font-black leading-tight">JIU-JITSU</h2>
+                    <p className="text-[clamp(0.45rem,1.1vw,0.72rem)] text-slate-300">Carteirinha de aluno</p>
+                  </div>
+                </div>
+                <div className="mt-[4%] grid flex-1 grid-cols-[27%_1fr] gap-[5%]">
+                  <div className="flex flex-col justify-center gap-[5%] self-center pb-[5%]">
+                    <div className="relative aspect-[3/3.05] overflow-hidden rounded-[12%] border-[3px] border-white/80 bg-slate-300 shadow-lg">
+                      {student.photo_url && <img src={student.photo_url} alt="Foto do aluno" className="absolute inset-0 h-full w-full object-cover" />}
+                    </div>
+                    {beltByKey(student.belt) && <BeltGraphic belt={beltByKey(student.belt)!} stripes={student.belt_stripes} className="mx-auto w-[78%]" />}
+                  </div>
+                  <dl className="grid content-center grid-cols-2 gap-x-[4%] gap-y-[5%]">
+                    <div className="col-span-2"><dt className="text-[clamp(0.4rem,0.9vw,0.62rem)] font-black uppercase tracking-widest text-amber-400">Aluno</dt><dd className="text-[clamp(0.78rem,1.8vw,1.2rem)] font-black uppercase leading-tight">{student.student_full_name}</dd></div>
+                    <div><dt className="text-[clamp(0.38rem,0.85vw,0.58rem)] font-black uppercase tracking-wider text-amber-400">Matrícula</dt><dd className="text-[clamp(0.5rem,1.1vw,0.75rem)] font-bold">{student.membership_number}</dd></div>
+                    <div><dt className="text-[clamp(0.38rem,0.85vw,0.58rem)] font-black uppercase tracking-wider text-amber-400">Validade</dt><dd className="text-[clamp(0.5rem,1.1vw,0.75rem)] font-bold">{date(student.card_valid_until)}</dd></div>
+                    <div className="col-span-2"><dt className="text-[clamp(0.38rem,0.85vw,0.58rem)] font-black uppercase tracking-wider text-amber-400">Nascimento</dt><dd className="text-[clamp(0.5rem,1.1vw,0.75rem)] font-bold">{date(student.birth_date)}</dd></div>
+                  </dl>
+                </div>
+                <div className="flex items-center justify-between border-t border-white/15 pt-[2%] text-[clamp(0.38rem,0.8vw,0.58rem)] text-slate-300">
+                  <span>Documento interno da associação</span>
+                  <span className="font-black text-amber-400">OSS!</span>
+                </div>
+              </div>
+            </section>
+            )}
+  
+            {part !== "front" && (
+            <section aria-label="Verso da carteirinha" className={cardClass}>
+              <div className="absolute inset-x-0 top-0 h-[2.5%] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-600" />
+              <div className="flex h-full flex-col p-[5%]">
+                <div className="flex items-start justify-between gap-[4%]">
+                  <div>
+                    <p className="text-[clamp(0.42rem,1vw,0.68rem)] font-black uppercase tracking-[0.2em] text-amber-400">Projeto Social</p>
+                    <h2 className="text-[clamp(0.9rem,2.2vw,1.45rem)] font-black">Mão Com Mão</h2>
+                    <p className="max-w-[22rem] text-[clamp(0.42rem,1vw,0.68rem)] leading-relaxed text-slate-300">Jiu-jítsu, disciplina, respeito e transformação social em Diadema.</p>
+                  </div>
+                  <img src="/images/logo-mao-com-mao-circular-carteirinha.png" alt="" className="h-[clamp(3rem,7vw,4.4rem)] w-[clamp(3rem,7vw,4.4rem)] rounded-full object-cover" />
+                </div>
+                <div className="mt-[4%] grid grid-cols-[1fr_23%] items-center gap-[4%] rounded-xl border border-white/10 bg-white/5 p-[4%]">
+                  <div>
+                    <p className="text-[clamp(0.4rem,0.9vw,0.62rem)] font-black uppercase tracking-widest text-amber-400">Aprovação do Sensei</p>
+                    <div className="mt-[3%] flex h-[clamp(2.4rem,6vw,3.9rem)] items-end justify-center border-b border-white/60 pb-[1%]">
+                      {ink
+                        ? <img src={ink} alt="Assinatura do Sensei" className="h-full w-full object-contain object-bottom" />
+                        : student.sensei_signature_url && <img src={student.sensei_signature_url} alt="Assinatura do Sensei" className="max-h-full max-w-full rounded bg-white object-contain px-1" />}
+                    </div>
+                    <p className="mt-[1.5%] text-center text-[clamp(0.62rem,1.4vw,0.95rem)] font-black">{student.sensei_name || "Joaquim Guedes"}</p>
+                    <p className="text-center text-[clamp(0.4rem,0.9vw,0.62rem)] text-slate-400">Sensei do Projeto Mão Com Mão</p>
+                  </div>
+                  <div className="rounded-lg bg-white p-[7%] text-center shadow-lg">
+                    <img src={qrState === "ok" && qr ? qr : "/images/qr-site-mao-com-mao.png"} alt="QR Code do aluno" className="aspect-square w-full" />
+                    <span className="mt-[3%] block text-[clamp(0.32rem,0.7vw,0.5rem)] font-black uppercase tracking-wider text-slate-900">Acesse o site</span>
+                  </div>
+                </div>
+                <div className="mt-auto flex items-end justify-between gap-3 text-[clamp(0.36rem,0.78vw,0.55rem)]">
+                  <span className="font-bold text-emerald-400">✓ Cadastro aprovado{student.training_time ? ` · Treino ${student.training_time.slice(0, 2)}h` : ""}</span>
+                  <span className="text-right text-slate-400">Av. Casa Grande, 485 — Diadema/SP<br />Ginásio Rômulo Ducan Arante</span>
+                </div>
+              </div>
+            </section>
+            )}
+    </>
+  );
+}
 
 export default function CardView() {
   const [student, setStudent] = useState<Student | null>(null);
@@ -133,71 +209,7 @@ export default function CardView() {
         <p className="screen-only mt-2 text-sm text-slate-400">Na impressão, escolha tamanho real (100%), sem margens. Saem duas páginas: frente e verso, no tamanho de um cartão (85,6 × 54 mm).</p>
 
         <div className="cards-grid mt-8 grid gap-8 lg:grid-cols-2">
-          <section aria-label="Frente da carteirinha" className={cardClass}>
-            <div className="absolute inset-x-0 top-0 h-[2.5%] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-600" />
-            <div className="flex h-full flex-col p-[5%]">
-              <div className="flex items-center gap-[3%]">
-                <img src="/images/logo-mao-com-mao-circular-carteirinha.png" alt="" className="h-[clamp(3.2rem,8vw,4.8rem)] w-[clamp(3.2rem,8vw,4.8rem)] rounded-full border-2 border-amber-400 object-cover" />
-                <div>
-                  <p className="text-[clamp(0.42rem,1vw,0.68rem)] font-black uppercase tracking-[0.2em] text-amber-400">Associação Mão Com Mão</p>
-                  <h2 className="text-[clamp(0.9rem,2.2vw,1.45rem)] font-black leading-tight">JIU-JITSU</h2>
-                  <p className="text-[clamp(0.45rem,1.1vw,0.72rem)] text-slate-300">Carteirinha de aluno</p>
-                </div>
-              </div>
-              <div className="mt-[4%] grid flex-1 grid-cols-[27%_1fr] gap-[5%]">
-                <div className="flex flex-col justify-center gap-[5%] self-center pb-[5%]">
-                  <div className="relative aspect-[3/3.05] overflow-hidden rounded-[12%] border-[3px] border-white/80 bg-slate-300 shadow-lg">
-                    {student.photo_url && <img src={student.photo_url} alt="Foto do aluno" className="absolute inset-0 h-full w-full object-cover" />}
-                  </div>
-                  {beltByKey(student.belt) && <BeltGraphic belt={beltByKey(student.belt)!} stripes={student.belt_stripes} className="mx-auto w-[78%]" />}
-                </div>
-                <dl className="grid content-center grid-cols-2 gap-x-[4%] gap-y-[5%]">
-                  <div className="col-span-2"><dt className="text-[clamp(0.4rem,0.9vw,0.62rem)] font-black uppercase tracking-widest text-amber-400">Aluno</dt><dd className="text-[clamp(0.78rem,1.8vw,1.2rem)] font-black uppercase leading-tight">{student.student_full_name}</dd></div>
-                  <div><dt className="text-[clamp(0.38rem,0.85vw,0.58rem)] font-black uppercase tracking-wider text-amber-400">Matrícula</dt><dd className="text-[clamp(0.5rem,1.1vw,0.75rem)] font-bold">{student.membership_number}</dd></div>
-                  <div><dt className="text-[clamp(0.38rem,0.85vw,0.58rem)] font-black uppercase tracking-wider text-amber-400">Validade</dt><dd className="text-[clamp(0.5rem,1.1vw,0.75rem)] font-bold">{date(student.card_valid_until)}</dd></div>
-                  <div className="col-span-2"><dt className="text-[clamp(0.38rem,0.85vw,0.58rem)] font-black uppercase tracking-wider text-amber-400">Nascimento</dt><dd className="text-[clamp(0.5rem,1.1vw,0.75rem)] font-bold">{date(student.birth_date)}</dd></div>
-                </dl>
-              </div>
-              <div className="flex items-center justify-between border-t border-white/15 pt-[2%] text-[clamp(0.38rem,0.8vw,0.58rem)] text-slate-300">
-                <span>Documento interno da associação</span>
-                <span className="font-black text-amber-400">OSS!</span>
-              </div>
-            </div>
-          </section>
-
-          <section aria-label="Verso da carteirinha" className={cardClass}>
-            <div className="absolute inset-x-0 top-0 h-[2.5%] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-600" />
-            <div className="flex h-full flex-col p-[5%]">
-              <div className="flex items-start justify-between gap-[4%]">
-                <div>
-                  <p className="text-[clamp(0.42rem,1vw,0.68rem)] font-black uppercase tracking-[0.2em] text-amber-400">Projeto Social</p>
-                  <h2 className="text-[clamp(0.9rem,2.2vw,1.45rem)] font-black">Mão Com Mão</h2>
-                  <p className="max-w-[22rem] text-[clamp(0.42rem,1vw,0.68rem)] leading-relaxed text-slate-300">Jiu-jítsu, disciplina, respeito e transformação social em Diadema.</p>
-                </div>
-                <img src="/images/logo-mao-com-mao-circular-carteirinha.png" alt="" className="h-[clamp(3rem,7vw,4.4rem)] w-[clamp(3rem,7vw,4.4rem)] rounded-full object-cover" />
-              </div>
-              <div className="mt-[4%] grid grid-cols-[1fr_23%] items-center gap-[4%] rounded-xl border border-white/10 bg-white/5 p-[4%]">
-                <div>
-                  <p className="text-[clamp(0.4rem,0.9vw,0.62rem)] font-black uppercase tracking-widest text-amber-400">Aprovação do Sensei</p>
-                  <div className="mt-[3%] flex h-[clamp(2.4rem,6vw,3.9rem)] items-end justify-center border-b border-white/60 pb-[1%]">
-                    {ink
-                      ? <img src={ink} alt="Assinatura do Sensei" className="h-full w-full object-contain object-bottom" />
-                      : student.sensei_signature_url && <img src={student.sensei_signature_url} alt="Assinatura do Sensei" className="max-h-full max-w-full rounded bg-white object-contain px-1" />}
-                  </div>
-                  <p className="mt-[1.5%] text-center text-[clamp(0.62rem,1.4vw,0.95rem)] font-black">{student.sensei_name || "Joaquim Guedes"}</p>
-                  <p className="text-center text-[clamp(0.4rem,0.9vw,0.62rem)] text-slate-400">Sensei do Projeto Mão Com Mão</p>
-                </div>
-                <div className="rounded-lg bg-white p-[7%] text-center shadow-lg">
-                  <img src={qrState === "ok" && qr ? qr : "/images/qr-site-mao-com-mao.png"} alt="QR Code do aluno" className="aspect-square w-full" />
-                  <span className="mt-[3%] block text-[clamp(0.32rem,0.7vw,0.5rem)] font-black uppercase tracking-wider text-slate-900">Acesse o site</span>
-                </div>
-              </div>
-              <div className="mt-auto flex items-end justify-between gap-3 text-[clamp(0.36rem,0.78vw,0.55rem)]">
-                <span className="font-bold text-emerald-400">✓ Cadastro aprovado{student.training_time ? ` · Treino ${student.training_time.slice(0, 2)}h` : ""}</span>
-                <span className="text-right text-slate-400">Av. Casa Grande, 485 — Diadema/SP<br />Ginásio Rômulo Ducan Arante</span>
-              </div>
-            </div>
-          </section>
+          <CardPair student={student} qr={qr} qrState={qrState} ink={ink} />
         </div>
       </div>
     </main>

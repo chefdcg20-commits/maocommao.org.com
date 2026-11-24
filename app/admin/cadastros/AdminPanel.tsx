@@ -190,6 +190,7 @@ export default function AdminPanel() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl font-black text-amber-400">Cadastros de alunos</h1>
         <div className="flex gap-2">
+          <a href="/admin/carteirinhas-todas/" className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-black text-slate-950 hover:bg-emerald-300">Carteirinhas de todos (PDF)</a>
           <button onClick={() => load(token)} disabled={busy} className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-bold hover:border-amber-400">{busy ? "Atualizando..." : "Atualizar"}</button>
           <button onClick={() => logout()} className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-bold hover:border-amber-400">Sair</button>
         </div>
