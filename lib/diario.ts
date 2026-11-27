@@ -29,6 +29,38 @@ export type DiarioPost = {
 
 export const diarioPosts: DiarioPost[] = [
   {
+    slug: 'rumo-graduacao-treino-18h-19h-jiu-jitsu-diadema',
+    title: 'Rumo à graduação: turmas das 18h e 19h intensificam os treinos',
+    seoTitle: 'Rumo à graduação: treino de jiu-jítsu infantil em Diadema',
+    excerpt:
+      'O novo vídeo acompanha o treino das turmas das 18h e 19h e traz o convite para a graduação do Projeto Mão Com Mão, marcada para 13 de dezembro, às 10h.',
+    keywords: [
+      'graduação de jiu-jítsu em Diadema',
+      'jiu-jítsu infantil em Diadema',
+      'Projeto Mão Com Mão',
+      'treino de jiu-jítsu para crianças',
+      'graduação Mão Com Mão 13 de dezembro'
+    ],
+    category: 'Vídeo',
+    publishedAt: '2026-11-27',
+    publishedLabel: '27 de novembro de 2026',
+    eventDate: '2026-11-26',
+    eventDateLabel: 'Quinta-feira, 26 de novembro de 2026',
+    image: '/images/diario-rumo-graduacao-treino-18h-19h.jpg',
+    imageAlt: 'Capa do vídeo Rumo à Graduação, com alunos do Projeto Mão Com Mão treinando jiu-jítsu em Diadema',
+    imageOrientation: 'wide',
+    youtubeId: '9ronLrzGDjU',
+    youtubeUrl: 'https://youtu.be/9ronLrzGDjU',
+    videoPublishedAt: '2026-11-27T15:21:33-03:00',
+    paragraphs: [
+      'O Projeto Mão Com Mão já está em clima de graduação. O vídeo mais recente do canal registra o treino de quinta-feira das turmas infantis das 18h e 19h, em uma noite de aprendizado, alegria e preparação no tatame.',
+      'Durante a aula, os alunos receberam orientações importantes sobre estabilizar a posição, passar a guarda e manter a segurança durante os exercícios. Cada detalhe faz parte da evolução técnica e da formação de atletas mais conscientes e disciplinados.',
+      'A graduação será realizada no dia 13 de dezembro, às 10h. Será um momento especial para reconhecer o esforço, a frequência e o crescimento dos alunos, além de celebrar o trabalho construído junto às famílias e à comunidade.',
+      'Mais do que trocar de faixa, a graduação representa compromisso, respeito e perseverança. A preparação já começou, e cada treino aproxima nossos alunos dessa nova etapa dentro do jiu-jítsu.',
+      'Assista ao vídeo, inscreva-se no canal e compartilhe o convite. Contamos com a presença das famílias na graduação do Projeto Mão Com Mão. Oss!'
+    ]
+  },
+  {
     slug: 'futuros-faixas-pretas-dia-de-treino-jiu-jitsu-social',
     title: 'Futuros faixas-pretas: um dia de treino no Projeto Mão Com Mão',
     seoTitle: 'Jiu-jítsu social em Diadema: futuros faixas-pretas em treino',
